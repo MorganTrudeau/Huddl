@@ -7,13 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		4C97677652B24F944C9A1913 /* Pods_Helloquent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45133CF7D71936EB63E66199 /* Pods_Helloquent.framework */; };
+		8664EF09AA2959AEAD427E67 /* Pods_HelloquentTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9903F0212B6980D79CB696E /* Pods_HelloquentTests.framework */; };
+		DF6EE0A8076409BDBC12C4DD /* Pods_HelloquentUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B01B6A9C2126C136662B5F3 /* Pods_HelloquentUITests.framework */; };
 		F90D10291FECDFB90012283B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D10281FECDFB90012283B /* AppDelegate.swift */; };
-		F90D102B1FECDFB90012283B /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D102A1FECDFB90012283B /* ViewController.swift */; };
 		F90D102E1FECDFB90012283B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F90D102C1FECDFB90012283B /* Main.storyboard */; };
 		F90D10301FECDFB90012283B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F90D102F1FECDFB90012283B /* Assets.xcassets */; };
 		F90D10331FECDFB90012283B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F90D10311FECDFB90012283B /* LaunchScreen.storyboard */; };
 		F90D103E1FECDFB90012283B /* HelloquentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D103D1FECDFB90012283B /* HelloquentTests.swift */; };
 		F90D10491FECDFB90012283B /* HelloquentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D10481FECDFB90012283B /* HelloquentUITests.swift */; };
+		F90D105B1FECE33B0012283B /* SigninVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D105A1FECE33B0012283B /* SigninVC.swift */; };
+		F90D105D1FECEA7D0012283B /* ContactsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D105C1FECEA7D0012283B /* ContactsVC.swift */; };
+		F90D105F1FECFAFD0012283B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */; };
+		F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC381FED050700CC3C58 /* AuthProvider.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,9 +40,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0B01B6A9C2126C136662B5F3 /* Pods_HelloquentUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HelloquentUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		376C428D7919B795340245AF /* Pods-Helloquent.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Helloquent.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Helloquent/Pods-Helloquent.debug.xcconfig"; sourceTree = "<group>"; };
+		45133CF7D71936EB63E66199 /* Pods_Helloquent.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Helloquent.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		46D7036EECB8E487EA1CDEC8 /* Pods-Helloquent.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Helloquent.release.xcconfig"; path = "Pods/Target Support Files/Pods-Helloquent/Pods-Helloquent.release.xcconfig"; sourceTree = "<group>"; };
+		7B0D3E3FCF152FF03386900A /* Pods-HelloquentTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HelloquentTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HelloquentTests/Pods-HelloquentTests.debug.xcconfig"; sourceTree = "<group>"; };
+		A785CB56C738B406C7409C1C /* Pods-HelloquentTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HelloquentTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-HelloquentTests/Pods-HelloquentTests.release.xcconfig"; sourceTree = "<group>"; };
+		B61C84F6EE2F8B946612DE92 /* Pods-HelloquentUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HelloquentUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HelloquentUITests/Pods-HelloquentUITests.debug.xcconfig"; sourceTree = "<group>"; };
+		C447E1574BB164EAE91B1231 /* Pods-HelloquentUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HelloquentUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-HelloquentUITests/Pods-HelloquentUITests.release.xcconfig"; sourceTree = "<group>"; };
+		C9903F0212B6980D79CB696E /* Pods_HelloquentTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HelloquentTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F90D10251FECDFB90012283B /* Helloquent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Helloquent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F90D10281FECDFB90012283B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		F90D102A1FECDFB90012283B /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		F90D102D1FECDFB90012283B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		F90D102F1FECDFB90012283B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F90D10321FECDFB90012283B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -47,6 +61,10 @@
 		F90D10441FECDFB90012283B /* HelloquentUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = HelloquentUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F90D10481FECDFB90012283B /* HelloquentUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelloquentUITests.swift; sourceTree = "<group>"; };
 		F90D104A1FECDFB90012283B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F90D105A1FECE33B0012283B /* SigninVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigninVC.swift; sourceTree = "<group>"; };
+		F90D105C1FECEA7D0012283B /* ContactsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsVC.swift; sourceTree = "<group>"; };
+		F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		F973BC381FED050700CC3C58 /* AuthProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProvider.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +72,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4C97677652B24F944C9A1913 /* Pods_Helloquent.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,6 +80,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8664EF09AA2959AEAD427E67 /* Pods_HelloquentTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -68,12 +88,36 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DF6EE0A8076409BDBC12C4DD /* Pods_HelloquentUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A8B0199393EE55B88763BD63 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				376C428D7919B795340245AF /* Pods-Helloquent.debug.xcconfig */,
+				46D7036EECB8E487EA1CDEC8 /* Pods-Helloquent.release.xcconfig */,
+				7B0D3E3FCF152FF03386900A /* Pods-HelloquentTests.debug.xcconfig */,
+				A785CB56C738B406C7409C1C /* Pods-HelloquentTests.release.xcconfig */,
+				B61C84F6EE2F8B946612DE92 /* Pods-HelloquentUITests.debug.xcconfig */,
+				C447E1574BB164EAE91B1231 /* Pods-HelloquentUITests.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		F299D65C296DA368F66065C4 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				45133CF7D71936EB63E66199 /* Pods_Helloquent.framework */,
+				C9903F0212B6980D79CB696E /* Pods_HelloquentTests.framework */,
+				0B01B6A9C2126C136662B5F3 /* Pods_HelloquentUITests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F90D101C1FECDFB90012283B = {
 			isa = PBXGroup;
 			children = (
@@ -81,6 +125,8 @@
 				F90D103C1FECDFB90012283B /* HelloquentTests */,
 				F90D10471FECDFB90012283B /* HelloquentUITests */,
 				F90D10261FECDFB90012283B /* Products */,
+				A8B0199393EE55B88763BD63 /* Pods */,
+				F299D65C296DA368F66065C4 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -97,12 +143,16 @@
 		F90D10271FECDFB90012283B /* Helloquent */ = {
 			isa = PBXGroup;
 			children = (
+				F90D10591FECE2DF0012283B /* Plugins */,
+				F90D10581FECE2D40012283B /* Controller */,
+				F90D10571FECE2CF0012283B /* View */,
+				F90D10561FECE2C90012283B /* Model */,
 				F90D10281FECDFB90012283B /* AppDelegate.swift */,
-				F90D102A1FECDFB90012283B /* ViewController.swift */,
 				F90D102C1FECDFB90012283B /* Main.storyboard */,
 				F90D102F1FECDFB90012283B /* Assets.xcassets */,
 				F90D10311FECDFB90012283B /* LaunchScreen.storyboard */,
 				F90D10341FECDFB90012283B /* Info.plist */,
+				F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */,
 			);
 			path = Helloquent;
 			sourceTree = "<group>";
@@ -125,6 +175,37 @@
 			path = HelloquentUITests;
 			sourceTree = "<group>";
 		};
+		F90D10561FECE2C90012283B /* Model */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
+		F90D10571FECE2CF0012283B /* View */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		F90D10581FECE2D40012283B /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				F90D105A1FECE33B0012283B /* SigninVC.swift */,
+				F90D105C1FECEA7D0012283B /* ContactsVC.swift */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		F90D10591FECE2DF0012283B /* Plugins */ = {
+			isa = PBXGroup;
+			children = (
+				F973BC381FED050700CC3C58 /* AuthProvider.swift */,
+			);
+			path = Plugins;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -132,9 +213,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F90D104D1FECDFB90012283B /* Build configuration list for PBXNativeTarget "Helloquent" */;
 			buildPhases = (
+				A17B7FF3EECEB04776EE6C2C /* [CP] Check Pods Manifest.lock */,
 				F90D10211FECDFB90012283B /* Sources */,
 				F90D10221FECDFB90012283B /* Frameworks */,
 				F90D10231FECDFB90012283B /* Resources */,
+				305C6280B34B32D4666D380F /* [CP] Embed Pods Frameworks */,
+				B7DAFF3DF0D00F6FA42464A8 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -149,9 +233,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F90D10501FECDFB90012283B /* Build configuration list for PBXNativeTarget "HelloquentTests" */;
 			buildPhases = (
+				F900906B9EA8916195C0AEFD /* [CP] Check Pods Manifest.lock */,
 				F90D10351FECDFB90012283B /* Sources */,
 				F90D10361FECDFB90012283B /* Frameworks */,
 				F90D10371FECDFB90012283B /* Resources */,
+				6D1A8BD6DA192871C2FE590A /* [CP] Embed Pods Frameworks */,
+				97ABA8CD083997378262F150 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -167,9 +254,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = F90D10531FECDFB90012283B /* Build configuration list for PBXNativeTarget "HelloquentUITests" */;
 			buildPhases = (
+				5BE5666861A1BF0CB38E3FFB /* [CP] Check Pods Manifest.lock */,
 				F90D10401FECDFB90012283B /* Sources */,
 				F90D10411FECDFB90012283B /* Frameworks */,
 				F90D10421FECDFB90012283B /* Resources */,
+				F8B22B4EA3FDEE46F9E97BBA /* [CP] Embed Pods Frameworks */,
+				BB4624C90AF1DB574DD81859 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -233,6 +323,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F90D10331FECDFB90012283B /* LaunchScreen.storyboard in Resources */,
+				F90D105F1FECFAFD0012283B /* GoogleService-Info.plist in Resources */,
 				F90D10301FECDFB90012283B /* Assets.xcassets in Resources */,
 				F90D102E1FECDFB90012283B /* Main.storyboard in Resources */,
 			);
@@ -254,13 +345,171 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		305C6280B34B32D4666D380F /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${SRCROOT}/Pods/Target Support Files/Pods-Helloquent/Pods-Helloquent-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/GTMSessionFetcher/GTMSessionFetcher.framework",
+				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
+				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
+				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GTMSessionFetcher.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Helloquent/Pods-Helloquent-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		5BE5666861A1BF0CB38E3FFB /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-HelloquentUITests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		6D1A8BD6DA192871C2FE590A /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-HelloquentTests/Pods-HelloquentTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		97ABA8CD083997378262F150 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-HelloquentTests/Pods-HelloquentTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A17B7FF3EECEB04776EE6C2C /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Helloquent-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		B7DAFF3DF0D00F6FA42464A8 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-Helloquent/Pods-Helloquent-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		BB4624C90AF1DB574DD81859 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-HelloquentUITests/Pods-HelloquentUITests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F8B22B4EA3FDEE46F9E97BBA /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-HelloquentUITests/Pods-HelloquentUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F900906B9EA8916195C0AEFD /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-HelloquentTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		F90D10211FECDFB90012283B /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F90D102B1FECDFB90012283B /* ViewController.swift in Sources */,
+				F90D105B1FECE33B0012283B /* SigninVC.swift in Sources */,
 				F90D10291FECDFB90012283B /* AppDelegate.swift in Sources */,
+				F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */,
+				F90D105D1FECEA7D0012283B /* ContactsVC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -424,6 +673,7 @@
 		};
 		F90D104E1FECDFB90012283B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 376C428D7919B795340245AF /* Pods-Helloquent.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -439,6 +689,7 @@
 		};
 		F90D104F1FECDFB90012283B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 46D7036EECB8E487EA1CDEC8 /* Pods-Helloquent.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -454,6 +705,7 @@
 		};
 		F90D10511FECDFB90012283B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 7B0D3E3FCF152FF03386900A /* Pods-HelloquentTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -471,6 +723,7 @@
 		};
 		F90D10521FECDFB90012283B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A785CB56C738B406C7409C1C /* Pods-HelloquentTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -488,6 +741,7 @@
 		};
 		F90D10541FECDFB90012283B /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B61C84F6EE2F8B946612DE92 /* Pods-HelloquentUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -504,6 +758,7 @@
 		};
 		F90D10551FECDFB90012283B /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = C447E1574BB164EAE91B1231 /* Pods-HelloquentUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
