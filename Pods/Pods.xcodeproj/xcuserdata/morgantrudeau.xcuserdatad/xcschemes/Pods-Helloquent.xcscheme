@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "5ECA9BA61D0668D5E94100C92897E7AF"
+               BlueprintIdentifier = "3A26FAAB3BB22EA4D77AE22317C78A9D"
                BuildableName = "Pods_Helloquent.framework"
                BlueprintName = "Pods-Helloquent"
                ReferencedContainer = "container:Pods.xcodeproj">
@@ -47,7 +47,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "5ECA9BA61D0668D5E94100C92897E7AF"
+            BlueprintIdentifier = "3A26FAAB3BB22EA4D77AE22317C78A9D"
             BuildableName = "Pods_Helloquent.framework"
             BlueprintName = "Pods-Helloquent"
             ReferencedContainer = "container:Pods.xcodeproj">

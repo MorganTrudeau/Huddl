@@ -38,6 +38,13 @@ class AuthProvider {
         })
     }
     
+    func isLoggedIn() -> Bool {
+        if Auth.auth().currentUser != nil {
+            return true
+        }
+        return false
+    }
+    
     func signUp(email: String, password: String, loginHandler: LoginHandler?) {
         
         Auth.auth().createUser(withEmail: email, password: password, completion: {(user, error) in
@@ -46,6 +53,7 @@ class AuthProvider {
                 self.handleErrors(error: error! as NSError, loginHandler: loginHandler)
             } else if user?.uid != nil {
                 //Store in db
+                DBProvider.Instance.saveUser(withID: user!.uid, email: email, password: password)
                 
                 //Sign in user
                 self.login(email: email, password: password, loginHandler: loginHandler)
