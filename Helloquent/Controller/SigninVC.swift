@@ -10,7 +10,7 @@ import UIKit
 
 class SigninVC: UIViewController {
     
-    private let CONTACTS_SEGUE: String = "ContactsSegue"
+    private let CHATROOMS_SEGUE: String = "chat_rooms_segue"
     
     @IBOutlet weak var emailTextField: UITextField!
     
@@ -24,7 +24,7 @@ class SigninVC: UIViewController {
     
     override func viewDidAppear(_ animated: Bool) {
         if AuthProvider.Instance.isLoggedIn() {
-            self.performSegue(withIdentifier: self.CONTACTS_SEGUE, sender: nil)
+            self.performSegue(withIdentifier: self.CHATROOMS_SEGUE, sender: nil)
         }
     }
     
@@ -37,7 +37,7 @@ class SigninVC: UIViewController {
                     self.alertUser(title: "Problem With Authentication", message: message!)
                 } else {
                     print("Login Successful")
-                    self.performSegue(withIdentifier: self.CONTACTS_SEGUE, sender: nil)
+                    self.performSegue(withIdentifier: self.CHATROOMS_SEGUE, sender: nil)
                 }
             })
         } else {
@@ -56,7 +56,7 @@ class SigninVC: UIViewController {
                     self.alertUser(title: "Problem Creating User", message: message!)
                 } else {
                     print("Successfully created user")
-                    self.performSegue(withIdentifier: self.CONTACTS_SEGUE, sender: nil)
+                    self.performSegue(withIdentifier: self.CHATROOMS_SEGUE, sender: nil)
                 }
             })
         } else {
@@ -64,7 +64,7 @@ class SigninVC: UIViewController {
         }
     }
     
-    private func alertUser(title: String, message: String) {
+    func alertUser(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
         alert.addAction(ok)

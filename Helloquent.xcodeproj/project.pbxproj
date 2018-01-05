@@ -25,6 +25,10 @@
 		F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3C1FEDA7B000CC3C58 /* Constants.swift */; };
 		F973BC3F1FEDB47E00CC3C58 /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3E1FEDB47E00CC3C58 /* Contact.swift */; };
 		F973BC411FEDDA8700CC3C58 /* ChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC401FEDDA8700CC3C58 /* ChatVC.swift */; };
+		F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */; };
+		F9E264D41FFD4EED00605CA7 /* ChatRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D31FFD4EED00605CA7 /* ChatRoomsVC.swift */; };
+		F9E264DA1FFDA35C00605CA7 /* ChatRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D91FFDA35C00605CA7 /* ChatRoom.swift */; };
+		F9E264DE1FFEDE5C00605CA7 /* PersonalChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264DD1FFEDE5C00605CA7 /* PersonalChatVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +79,11 @@
 		F973BC3C1FEDA7B000CC3C58 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		F973BC3E1FEDB47E00CC3C58 /* Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contact.swift; sourceTree = "<group>"; };
 		F973BC401FEDDA8700CC3C58 /* ChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatVC.swift; sourceTree = "<group>"; };
+		F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesHandler.swift; sourceTree = "<group>"; };
+		F9E264D31FFD4EED00605CA7 /* ChatRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRoomsVC.swift; sourceTree = "<group>"; };
+		F9E264D51FFD639100605CA7 /* Helloquent-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Helloquent-Bridging-Header.h"; sourceTree = "<group>"; };
+		F9E264D91FFDA35C00605CA7 /* ChatRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRoom.swift; sourceTree = "<group>"; };
+		F9E264DD1FFEDE5C00605CA7 /* PersonalChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalChatVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -157,13 +166,13 @@
 				F93364D91FEDE8BF002A3718 /* avatar.gif */,
 				F90D10591FECE2DF0012283B /* Plugins */,
 				F90D10581FECE2D40012283B /* Controller */,
-				F90D10571FECE2CF0012283B /* View */,
 				F90D10561FECE2C90012283B /* Model */,
 				F90D10281FECDFB90012283B /* AppDelegate.swift */,
 				F90D102C1FECDFB90012283B /* Main.storyboard */,
 				F90D10311FECDFB90012283B /* LaunchScreen.storyboard */,
 				F90D10341FECDFB90012283B /* Info.plist */,
 				F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */,
+				F9E264D51FFD639100605CA7 /* Helloquent-Bridging-Header.h */,
 			);
 			path = Helloquent;
 			sourceTree = "<group>";
@@ -191,15 +200,9 @@
 			children = (
 				F973BC3C1FEDA7B000CC3C58 /* Constants.swift */,
 				F973BC3E1FEDB47E00CC3C58 /* Contact.swift */,
+				F9E264D91FFDA35C00605CA7 /* ChatRoom.swift */,
 			);
 			path = Model;
-			sourceTree = "<group>";
-		};
-		F90D10571FECE2CF0012283B /* View */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = View;
 			sourceTree = "<group>";
 		};
 		F90D10581FECE2D40012283B /* Controller */ = {
@@ -207,7 +210,9 @@
 			children = (
 				F90D105A1FECE33B0012283B /* SigninVC.swift */,
 				F90D105C1FECEA7D0012283B /* ContactsVC.swift */,
+				F9E264D31FFD4EED00605CA7 /* ChatRoomsVC.swift */,
 				F973BC401FEDDA8700CC3C58 /* ChatVC.swift */,
+				F9E264DD1FFEDE5C00605CA7 /* PersonalChatVC.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -217,6 +222,7 @@
 			children = (
 				F973BC381FED050700CC3C58 /* AuthProvider.swift */,
 				F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */,
+				F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -298,6 +304,7 @@
 				TargetAttributes = {
 					F90D10241FECDFB90012283B = {
 						CreatedOnToolsVersion = 9.2;
+						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
 					};
 					F90D10381FECDFB90012283B = {
@@ -526,9 +533,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F9E264DE1FFEDE5C00605CA7 /* PersonalChatVC.swift in Sources */,
+				F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */,
+				F9E264D41FFD4EED00605CA7 /* ChatRoomsVC.swift in Sources */,
 				F973BC411FEDDA8700CC3C58 /* ChatVC.swift in Sources */,
 				F90D105B1FECE33B0012283B /* SigninVC.swift in Sources */,
 				F90D10291FECDFB90012283B /* AppDelegate.swift in Sources */,
+				F9E264DA1FFDA35C00605CA7 /* ChatRoom.swift in Sources */,
 				F973BC3B1FEDA66800CC3C58 /* DBProvider.swift in Sources */,
 				F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */,
 				F90D105D1FECEA7D0012283B /* ContactsVC.swift in Sources */,
@@ -700,12 +711,19 @@
 			baseConfigurationReference = 376C428D7919B795340245AF /* Pods-Helloquent.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4G2FEEY64T;
 				INFOPLIST_FILE = Helloquent/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.morgantrudeau.Helloquent;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_PRECOMPILE_BRIDGING_HEADER = NO;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -716,12 +734,18 @@
 			baseConfigurationReference = 46D7036EECB8E487EA1CDEC8 /* Pods-Helloquent.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4G2FEEY64T;
 				INFOPLIST_FILE = Helloquent/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.morgantrudeau.Helloquent;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_PRECOMPILE_BRIDGING_HEADER = NO;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

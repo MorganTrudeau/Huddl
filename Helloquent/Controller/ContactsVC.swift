@@ -8,23 +8,25 @@
 
 import UIKit
 
-class ContactsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, FetchData {
+class ContactsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, FetchContactData {
     
-    private let CELL_ID = "Cell"
-    private let CHAT_SEGUE = "ChatSegue"
+    private let CELL_ID = "contact_cell"
+    private let CHAT_SEGUE = "personal_chat_segue"
     
     private var contacts = [Contact]()
+    private var index: Int?
     
     @IBOutlet weak var contactsTableView: UITableView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        DBProvider.Instance.delegate = self
+        DBProvider.Instance.delegateContacts = self
         DBProvider.Instance.getContacts()
     }
     
-    func dataReceived(contacts: [Contact]) {
+    func contactDataReceived(contacts: [Contact]) {
         self.contacts = contacts
+        
         contactsTableView.reloadData()
     }
 
@@ -44,13 +46,17 @@ class ContactsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, 
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        index = indexPath.row
         performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
     }
     
-    @IBAction func logout(_ sender: Any) {
-        
-        if AuthProvider.Instance.logout() {
-            dismiss(animated: true, completion: nil)
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == CHAT_SEGUE {
+            if let vc = segue.destination as? PersonalChatVC {
+                vc.selectedContactID = contacts[index!].id
+                vc.selectedContactName = contacts[index!].name
+                DBProvider.Instance.selectedContactID = contacts[index!].id
+            }
         }
     }
     

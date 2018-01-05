@@ -1,5 +1,5 @@
 //
-//  ChatVC.swift
+//  PersonalChatVC.swift
 //  Helloquent
 //
 //  Created by Morgan Trudeau on 2017-12-22.
@@ -11,33 +11,33 @@ import JSQMessagesViewController
 import MobileCoreServices
 import AVKit
 
-class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class PersonalChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     
     private var messages = [JSQMessage]()
     
-    var currentChatRoomId: String?
-    var currentChatRoomName: String?
+    var selectedContactID: String?
+    var selectedContactName: String?
     
     let picker = UIImagePickerController()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.senderId = AuthProvider.Instance.userID()
         self.senderDisplayName = AuthProvider.Instance.currentUserName()
         
-        self.navigationItem.title = currentChatRoomName;
-
+        self.navigationItem.title = selectedContactName;
+        
         MessagesHandler.Instance.delegate = self
-        MessagesHandler.Instance.observeChatRoomMessges()
+        MessagesHandler.Instance.observePersonalChatMessges()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
-        MessagesHandler.Instance.removeChatRoomObservers()
+        MessagesHandler.Instance.removePersonalChatObservers()
     }
     
     // Collection view functions
-        
+    
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
         return JSQMessagesAvatarImageFactory.avatarImage(with: UIImage(named: "avatar.gif"), diameter: 30)
     }
@@ -77,9 +77,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
                 return nil
             }
             return NSAttributedString(string: senderDisplayName)
-            
         }
-        
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat
@@ -90,15 +88,13 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         if message.senderId == senderId {
             return 0.0
         } else {
-            
             return 17.0
-            
         }
     }
-
+    
     // End collection view functions
-
-
+    
+    
     // Sending buttons functions
     
     override func didPressAccessoryButton(_ sender: UIButton!) {
@@ -128,8 +124,8 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     }
     
     // End picker view functions
-
-
+    
+    
     // Delegation functions
     
     func messageReceived(senderID: String, senderName: String, text: String) {
@@ -140,7 +136,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     // End Delegation functions
     
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        MessagesHandler.Instance.sendChatRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, chatRoomName: currentChatRoomName!)
+        MessagesHandler.Instance.sendPersonalChatMessage(senderID: senderId, senderName: senderDisplayName, text: text, selectedContactID: selectedContactID!)
         
         // Removes text from text field
         finishSendingMessage()
@@ -148,7 +144,6 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     
     
-
     
     
     
@@ -162,5 +157,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     
     
-
+    
+    
 }
+

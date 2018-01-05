@@ -12,6 +12,7 @@ class Constants {
     
     // DBProvider
     static let CONTACTS = "Contacts"
+    static let CHAT_ROOMS = "Chat_Rooms"
     static let MESSAGES = "Messages"
     static let MEDIA_MESSAGES = "Media_Messages"
     static let IMAGE_STORAGE = "Image_Storage"
@@ -20,11 +21,12 @@ class Constants {
     static let EMAIL = "email"
     static let PASSWORD = "password"
     static let DATA = "data"
+    static let ROOM_NAME = "room_name"
+    static let ROOM_ID = "room_id"
     
     // Messages
     static let TEXT = "text"
     static let SENDER_ID = "sender_id"
     static let SENDER_NAME = "sender_name"
     static let URL = "url"
-    
 }

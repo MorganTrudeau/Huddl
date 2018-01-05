@@ -45,8 +45,15 @@ class AuthProvider {
         return false
     }
     
+    func userID() -> String {
+        return Auth.auth().currentUser!.uid
+    }
+    
+    func currentUserName() -> String {
+        return (Auth.auth().currentUser?.email)!
+    }
+    
     func signUp(email: String, password: String, loginHandler: LoginHandler?) {
-        
         Auth.auth().createUser(withEmail: email, password: password, completion: {(user, error) in
             
             if error != nil {
