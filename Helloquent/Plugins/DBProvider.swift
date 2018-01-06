@@ -19,6 +19,10 @@ protocol FetchChatRoomData: class {
     func chatRoomDataReceived(chatRooms: [ChatRoom])
 }
 
+protocol FetchColorData: class {
+    func colorDataReceived(color: String)
+}
+
 protocol SavedChatRoom: class {
     func chatRoomSaved(success: Bool)
 }
@@ -32,6 +36,7 @@ class DBProvider {
     
     weak var delegateContacts: FetchContactData?
     weak var delegateChatRooms: FetchChatRoomData?
+    weak var delegateColor: FetchColorData?
     weak var delegateSaveChatRoom: SavedChatRoom?
     
     var currentRoomName: String?
@@ -77,8 +82,8 @@ class DBProvider {
         return storageRef.child(Constants.VIDEO_STORAGE)
     }
     
-    func saveUser(withID: String, email: String, password: String) {
-        let data: Dictionary<String, Any> = [Constants.EMAIL: email, Constants.PASSWORD: password]
+    func saveUser(withID: String, email: String, password: String, color: String) {
+        let data: Dictionary<String, Any> = [Constants.EMAIL: email, Constants.PASSWORD: password, Constants.COLOR: color]
         contactsRef.child(withID).setValue(data)
     }
     
@@ -99,7 +104,7 @@ class DBProvider {
                             if let email = contactData[Constants.EMAIL] as? String {
                                 
                                 let id = key as! String
-                                let newContact = Contact(id: id, name: email)
+                                let newContact = Contact(id: id, name: email, color: nil)
                                 contacts.append(newContact)
                             }
                         }
@@ -110,9 +115,21 @@ class DBProvider {
         }
     }
     
+    func currentUserColor() {
+        var currentUserColor = ""
+        contactsRef.child(AuthProvider.Instance.userID()).observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+            if let data = snapshot.value as? NSDictionary {
+                if let color = data[Constants.COLOR] as? String {
+                    currentUserColor = color
+                }
+            }
+            self.delegateColor?.colorDataReceived(color: currentUserColor)
+        })
+    }
+    
     func saveChatRoom(name: String, password: String?) {
         var success = false
-        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.PASSWORD: password ?? ""]
+        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0]
         chatRoomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             if !snapshot.hasChild(name) {
                 self.chatRoomsRef.child(name).setValue(data)
@@ -135,9 +152,15 @@ class DBProvider {
                     if let chatRoomData = value as? NSDictionary {
                         
                         if let roomName = chatRoomData[Constants.ROOM_NAME] as? String {
-                            let id = key as! String
-                            let newRoom = ChatRoom(id: id, name: roomName)
-                            chatRooms.append(newRoom)
+                            
+                            if let password = chatRoomData[Constants.PASSWORD] as? String {
+                                
+                                if let activeUsers = chatRoomData[Constants.ACTIVE_USERS] as? Int {
+                                    let id = key as! String
+                                    let newRoom = ChatRoom(id: id, name: roomName, password: password, activeUsers: activeUsers)
+                                    chatRooms.append(newRoom)
+                                }
+                            }
                         }
                     }
                 }
@@ -146,6 +169,29 @@ class DBProvider {
         }
     }
     
+    func increaseActiveUsers() {
+        chatRoomsRef.child(currentRoomName!).runTransactionBlock({(data: MutableData) in
+            if var chatRoom = data.value as? [String: Any] {
+                var activeUsers = chatRoom[Constants.ACTIVE_USERS] as? Int
+                activeUsers = activeUsers! + 1
+                chatRoom[Constants.ACTIVE_USERS] = activeUsers
+                data.value = chatRoom
+            }
+            return TransactionResult.success(withValue: data)
+        })
+    }
     
-
+    func decreaseActiveUsers() {
+        chatRoomsRef.child(currentRoomName!).runTransactionBlock({(data: MutableData) in
+            if var chatRoom = data.value as? [String: Any] {
+                var activeUsers = chatRoom[Constants.ACTIVE_USERS] as? Int
+                activeUsers = activeUsers! - 1
+                chatRoom[Constants.ACTIVE_USERS] = activeUsers
+                data.value = chatRoom
+            }
+            return TransactionResult.success(withValue: data)
+        })
+    }
+    
+    
 }

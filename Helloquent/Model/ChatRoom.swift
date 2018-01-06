@@ -12,10 +12,14 @@ class ChatRoom {
     
     private var _name = ""
     private var _id = ""
+    private var _password = ""
+    private var _activeUsers = 0
     
-    init(id: String, name: String) {
+    init(id: String, name: String, password: String, activeUsers: Int) {
         _id = id
         _name = name
+        _password = password
+        _activeUsers = activeUsers
     }
     
     var name: String {
@@ -26,4 +30,11 @@ class ChatRoom {
         return _id
     }
     
+    var password: String {
+        return _password
+    }
+    
+    var activeUsers: Int {
+        return _activeUsers
+    }
 }

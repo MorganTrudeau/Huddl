@@ -11,17 +11,21 @@ import JSQMessagesViewController
 import MobileCoreServices
 import AVKit
 
-class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FetchColorData {
     
     private var messages = [JSQMessage]()
+    private var messageColors = [String]()
     
     var currentChatRoomId: String?
     var currentChatRoomName: String?
+    var currentUserColor: String?
     
     let picker = UIImagePickerController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        DBProvider.Instance.delegateColor = self
+        DBProvider.Instance.currentUserColor()
         self.senderId = AuthProvider.Instance.userID()
         self.senderDisplayName = AuthProvider.Instance.currentUserName()
         
@@ -29,11 +33,15 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
 
         MessagesHandler.Instance.delegate = self
         MessagesHandler.Instance.observeChatRoomMessges()
+        
+        self.collectionView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+        self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
         MessagesHandler.Instance.removeChatRoomObservers()
+        //DBProvider.Instance.decreaseActiveUsers()
     }
     
     // Collection view functions
@@ -45,10 +53,11 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
         let bubbleFactory = JSQMessagesBubbleImageFactory()
         let message = messages[indexPath.item]
+        let messageColor = ColorHandler.Instance.convertToUIColor(colorString: messageColors[indexPath.row])
         if message.senderId == AuthProvider.Instance.userID() {
-            return bubbleFactory?.outgoingMessagesBubbleImage(with: UIColor.blue)
+            return bubbleFactory?.outgoingMessagesBubbleImage(with: messageColor)
         } else {
-            return bubbleFactory?.incomingMessagesBubbleImage(with: UIColor.red)
+            return bubbleFactory?.incomingMessagesBubbleImage(with: messageColor)
         }
     }
     
@@ -132,18 +141,23 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
 
     // Delegation functions
     
-    func messageReceived(senderID: String, senderName: String, text: String) {
+    func messageReceived(senderID: String, senderName: String, text: String, color: String) {
         messages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
+        messageColors.append(color)
         collectionView.reloadData()
     }
     
     // End Delegation functions
     
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        MessagesHandler.Instance.sendChatRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, chatRoomName: currentChatRoomName!)
+        MessagesHandler.Instance.sendChatRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, chatRoomName: currentChatRoomName!, color: currentUserColor!)
         
         // Removes text from text field
         finishSendingMessage()
+    }
+    
+    func colorDataReceived(color: String) {
+        currentUserColor = color
     }
     
     

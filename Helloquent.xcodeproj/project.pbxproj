@@ -29,6 +29,7 @@
 		F9E264D41FFD4EED00605CA7 /* ChatRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D31FFD4EED00605CA7 /* ChatRoomsVC.swift */; };
 		F9E264DA1FFDA35C00605CA7 /* ChatRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D91FFDA35C00605CA7 /* ChatRoom.swift */; };
 		F9E264DE1FFEDE5C00605CA7 /* PersonalChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264DD1FFEDE5C00605CA7 /* PersonalChatVC.swift */; };
+		F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EA8BEC20008A6400A98421 /* ColorHandler.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,9 +82,9 @@
 		F973BC401FEDDA8700CC3C58 /* ChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatVC.swift; sourceTree = "<group>"; };
 		F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesHandler.swift; sourceTree = "<group>"; };
 		F9E264D31FFD4EED00605CA7 /* ChatRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRoomsVC.swift; sourceTree = "<group>"; };
-		F9E264D51FFD639100605CA7 /* Helloquent-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Helloquent-Bridging-Header.h"; sourceTree = "<group>"; };
 		F9E264D91FFDA35C00605CA7 /* ChatRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRoom.swift; sourceTree = "<group>"; };
 		F9E264DD1FFEDE5C00605CA7 /* PersonalChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalChatVC.swift; sourceTree = "<group>"; };
+		F9EA8BEC20008A6400A98421 /* ColorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHandler.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -172,7 +173,6 @@
 				F90D10311FECDFB90012283B /* LaunchScreen.storyboard */,
 				F90D10341FECDFB90012283B /* Info.plist */,
 				F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */,
-				F9E264D51FFD639100605CA7 /* Helloquent-Bridging-Header.h */,
 			);
 			path = Helloquent;
 			sourceTree = "<group>";
@@ -223,6 +223,7 @@
 				F973BC381FED050700CC3C58 /* AuthProvider.swift */,
 				F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */,
 				F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */,
+				F9EA8BEC20008A6400A98421 /* ColorHandler.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -534,6 +535,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F9E264DE1FFEDE5C00605CA7 /* PersonalChatVC.swift in Sources */,
+				F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */,
 				F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */,
 				F9E264D41FFD4EED00605CA7 /* ChatRoomsVC.swift in Sources */,
 				F973BC411FEDDA8700CC3C58 /* ChatVC.swift in Sources */,
@@ -716,7 +718,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4G2FEEY64T;
 				INFOPLIST_FILE = Helloquent/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.morgantrudeau.Helloquent;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -739,7 +741,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4G2FEEY64T;
 				INFOPLIST_FILE = Helloquent/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.morgantrudeau.Helloquent;
 				PRODUCT_NAME = "$(TARGET_NAME)";

@@ -7,15 +7,18 @@
 //
 
 import Foundation
+import UIKit
 
 class Contact {
     
     private var _name = ""
     private var _id = ""
+    private var _color: UIColor?
     
-    init(id: String, name: String) {
+    init(id: String, name: String, color: UIColor?) {
         _id = id
         _name = name
+        _color = color
     }
     
     var name: String {
@@ -24,6 +27,10 @@ class Contact {
     
     var id: String {
         return _id
+    }
+    
+    var color: UIColor? {
+        return _color
     }
     
 }

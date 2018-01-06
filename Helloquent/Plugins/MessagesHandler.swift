@@ -9,9 +9,10 @@
 import Foundation
 import FirebaseDatabase
 import FirebaseStorage
+import UIKit
 
 protocol MessageReceivedDelegate: class {
-    func messageReceived(senderID: String, senderName: String, text: String)
+    func messageReceived(senderID: String, senderName: String, text: String, color: String)
 }
 
 class MessagesHandler {
@@ -24,8 +25,8 @@ class MessagesHandler {
         return _instance
     }
     
-    func sendChatRoomMessage(senderID: String, senderName: String, text: String, chatRoomName: String) {
-        let data: Dictionary<String, Any> = [Constants.SENDER_ID: senderID, Constants.SENDER_NAME: senderName, Constants.TEXT: text]
+    func sendChatRoomMessage(senderID: String, senderName: String, text: String, chatRoomName: String, color: String) {
+        let data: Dictionary<String, Any> = [Constants.SENDER_ID: senderID, Constants.SENDER_NAME: senderName, Constants.TEXT: text, Constants.COLOR: color]
         DBProvider.Instance.currentRoomName = chatRoomName
     DBProvider.Instance.chatRoomMessagesRef.childByAutoId().setValue(data)
         
@@ -37,7 +38,9 @@ class MessagesHandler {
                 if let senderID = data[Constants.SENDER_ID] as? String {
                     if let senderName = data[Constants.SENDER_NAME] as? String {
                         if let text = data[Constants.TEXT] as? String {
-                            self.delegate?.messageReceived(senderID: senderID, senderName:senderName, text: text)
+                            if let color = data[Constants.COLOR] as? String {
+                                self.delegate?.messageReceived(senderID: senderID, senderName:senderName, text: text, color: color)
+                            }
                         }
                     }
                 }
@@ -49,30 +52,30 @@ class MessagesHandler {
         DBProvider.Instance.chatRoomMessagesRef.removeAllObservers()
     }
     
-    func sendPersonalChatMessage(senderID: String, senderName: String, text: String, selectedContactID: String) {
-        let data: Dictionary<String, Any> = [Constants.SENDER_ID: senderID, Constants.SENDER_NAME: senderName, Constants.TEXT: text]
-        DBProvider.Instance.selectedContactID = selectedContactID
-        DBProvider.Instance.personalChatMessagesRef.childByAutoId().setValue(data)
-        
-    }
+//    func sendPersonalChatMessage(senderID: String, senderName: String, text: String, selectedContactID: String) {
+//        let data: Dictionary<String, Any> = [Constants.SENDER_ID: senderID, Constants.SENDER_NAME: senderName, Constants.TEXT: text]
+//        DBProvider.Instance.selectedContactID = selectedContactID
+//        DBProvider.Instance.personalChatMessagesRef.childByAutoId().setValue(data)
+//        
+//    }
     
-    func observePersonalChatMessges() {
-        DBProvider.Instance.personalChatMessagesRef.observe(DataEventType.childAdded) { (snapshot: DataSnapshot) in
-            if let data = snapshot.value as? NSDictionary {
-                if let senderID = data[Constants.SENDER_ID] as? String {
-                    if let senderName = data[Constants.SENDER_NAME] as? String {
-                        if let text = data[Constants.TEXT] as? String {
-                            self.delegate?.messageReceived(senderID: senderID, senderName:senderName, text: text)
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
-    func removePersonalChatObservers() {
-        DBProvider.Instance.personalChatMessagesRef.removeAllObservers()
-    }
+//    func observePersonalChatMessges() {
+//        DBProvider.Instance.personalChatMessagesRef.observe(DataEventType.childAdded) { (snapshot: DataSnapshot) in
+//            if let data = snapshot.value as? NSDictionary {
+//                if let senderID = data[Constants.SENDER_ID] as? String {
+//                    if let senderName = data[Constants.SENDER_NAME] as? String {
+//                        if let text = data[Constants.TEXT] as? String {
+//                            self.delegate?.messageReceived(senderID: senderID, senderName:senderName, text: text)
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
+//
+//    func removePersonalChatObservers() {
+//        DBProvider.Instance.personalChatMessagesRef.removeAllObservers()
+//    }
     
     
     

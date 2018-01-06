@@ -60,7 +60,8 @@ class AuthProvider {
                 self.handleErrors(error: error! as NSError, loginHandler: loginHandler)
             } else if user?.uid != nil {
                 //Store in db
-                DBProvider.Instance.saveUser(withID: user!.uid, email: email, password: password)
+                let userColor = ColorHandler.Instance.userColor()
+                DBProvider.Instance.saveUser(withID: user!.uid, email: email, password: password, color: userColor)
                 
                 //Sign in user
                 self.login(email: email, password: password, loginHandler: loginHandler)
