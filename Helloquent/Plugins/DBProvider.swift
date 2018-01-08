@@ -27,6 +27,14 @@ protocol SavedChatRoom: class {
     func chatRoomSaved(success: Bool)
 }
 
+protocol ActiveUsersDecreased: class {
+    func activeUsersDecreased()
+}
+
+protocol UserEnteredRoom: class {
+    func userEnteredRoom()
+}
+
 class DBProvider {
     
     private static let _instance = DBProvider()
@@ -38,6 +46,8 @@ class DBProvider {
     weak var delegateChatRooms: FetchChatRoomData?
     weak var delegateColor: FetchColorData?
     weak var delegateSaveChatRoom: SavedChatRoom?
+    weak var delegateActiveUsersDecreased: ActiveUsersDecreased?
+    weak var delegateUserEnteredRoom: UserEnteredRoom?
     
     var currentRoomName: String?
     var selectedContactID: String?
@@ -169,6 +179,12 @@ class DBProvider {
         }
     }
     
+    func observeChatRooms() {
+        chatRoomsRef.observe(DataEventType.value) { (snapshot: DataSnapshot) in
+            self.delegateUserEnteredRoom?.userEnteredRoom()
+        }
+    }
+    
     func increaseActiveUsers() {
         chatRoomsRef.child(currentRoomName!).runTransactionBlock({(data: MutableData) in
             if var chatRoom = data.value as? [String: Any] {
@@ -181,6 +197,23 @@ class DBProvider {
         })
     }
     
+    func decreaseActiveUsersWithCallback() {
+        chatRoomsRef.child(currentRoomName!).runTransactionBlock({(data: MutableData) in
+            if var chatRoom = data.value as? [String: Any] {
+                var activeUsers = chatRoom[Constants.ACTIVE_USERS] as? Int
+                activeUsers = activeUsers! - 1
+                chatRoom[Constants.ACTIVE_USERS] = activeUsers
+                data.value = chatRoom
+            }
+            return TransactionResult.success(withValue: data)}
+            
+            , andCompletionBlock: {(error: Error?, success: Bool, snapshot: DataSnapshot?) in
+                if success {
+                    self.delegateActiveUsersDecreased?.activeUsersDecreased()
+                }
+                })
+    }
+    
     func decreaseActiveUsers() {
         chatRoomsRef.child(currentRoomName!).runTransactionBlock({(data: MutableData) in
             if var chatRoom = data.value as? [String: Any] {
@@ -189,8 +222,7 @@ class DBProvider {
                 chatRoom[Constants.ACTIVE_USERS] = activeUsers
                 data.value = chatRoom
             }
-            return TransactionResult.success(withValue: data)
-        })
+            return TransactionResult.success(withValue: data)})
     }
     
     

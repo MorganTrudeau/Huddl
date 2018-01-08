@@ -10,11 +10,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Helloquent/Controller/ChatVC.swift"
-            timestampString = "536915349.406667"
+            timestampString = "537070877.002198"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "160"
-            endingLineNumber = "160"
+            startingLineNumber = "170"
+            endingLineNumber = "170"
             landmarkName = "colorDataReceived(color:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Helloquent/Controller/ChatVC.swift"
-            timestampString = "536915349.407015"
+            timestampString = "537070877.002291"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "153"
-            endingLineNumber = "153"
+            startingLineNumber = "163"
+            endingLineNumber = "163"
             landmarkName = "didPressSend(_:withMessageText:senderId:senderDisplayName:date:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -42,11 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Helloquent/Plugins/DBProvider.swift"
-            timestampString = "536915349.4073139"
+            timestampString = "537070877.0023659"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "119"
-            endingLineNumber = "119"
+            startingLineNumber = "129"
+            endingLineNumber = "129"
             landmarkName = "currentUserColor()"
             landmarkType = "7">
             <Locations>
@@ -90,11 +90,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Helloquent/Plugins/DBProvider.swift"
-            timestampString = "536915349.407373"
+            timestampString = "537070877.002887"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "120"
-            endingLineNumber = "120"
+            startingLineNumber = "130"
+            endingLineNumber = "130"
             landmarkName = "currentUserColor()"
             landmarkType = "7">
             <Locations>
@@ -138,12 +138,28 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Helloquent/Controller/ChatVC.swift"
-            timestampString = "536915349.407424"
+            timestampString = "537070877.003302"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "152"
-            endingLineNumber = "152"
+            startingLineNumber = "162"
+            endingLineNumber = "162"
             landmarkName = "didPressSend(_:withMessageText:senderId:senderDisplayName:date:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Helloquent/Controller/ChatVC.swift"
+            timestampString = "537070877.003396"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "57"
+            endingLineNumber = "57"
+            landmarkName = "handleResignActive()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

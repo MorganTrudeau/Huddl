@@ -8,16 +8,14 @@
 
 import UIKit
 
-class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, FetchChatRoomData, SavedChatRoom {
+class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, FetchChatRoomData, SavedChatRoom, UserEnteredRoom {
     
     @IBOutlet weak var addRoomButton: UIBarButtonItem!
-
     @IBOutlet weak var chatRoomTableView: UITableView!
-    
     @IBOutlet weak var chatRoomsToolbar: UIToolbar!
+    @IBOutlet weak var logoutButton: UIBarButtonItem!
     
     var chatRooms = [ChatRoom]()
-    
     var index: Int?
     
     let CHAT_SEGUE = "chat_room_segue"
@@ -27,8 +25,15 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         super.viewDidLoad()
         DBProvider.Instance.delegateChatRooms = self
         DBProvider.Instance.delegateSaveChatRoom = self
+        DBProvider.Instance.delegateUserEnteredRoom = self
+        DBProvider.Instance.observeChatRooms()
         
         setUpUI()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+        DBProvider.Instance.getChatRooms()
     }
     
     func setUpUI() {
@@ -36,11 +41,6 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
         self.chatRoomsToolbar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewDidAppear(true)
-        DBProvider.Instance.getChatRooms()
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
@@ -61,19 +61,18 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: CELL_ID, for: indexPath)
+        let cell = UITableViewCell(style: UITableViewCellStyle.subtitle,
+                                   reuseIdentifier: CELL_ID)
         cell.textLabel?.text = chatRooms[indexPath.row].name
         cell.textLabel?.textColor = UIColor.white
-        cell.detailTextLabel?.text = String(chatRooms[indexPath.row].activeUsers) + "Active Users"
+        cell.detailTextLabel?.text = String(chatRooms[indexPath.row].activeUsers) + " Active Users"
         cell.detailTextLabel?.textColor = UIColor.white
-        
         let backgroundView = UIView()
         backgroundView.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
         cell.selectedBackgroundView = backgroundView
         return cell
     }
-    
+
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         index = indexPath.row
         let requiredPassword = chatRooms[index!].password
@@ -90,7 +89,6 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                 vc.currentChatRoomId = chatRooms[index!].id
                 vc.currentChatRoomName = chatRooms[index!].name
                 DBProvider.Instance.currentRoomName = chatRooms[index!].name
-                DBProvider.Instance.increaseActiveUsers()
             }
         }
     }
@@ -152,6 +150,7 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     self.performSegue(withIdentifier: self.CHAT_SEGUE, sender: nil)
                 } else {
                     self.alertUser(title: "Incorrect Password", message: "Please try again")
+                    self.chatRoomTableView.reloadData()
                 }
             }
         })
@@ -163,6 +162,9 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         present(alert, animated: true, completion: nil)
     }
     
+    func userEnteredRoom() {
+        chatRoomTableView.reloadData()
+    }
     
     
     

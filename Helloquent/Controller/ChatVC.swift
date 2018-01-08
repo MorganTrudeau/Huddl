@@ -11,7 +11,7 @@ import JSQMessagesViewController
 import MobileCoreServices
 import AVKit
 
-class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FetchColorData {
+class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FetchColorData, ActiveUsersDecreased {
     
     private var messages = [JSQMessage]()
     private var messageColors = [String]()
@@ -21,28 +21,46 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     var currentUserColor: String?
     
     let picker = UIImagePickerController()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleResignActive), name: NSNotification.Name(rawValue: "ResignActiveNotification"), object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleBecomeActive), name: NSNotification.Name(rawValue: "BecomeActiveNotification"), object: nil)
+        
         DBProvider.Instance.delegateColor = self
+        DBProvider.Instance.delegateActiveUsersDecreased = self
         DBProvider.Instance.currentUserColor()
         self.senderId = AuthProvider.Instance.userID()
         self.senderDisplayName = AuthProvider.Instance.currentUserName()
         
         self.navigationItem.title = currentChatRoomName;
+        self.navigationItem.hidesBackButton = true
+        let newBackButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ChatVC.back(sender:)))
+        self.navigationItem.leftBarButtonItem = newBackButton
 
         MessagesHandler.Instance.delegate = self
         MessagesHandler.Instance.observeChatRoomMessges()
         
         self.collectionView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
-        self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
+        DBProvider.Instance.increaseActiveUsers()
+    }
+    
+    override func viewDidDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
         MessagesHandler.Instance.removeChatRoomObservers()
-        //DBProvider.Instance.decreaseActiveUsers()
     }
+    
+    @objc func handleResignActive() {
+        DBProvider.Instance.decreaseActiveUsers()
+    }
+    
+    @objc func handleBecomeActive() {
+        DBProvider.Instance.increaseActiveUsers()
+    }
+    
     
     // Collection view functions
         
@@ -71,6 +89,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
+        cell.messageBubbleTopLabel.textColor = UIColor.init(white: 0.9, alpha: 1)
         return cell
     }
     
@@ -93,16 +112,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat
     {
-        //return 17.0
-        let message = messages[indexPath.item]
-        
-        if message.senderId == senderId {
-            return 0.0
-        } else {
-            
-            return 17.0
-            
-        }
+        return 17.0
     }
 
     // End collection view functions
@@ -159,6 +169,18 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     func colorDataReceived(color: String) {
         currentUserColor = color
     }
+    
+    @objc func back(sender: UIBarButtonItem) {
+        DBProvider.Instance.decreaseActiveUsersWithCallback()
+    }
+    
+    func activeUsersDecreased() {
+        _ = navigationController?.popViewController(animated: true)
+    }
+    
+    
+    
+
     
     
     
