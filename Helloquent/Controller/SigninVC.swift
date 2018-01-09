@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import FBSDKCoreKit
+import FBSDKLoginKit
 
 class SigninVC: UIViewController {
     
@@ -20,6 +22,9 @@ class SigninVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        let loginButton = FBSDKLoginButton.init()
+        loginButton.center = CGPoint.init(x: self.view.bounds.size.width / 2, y: self.view.frame.size.height / 2 + 150)
+        view.addSubview(loginButton)
     }
     
     override func viewDidAppear(_ animated: Bool) {

@@ -12,6 +12,10 @@ pod 'Firebase/Storage'
 pod 'Firebase/Auth'
 pod 'Firebase/Database'
 pod 'JSQMessagesViewController'
+pod 'FacebookCore'
+pod 'FBSDKLoginKit'
+pod 'FacebookShare'
+
 
   target 'HelloquentTests' do
     inherit! :search_paths
