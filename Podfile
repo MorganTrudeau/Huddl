@@ -13,7 +13,7 @@ pod 'Firebase/Auth'
 pod 'Firebase/Database'
 pod 'JSQMessagesViewController'
 pod 'FacebookCore'
-pod 'FBSDKLoginKit'
+pod 'FacebookLogin'
 pod 'FacebookShare'
 
 
