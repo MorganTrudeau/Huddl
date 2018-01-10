@@ -49,7 +49,7 @@ class DBProvider {
     weak var delegateActiveUsersDecreased: ActiveUsersDecreased?
     weak var delegateUserEnteredRoom: UserEnteredRoom?
     
-    var currentRoomName: String?
+    var currentRoomID: String?
     var selectedContactID: String?
     
     var dbRef: DatabaseReference {
@@ -69,7 +69,7 @@ class DBProvider {
     }
     
     var chatRoomMessagesRef: DatabaseReference {
-        return messagesRef.child(currentRoomName!)
+        return messagesRef.child(currentRoomID!)
     }
     
     var personalChatMessagesRef: DatabaseReference {
@@ -144,8 +144,20 @@ class DBProvider {
             if !snapshot.hasChild(name) {
                 self.chatRoomsRef.child(name).setValue(data)
                 success = true
+                self.delegateSaveChatRoom?.chatRoomSaved(success: success)
             }
-            self.delegateSaveChatRoom?.chatRoomSaved(success: success)
+        })
+    }
+    
+    func saveLocationChatRoom(id: String, name: String, password: String?) {
+        var success = false
+        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0]
+        chatRoomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+            if !snapshot.hasChild(name) {
+                self.chatRoomsRef.child(id).setValue(data)
+                success = true
+                self.delegateSaveChatRoom?.chatRoomSaved(success: success)
+            }
         })
     }
     
@@ -186,7 +198,7 @@ class DBProvider {
     }
     
     func increaseActiveUsers() {
-        chatRoomsRef.child(currentRoomName!).runTransactionBlock({(data: MutableData) in
+        chatRoomsRef.child(currentRoomID!).runTransactionBlock({(data: MutableData) in
             if var chatRoom = data.value as? [String: Any] {
                 var activeUsers = chatRoom[Constants.ACTIVE_USERS] as? Int
                 activeUsers = activeUsers! + 1
@@ -198,7 +210,7 @@ class DBProvider {
     }
     
     func decreaseActiveUsersWithCallback() {
-        chatRoomsRef.child(currentRoomName!).runTransactionBlock({(data: MutableData) in
+        chatRoomsRef.child(currentRoomID!).runTransactionBlock({(data: MutableData) in
             if var chatRoom = data.value as? [String: Any] {
                 var activeUsers = chatRoom[Constants.ACTIVE_USERS] as? Int
                 activeUsers = activeUsers! - 1
@@ -215,7 +227,7 @@ class DBProvider {
     }
     
     func decreaseActiveUsers() {
-        chatRoomsRef.child(currentRoomName!).runTransactionBlock({(data: MutableData) in
+        chatRoomsRef.child(currentRoomID!).runTransactionBlock({(data: MutableData) in
             if var chatRoom = data.value as? [String: Any] {
                 var activeUsers = chatRoom[Constants.ACTIVE_USERS] as? Int
                 activeUsers = activeUsers! - 1

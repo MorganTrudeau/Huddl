@@ -64,7 +64,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="136.80000000000001" y="-303.59820089955025"/>
+            <point key="canvasLocation" x="146" y="-481"/>
         </scene>
         <!--ContactsVC-->
         <scene sceneID="Ixh-3m-6V4">
@@ -112,7 +112,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="aI6-3G-Xtl" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1918" y="527"/>
+            <point key="canvasLocation" x="1918" y="626"/>
         </scene>
         <!--Personal ChatVC-->
         <scene sceneID="doO-WK-zul">
@@ -127,9 +127,9 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tR2-sh-71t" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2761" y="527"/>
+            <point key="canvasLocation" x="2761" y="626"/>
         </scene>
-        <!--Chat Rooms-->
+        <!--Rooms-->
         <scene sceneID="ZO9-UT-4Te">
             <objects>
                 <viewController id="uUz-x9-H7g" customClass="ChatRoomsVC" customModule="Helloquent" customModuleProvider="target" sceneMemberID="viewController">
@@ -137,6 +137,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
+                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wQE-xV-Sww">
+                                <rect key="frame" x="0.0" y="623" width="375" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <items>
+                                    <barButtonItem title="Add Room" id="rP1-fP-iTE">
+                                        <connections>
+                                            <action selector="addRoomButton:" destination="uUz-x9-H7g" id="d63-Gb-AJe"/>
+                                        </connections>
+                                    </barButtonItem>
+                                </items>
+                            </toolbar>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="lq2-hG-mPz">
                                 <rect key="frame" x="0.0" y="64" width="375" height="559"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" widthSizable="YES" flexibleMaxX="YES" flexibleMinY="YES" heightSizable="YES" flexibleMaxY="YES"/>
@@ -158,25 +169,19 @@
                                     <outlet property="delegate" destination="uUz-x9-H7g" id="bsf-HD-boM"/>
                                 </connections>
                             </tableView>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="wQE-xV-Sww">
-                                <rect key="frame" x="0.0" y="623" width="375" height="44"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
-                                <items>
-                                    <barButtonItem title="Add Room" id="rP1-fP-iTE">
-                                        <connections>
-                                            <action selector="addRoomButton:" destination="uUz-x9-H7g" id="d63-Gb-AJe"/>
-                                        </connections>
-                                    </barButtonItem>
-                                </items>
-                            </toolbar>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <viewLayoutGuide key="safeArea" id="GSi-Id-i4g"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Chat Rooms" id="3lz-97-jai">
+                    <navigationItem key="navigationItem" title="Rooms" id="3lz-97-jai">
                         <barButtonItem key="leftBarButtonItem" title="Logout" id="SDt-rM-1Rc">
                             <connections>
                                 <action selector="logout:" destination="uUz-x9-H7g" id="wdw-SR-Q3q"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" title="Search" id="jjD-1d-LJV">
+                            <connections>
+                                <segue destination="djL-q3-ApR" kind="show" id="nXn-gh-95a"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -190,7 +195,39 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ylv-px-rOj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1917.5999999999999" y="-301.79910044977515"/>
+            <point key="canvasLocation" x="1918" y="-839"/>
+        </scene>
+        <!--Location Rooms-->
+        <scene sceneID="8aL-Ok-ojZ">
+            <objects>
+                <viewController id="djL-q3-ApR" customClass="LocationRooms" customModule="Helloquent" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Tlo-4b-Oxj">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <searchBar contentMode="redraw" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="veh-96-scX">
+                                <rect key="frame" x="0.0" y="64" width="375" height="56"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <textInputTraits key="textInputTraits"/>
+                            </searchBar>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="hcE-WO-BY9">
+                                <rect key="frame" x="0.0" y="120" width="375" height="547"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </tableView>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <viewLayoutGuide key="safeArea" id="Sec-C1-lAa"/>
+                    </view>
+                    <connections>
+                        <outlet property="placesSearchBar" destination="veh-96-scX" id="g2C-VS-t7Z"/>
+                        <outlet property="placesTableView" destination="hcE-WO-BY9" id="de3-9v-cC6"/>
+                        <segue destination="vCp-1D-NmO" kind="show" identifier="chat_room_segue" id="tSG-gr-oaw"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="pmD-Lo-5PC" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1917.5999999999999" y="-76.011994002998506"/>
         </scene>
         <!--ChatVC-->
         <scene sceneID="LDk-FZ-jkK">
@@ -209,7 +246,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="z4j-EJ-dIu" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2761" y="-302"/>
+            <point key="canvasLocation" x="2761" y="-482"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Y2h-8D-T0g">
@@ -227,7 +264,10 @@
                 </navigationController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Noc-YC-ZTP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="942" y="132"/>
+            <point key="canvasLocation" x="1065" y="-480"/>
         </scene>
     </scenes>
+    <inferredMetricsTieBreakers>
+        <segue reference="tSG-gr-oaw"/>
+    </inferredMetricsTieBreakers>
 </document>

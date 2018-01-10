@@ -16,7 +16,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     private var messages = [JSQMessage]()
     private var messageColors = [String]()
     
-    var currentChatRoomId: String?
+    var currentChatRoomID: String?
     var currentChatRoomName: String?
     var currentUserColor: String?
     
@@ -160,7 +160,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     // End Delegation functions
     
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        MessagesHandler.Instance.sendChatRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, chatRoomName: currentChatRoomName!, color: currentUserColor!)
+        MessagesHandler.Instance.sendChatRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, chatRoomID: currentChatRoomID!, color: currentUserColor!)
         
         // Removes text from text field
         finishSendingMessage()

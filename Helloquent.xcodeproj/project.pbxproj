@@ -20,6 +20,8 @@
 		F90D105F1FECFAFD0012283B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */; };
 		F93364D81FEDE89D002A3718 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F93364D71FEDE89D002A3718 /* Assets.xcassets */; };
 		F93364DA1FEDE8BF002A3718 /* avatar.gif in Resources */ = {isa = PBXBuildFile; fileRef = F93364D91FEDE8BF002A3718 /* avatar.gif */; };
+		F966C9D62005300000E92A39 /* LocationRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F966C9D52005300000E92A39 /* LocationRoomsVC.swift */; };
+		F966C9E32005384600E92A39 /* PlacesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F966C9E22005384600E92A39 /* PlacesProvider.swift */; };
 		F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC381FED050700CC3C58 /* AuthProvider.swift */; };
 		F973BC3B1FEDA66800CC3C58 /* DBProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */; };
 		F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3C1FEDA7B000CC3C58 /* Constants.swift */; };
@@ -50,7 +52,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		F9EA8BFF200496C600A98421 /* Embed Frameworks */ = {
+		F966C9E1200537E000E92A39 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
@@ -88,6 +90,8 @@
 		F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F93364D71FEDE89D002A3718 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F93364D91FEDE8BF002A3718 /* avatar.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = avatar.gif; path = Assets.xcassets/avatar.gif; sourceTree = "<group>"; };
+		F966C9D52005300000E92A39 /* LocationRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRoomsVC.swift; sourceTree = "<group>"; };
+		F966C9E22005384600E92A39 /* PlacesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesProvider.swift; sourceTree = "<group>"; };
 		F973BC381FED050700CC3C58 /* AuthProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProvider.swift; sourceTree = "<group>"; };
 		F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBProvider.swift; sourceTree = "<group>"; };
 		F973BC3C1FEDA7B000CC3C58 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -226,6 +230,7 @@
 				F9E264D31FFD4EED00605CA7 /* ChatRoomsVC.swift */,
 				F973BC401FEDDA8700CC3C58 /* ChatVC.swift */,
 				F9E264DD1FFEDE5C00605CA7 /* PersonalChatVC.swift */,
+				F966C9D52005300000E92A39 /* LocationRoomsVC.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -237,6 +242,7 @@
 				F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */,
 				F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */,
 				F9EA8BEC20008A6400A98421 /* ColorHandler.swift */,
+				F966C9E22005384600E92A39 /* PlacesProvider.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -254,7 +260,7 @@
 				F90D10231FECDFB90012283B /* Resources */,
 				305C6280B34B32D4666D380F /* [CP] Embed Pods Frameworks */,
 				B7DAFF3DF0D00F6FA42464A8 /* [CP] Copy Pods Resources */,
-				F9EA8BFF200496C600A98421 /* Embed Frameworks */,
+				F966C9E1200537E000E92A39 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -568,8 +574,10 @@
 				F90D105B1FECE33B0012283B /* SigninVC.swift in Sources */,
 				F90D10291FECDFB90012283B /* AppDelegate.swift in Sources */,
 				F9E264DA1FFDA35C00605CA7 /* ChatRoom.swift in Sources */,
+				F966C9D62005300000E92A39 /* LocationRoomsVC.swift in Sources */,
 				F973BC3B1FEDA66800CC3C58 /* DBProvider.swift in Sources */,
 				F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */,
+				F966C9E32005384600E92A39 /* PlacesProvider.swift in Sources */,
 				F90D105D1FECEA7D0012283B /* ContactsVC.swift in Sources */,
 				F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */,
 				F973BC3F1FEDB47E00CC3C58 /* Contact.swift in Sources */,

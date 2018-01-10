@@ -44,7 +44,6 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        cell.contentView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
     }
     
     func chatRoomDataReceived(chatRooms: [ChatRoom]) {
@@ -64,9 +63,10 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         let cell = UITableViewCell(style: UITableViewCellStyle.subtitle,
                                    reuseIdentifier: CELL_ID)
         cell.textLabel?.text = chatRooms[indexPath.row].name
-        cell.textLabel?.textColor = UIColor.white
         cell.detailTextLabel?.text = String(chatRooms[indexPath.row].activeUsers) + " Active Users"
+        cell.textLabel?.textColor = UIColor.white
         cell.detailTextLabel?.textColor = UIColor.white
+        cell.contentView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
         let backgroundView = UIView()
         backgroundView.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
         cell.selectedBackgroundView = backgroundView
@@ -86,9 +86,9 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                vc.currentChatRoomId = chatRooms[index!].id
+                vc.currentChatRoomID = chatRooms[index!].name
                 vc.currentChatRoomName = chatRooms[index!].name
-                DBProvider.Instance.currentRoomName = chatRooms[index!].name
+                DBProvider.Instance.currentRoomID = chatRooms[index!].id
             }
         }
     }

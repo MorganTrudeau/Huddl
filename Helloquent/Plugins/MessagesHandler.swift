@@ -25,9 +25,9 @@ class MessagesHandler {
         return _instance
     }
     
-    func sendChatRoomMessage(senderID: String, senderName: String, text: String, chatRoomName: String, color: String) {
+    func sendChatRoomMessage(senderID: String, senderName: String, text: String, chatRoomID: String, color: String) {
         let data: Dictionary<String, Any> = [Constants.SENDER_ID: senderID, Constants.SENDER_NAME: senderName, Constants.TEXT: text, Constants.COLOR: color]
-        DBProvider.Instance.currentRoomName = chatRoomName
+        DBProvider.Instance.currentRoomID = chatRoomID
     DBProvider.Instance.chatRoomMessagesRef.childByAutoId().setValue(data)
         
     }
