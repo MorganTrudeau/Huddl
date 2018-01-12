@@ -126,10 +126,14 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func placesRequest(query: String) {
-        let vancouver = NMAGeoCoordinates.init(latitude: 0, longitude: 0)
-        let request: NMAAutoSuggestionRequest = (NMAPlaces.sharedInstance()?.createAutoSuggestionRequest(location: vancouver, partialTerm: query))!
-        request.collectionSize = 5
+        let vancouver = NMAGeoCoordinates.init(latitude: 48.263392, longitude: -123.12203)
+        let boudingTopLeftCoords: NMAGeoCoordinates = NMAGeoCoordinates.init(latitude: 49.277484, longitude: -123.133693)
+        let boundingBottomRightCoords: NMAGeoCoordinates = NMAGeoCoordinates.init(latitude: 49.257209, longitude: -123.11275)
+        let bounding: NMAGeoBoundingBox = NMAGeoBoundingBox.init(topLeft: boudingTopLeftCoords, bottomRight: boundingBottomRightCoords)!
         
+        let request: NMAAutoSuggestionRequest = (NMAPlaces.sharedInstance()?.createAutoSuggestionRequest(location: vancouver, partialTerm: query))!
+        request.viewport = bounding;
+        request.collectionSize = 10
         request.start({(request: NMARequest, data: Any?, error: Error?) in
             if error == nil && self.searchActive {
                 self.autoSuggestions = data as! [NMAAutoSuggest]

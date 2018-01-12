@@ -19,37 +19,39 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     var currentChatRoomID: String?
     var currentChatRoomName: String?
     var currentUserColor: String?
+    var goingBack = false
     
     let picker = UIImagePickerController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleResignActive), name: NSNotification.Name(rawValue: "ResignActiveNotification"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleBecomeActive), name: NSNotification.Name(rawValue: "BecomeActiveNotification"), object: nil)
         
         DBProvider.Instance.delegateColor = self
         DBProvider.Instance.delegateActiveUsersDecreased = self
         DBProvider.Instance.currentUserColor()
+        
         self.senderId = AuthProvider.Instance.userID()
         self.senderDisplayName = AuthProvider.Instance.currentUserName()
-        
-        self.navigationItem.title = currentChatRoomName;
-        self.navigationItem.hidesBackButton = true
-        let newBackButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ChatVC.back(sender:)))
-        self.navigationItem.leftBarButtonItem = newBackButton
 
         MessagesHandler.Instance.delegate = self
         MessagesHandler.Instance.observeChatRoomMessges()
         
-        self.collectionView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+        setUpUI()
     }
     
     override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
         DBProvider.Instance.increaseActiveUsers()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
+        if !goingBack {
+            DBProvider.Instance.decreaseActiveUsers()
+        }
         MessagesHandler.Instance.removeChatRoomObservers()
     }
     
@@ -61,13 +63,20 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         DBProvider.Instance.increaseActiveUsers()
     }
     
-    
+    func setUpUI() {
+        self.collectionView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+        self.navigationItem.title = currentChatRoomName;
+        self.navigationItem.hidesBackButton = true
+        let newBackButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ChatVC.back(sender:)))
+        self.navigationItem.leftBarButtonItem = newBackButton
+    }
+
     // Collection view functions
-        
+
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
         return JSQMessagesAvatarImageFactory.avatarImage(with: UIImage(named: "avatar.gif"), diameter: 30)
     }
-    
+
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
         let bubbleFactory = JSQMessagesBubbleImageFactory()
         let message = messages[indexPath.item]
@@ -78,7 +87,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
             return bubbleFactory?.incomingMessagesBubbleImage(with: messageColor)
         }
     }
-    
+
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
         return messages[indexPath.item]
     }
@@ -114,11 +123,15 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     {
         return 17.0
     }
-
-    // End collection view functions
-
-
+    
     // Sending buttons functions
+    
+    override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
+        MessagesHandler.Instance.sendChatRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, chatRoomID: currentChatRoomID!, color: currentUserColor!)
+        
+        // Removes text from text field
+        finishSendingMessage()
+    }
     
     override func didPressAccessoryButton(_ sender: UIButton!) {
         let alert = UIAlertController(title: "Media Messages", message: "Please select a media", preferredStyle: .actionSheet)
@@ -137,8 +150,6 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         present(alert, animated: true, completion: nil)
     }
     
-    // End sending buttons functions
-    
     // Picker view fucntions
     
     private func chooseMedia(type: CFString) {
@@ -146,9 +157,6 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         present(picker, animated: true, completion: nil)
     }
     
-    // End picker view functions
-
-
     // Delegation functions
     
     func messageReceived(senderID: String, senderName: String, text: String, color: String) {
@@ -157,20 +165,12 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         collectionView.reloadData()
     }
     
-    // End Delegation functions
-    
-    override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        MessagesHandler.Instance.sendChatRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, chatRoomID: currentChatRoomID!, color: currentUserColor!)
-        
-        // Removes text from text field
-        finishSendingMessage()
-    }
-    
     func colorDataReceived(color: String) {
         currentUserColor = color
     }
     
     @objc func back(sender: UIBarButtonItem) {
+        goingBack = true
         DBProvider.Instance.decreaseActiveUsersWithCallback()
     }
     

@@ -91,7 +91,7 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                vc.currentChatRoomID = chatRooms[index!].name
+                vc.currentChatRoomID = chatRooms[index!].id
                 vc.currentChatRoomName = chatRooms[index!].name
                 DBProvider.Instance.currentRoomID = chatRooms[index!].id
             }
@@ -120,9 +120,13 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             }
         })
         
+        let cancel: UIAlertAction = UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil)
+        
         alert.addAction(submit)
+        alert.addAction(cancel)
         alert.addTextField(configurationHandler: {(nameTextField: UITextField) in
             nameTextField.placeholder = "Room Name"
+            nameTextField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 10))
         })
         alert.addTextField(configurationHandler: {(passwordTextField: UITextField) in
             passwordTextField.placeholder = "Password"
@@ -160,6 +164,9 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             }
         })
         
+        let cancel: UIAlertAction = UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil)
+        
+        alert.addAction(cancel)
         alert.addAction(submit)
         alert.addTextField(configurationHandler: {(passwordTextField: UITextField) in
             passwordTextField.placeholder = "Password"
