@@ -26,7 +26,6 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         DBProvider.Instance.delegateChatRooms = self
         DBProvider.Instance.delegateSaveChatRoom = self
         DBProvider.Instance.delegateUserEnteredRoom = self
-        DBProvider.Instance.observeChatRooms()
         
         setUpUI()
     }
@@ -34,6 +33,12 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         DBProvider.Instance.getChatRooms()
+        DBProvider.Instance.observeChatRooms()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        DBProvider.Instance.removeChatRoomsObservers()
     }
     
     func setUpUI() {
@@ -163,7 +168,7 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     }
     
     func userEnteredRoom() {
-        chatRoomTableView.reloadData()
+        DBProvider.Instance.getChatRooms()
     }
     
     

@@ -192,9 +192,13 @@ class DBProvider {
     }
     
     func observeChatRooms() {
-        chatRoomsRef.observe(DataEventType.value) { (snapshot: DataSnapshot) in
+        chatRoomsRef.observe(DataEventType.childChanged) { (snapshot: DataSnapshot) in
             self.delegateUserEnteredRoom?.userEnteredRoom()
         }
+    }
+    
+    func removeChatRoomsObservers() {
+        chatRoomsRef.removeAllObservers()
     }
     
     func increaseActiveUsers() {

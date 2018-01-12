@@ -48,7 +48,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         DBProvider.Instance.increaseActiveUsers()
     }
     
-    override func viewDidDisappear(_ animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
         MessagesHandler.Instance.removeChatRoomObservers()
     }
