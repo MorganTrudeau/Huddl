@@ -20,6 +20,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     var currentChatRoomName: String?
     var currentUserColor: String?
     var goingBack = false
+    var viewHasLoadedSubviews = true
     
     let picker = UIImagePickerController()
     
@@ -42,8 +43,13 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         setUpUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(true)
+    }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
+        scrollToBottom(animated: false)
         DBProvider.Instance.increaseActiveUsers()
     }
     
@@ -100,6 +106,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         let cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
         cell.messageBubbleTopLabel.textColor = UIColor.init(white: 0.9, alpha: 1)
         return cell
+        
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString!
@@ -163,6 +170,8 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         messages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
         messageColors.append(color)
         collectionView.reloadData()
+        let bottomOffset = CGPoint(x: 0, y: self.collectionView.contentSize.height)
+        self.collectionView.setContentOffset(bottomOffset, animated: false)
     }
     
     func colorDataReceived(color: String) {
