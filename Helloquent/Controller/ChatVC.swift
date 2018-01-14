@@ -20,7 +20,6 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     var currentChatRoomName: String?
     var currentUserColor: String?
     var goingBack = false
-    var shouldScrollToLastRow = true
     
     let picker = UIImagePickerController()
     
@@ -41,27 +40,11 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         MessagesHandler.Instance.observeChatRoomMessges()
         
         setUpUI()
-        shouldScrollToLastRow = true
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
         DBProvider.Instance.increaseActiveUsers()
-    }
-    
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        collectionView.layoutIfNeeded()
-        if (shouldScrollToLastRow)
-        {
-            shouldScrollToLastRow = false;
-            let bottomOffset = CGPoint(x: 0, y: self.collectionView.contentSize.height)
-            self.collectionView.setContentOffset(bottomOffset, animated: true)
-        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -86,6 +69,8 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         self.navigationItem.hidesBackButton = true
         let newBackButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ChatVC.back(sender:)))
         self.navigationItem.leftBarButtonItem = newBackButton
+        collectionView.layoutIfNeeded()
+        scrollToBottom(animated: false)
     }
 
     // Collection view functions
@@ -181,7 +166,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         messages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
         messageColors.append(color)
         collectionView.reloadData()
-        scrollToBottom(animated: false)
+        super.scrollToBottom(animated: true)
     }
     
     func colorDataReceived(color: String) {
