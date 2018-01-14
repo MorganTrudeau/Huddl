@@ -8,6 +8,7 @@
 
 import Foundation
 import FirebaseAuth
+import FBSDKLoginKit
 
 typealias LoginHandler = (_ msg: String?) -> Void
 
@@ -30,6 +31,16 @@ class AuthProvider {
     func login(email: String, password: String, loginHandler: LoginHandler?) {
         Auth.auth().signIn(withEmail: email, password: password, completion: {(user, error) in
             
+            if error != nil {
+                self.handleErrors(error: error! as NSError, loginHandler: loginHandler)
+            } else {
+                loginHandler?(nil)
+            }
+        })
+    }
+    
+    func facebookAuth(credential: AuthCredential, loginHandler: LoginHandler?) {
+        Auth.auth().signIn(with: credential, completion: {(user, error) in
             if error != nil {
                 self.handleErrors(error: error! as NSError, loginHandler: loginHandler)
             } else {
@@ -74,6 +85,7 @@ class AuthProvider {
     func logout() -> Bool {
         do {
             try Auth.auth().signOut()
+            FBSDKLoginManager.init().logOut()
             return true
         } catch {
             return false

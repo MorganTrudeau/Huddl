@@ -9,8 +9,9 @@
 import UIKit
 import FBSDKCoreKit
 import FBSDKLoginKit
+import FirebaseAuth
 
-class SigninVC: UIViewController {
+class SigninVC: UIViewController, FBSDKLoginButtonDelegate {
     
     private let CHATROOMS_SEGUE: String = "chat_rooms_segue"
     
@@ -25,6 +26,7 @@ class SigninVC: UIViewController {
         let loginButton = FBSDKLoginButton.init()
         loginButton.center = CGPoint.init(x: self.view.bounds.size.width / 2, y: self.view.frame.size.height / 2 + 150)
         view.addSubview(loginButton)
+        loginButton.delegate = self
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -33,9 +35,32 @@ class SigninVC: UIViewController {
         }
     }
     
+    func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!) {
+        if error != nil {
+            print(error.localizedDescription)
+            return
+        } else {
+            if let credential: AuthCredential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString) as? AuthCredential {
+                AuthProvider.Instance.facebookAuth(credential: credential, loginHandler: {(message) in
+                    
+                    if message != nil {
+                        self.alertUser(title: "Problem With Authentication", message: message!)
+                    } else {
+                        print("Login Successful")
+                        self.performSegue(withIdentifier: self.CHATROOMS_SEGUE, sender: nil)
+                    }
+                })
+            }
+        }
+    }
+    
+    func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
+    }
+    
     @IBAction func login(_ sender: Any) {
         
         if emailTextField.text != "" && passwordTextField.text != "" {
+            
             AuthProvider.Instance.login(email: emailTextField.text!, password: passwordTextField.text!, loginHandler: {(message) in
                 
                 if message != nil {
@@ -70,6 +95,7 @@ class SigninVC: UIViewController {
     }
     
     func alertUser(title: String, message: String) {
+        
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
         alert.addAction(ok)

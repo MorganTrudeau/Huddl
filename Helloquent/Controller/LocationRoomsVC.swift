@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import NMAKit
 
-class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, NMAResultListener {
+class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
     
     
     @IBOutlet weak var placesSearchBar: UISearchBar!
@@ -18,7 +18,7 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var placesTableView: UITableView!
     
     var searchActive : Bool = false
-    var autoSuggestions = [NMAAutoSuggest]()
+    var autoSuggestions = [NMAAutoSuggestPlace]()
     
     let CELL_ID = "cell"
     let CHAT_SEGUE = "chat_room_segue"
@@ -73,6 +73,10 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        print(autoSuggestions.count)
+        for place in autoSuggestions {
+            print(place.highlightedTitle!)
+        }
         return autoSuggestions.count
     }
     
@@ -86,18 +90,19 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
         cell.selectedBackgroundView = backgroundView
         
         if autoSuggestions[0].isKind(of: NMAAutoSuggest.self) {
-            if let autoSuggestionItem = autoSuggestions[indexPath.row] as? NMAAutoSuggestPlace {
-                let htmlString = autoSuggestionItem.highlightedTitle
-                let detailText = autoSuggestionItem.vicinityDescription?.replacingOccurrences(of: "<br/>", with: ", ")
-                cell.textLabel?.text = autoSuggestionItem.highlightedTitle
+            let autoSuggestionPlace = autoSuggestions[indexPath.row]
+            let htmlString: String? = autoSuggestionPlace.highlightedTitle
+            let detailText: String? = autoSuggestionPlace.vicinityDescription?.replacingOccurrences(of: "<br/>", with: ", ")
                 cell.detailTextLabel?.text = detailText
-                do {
-                    let attrString = try NSAttributedString.init(data: (htmlString?.data(using: String.Encoding.unicode))!, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
+            
+            do {
+                let attrString = try NSAttributedString.init(data: (htmlString?.data(using: String.Encoding.unicode))!, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
                     cell.textLabel?.text = attrString.string
-                } catch _ {
+            } catch _ {
 
-                }
             }
+            
+            
         }
         
         return cell;
@@ -136,19 +141,16 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
         request.collectionSize = 10
         request.start({(request: NMARequest, data: Any?, error: Error?) in
             if error == nil && self.searchActive {
-                self.autoSuggestions = data as! [NMAAutoSuggest]
+                self.autoSuggestions.removeAll()
+                for item in data as! [NMAAutoSuggest] {
+                    if let place = item as? NMAAutoSuggestPlace {
+                        self.autoSuggestions.append(place)
+                    }
+                }
                 self.placesTableView.reloadData()
             }
         })
     }
-    
-    func request(_ request: NMARequest, didCompleteWithData data: Any?, error: Error?) {
-        
-        
-    }
-    
-    
-
     
     
 }
