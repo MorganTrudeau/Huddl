@@ -13,14 +13,13 @@ import AVKit
 
 class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FetchColorData, ActiveUsersDecreased {
     
-    private var messages = [JSQMessage]()
-    private var messageColors = [String]()
+    var messages = [JSQMessage]()
+    var messageColors = [String]()
     
     var currentChatRoomID: String?
     var currentChatRoomName: String?
     var currentUserColor: String?
     var goingBack = false
-    var viewHasLoadedSubviews = true
     
     let picker = UIImagePickerController()
     
@@ -37,19 +36,14 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         self.senderId = AuthProvider.Instance.userID()
         self.senderDisplayName = AuthProvider.Instance.currentUserName()
 
-        MessagesHandler.Instance.delegate = self
+        MessagesHandler.Instance.delegateMessage = self
         MessagesHandler.Instance.observeChatRoomMessges()
         
         setUpUI()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
-    }
-    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
-        scrollToBottom(animated: false)
         DBProvider.Instance.increaseActiveUsers()
     }
     
@@ -75,6 +69,8 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         self.navigationItem.hidesBackButton = true
         let newBackButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ChatVC.back(sender:)))
         self.navigationItem.leftBarButtonItem = newBackButton
+        collectionView.layoutIfNeeded()
+        scrollToBottom(animated: false)
     }
 
     // Collection view functions
@@ -170,8 +166,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         messages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
         messageColors.append(color)
         collectionView.reloadData()
-        let bottomOffset = CGPoint(x: 0, y: self.collectionView.contentSize.height)
-        self.collectionView.setContentOffset(bottomOffset, animated: false)
+        super.scrollToBottom(animated: true)
     }
     
     func colorDataReceived(color: String) {

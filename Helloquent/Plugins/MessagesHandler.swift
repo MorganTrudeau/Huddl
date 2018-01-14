@@ -10,16 +10,22 @@ import Foundation
 import FirebaseDatabase
 import FirebaseStorage
 import UIKit
+import JSQMessagesViewController
 
 protocol MessageReceivedDelegate: class {
     func messageReceived(senderID: String, senderName: String, text: String, color: String)
+}
+
+protocol AllMessagesReceivedDelegate: class {
+    func allMessagesReceived(messages: [JSQMessage], messageColors: [String])
 }
 
 class MessagesHandler {
     private static let _instance = MessagesHandler()
     private init() {}
     
-    weak var delegate: MessageReceivedDelegate?
+    weak var delegateMessage: MessageReceivedDelegate?
+    weak var delegateAllMessages: AllMessagesReceivedDelegate?
     
     static var Instance: MessagesHandler {
         return _instance
@@ -29,17 +35,25 @@ class MessagesHandler {
         let data: Dictionary<String, Any> = [Constants.SENDER_ID: senderID, Constants.SENDER_NAME: senderName, Constants.TEXT: text, Constants.COLOR: color]
         DBProvider.Instance.currentRoomID = chatRoomID
     DBProvider.Instance.chatRoomMessagesRef.childByAutoId().setValue(data)
-        
     }
     
     func observeChatRoomMessges() {
-    DBProvider.Instance.chatRoomMessagesRef.observe(DataEventType.childAdded) { (snapshot: DataSnapshot) in
-            if let data = snapshot.value as? NSDictionary {
-                if let senderID = data[Constants.SENDER_ID] as? String {
-                    if let senderName = data[Constants.SENDER_NAME] as? String {
-                        if let text = data[Constants.TEXT] as? String {
-                            if let color = data[Constants.COLOR] as? String {
-                                self.delegate?.messageReceived(senderID: senderID, senderName:senderName, text: text, color: color)
+        var firstObserve = true
+        DBProvider.Instance.chatRoomMessagesRef.queryLimited(toLast: 1).observe(DataEventType.value) { (snapshot: DataSnapshot) in
+            if firstObserve {
+                firstObserve = false
+            } else {
+                if let message = snapshot.value as? NSDictionary {
+                    for (_, value) in message {
+                        if let messageData = value as? NSDictionary{
+                            if let senderID = messageData[Constants.SENDER_ID] as? String {
+                                if let senderName = messageData[Constants.SENDER_NAME] as? String {
+                                    if let text = messageData[Constants.TEXT] as? String {
+                                        if let color = messageData[Constants.COLOR] as? String {
+                                            self.delegateMessage?.messageReceived(senderID: senderID, senderName:senderName, text: text, color: color)
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -52,36 +66,29 @@ class MessagesHandler {
         DBProvider.Instance.chatRoomMessagesRef.removeAllObservers()
     }
     
-//    func sendPersonalChatMessage(senderID: String, senderName: String, text: String, selectedContactID: String) {
-//        let data: Dictionary<String, Any> = [Constants.SENDER_ID: senderID, Constants.SENDER_NAME: senderName, Constants.TEXT: text]
-//        DBProvider.Instance.selectedContactID = selectedContactID
-//        DBProvider.Instance.personalChatMessagesRef.childByAutoId().setValue(data)
-//        
-//    }
-    
-//    func observePersonalChatMessges() {
-//        DBProvider.Instance.personalChatMessagesRef.observe(DataEventType.childAdded) { (snapshot: DataSnapshot) in
-//            if let data = snapshot.value as? NSDictionary {
-//                if let senderID = data[Constants.SENDER_ID] as? String {
-//                    if let senderName = data[Constants.SENDER_NAME] as? String {
-//                        if let text = data[Constants.TEXT] as? String {
-//                            self.delegate?.messageReceived(senderID: senderID, senderName:senderName, text: text)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    func removePersonalChatObservers() {
-//        DBProvider.Instance.personalChatMessagesRef.removeAllObservers()
-//    }
-    
-    
-    
-    
-    
-    
-    
+    func getChatRoomMessges() {
+        var messages = [JSQMessage]()
+        var messageColors = [String]()
+        
+        DBProvider.Instance.chatRoomMessagesRef.queryOrderedByKey().observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+            
+            for child in snapshot.children.allObjects as! [DataSnapshot] {
+                if let messageData = child.value as? NSDictionary {
+                    if let senderID = messageData[Constants.SENDER_ID] as? String {
+                        if let senderName = messageData[Constants.SENDER_NAME] as? String {
+                            if let text = messageData[Constants.TEXT] as? String {
+                                if let color = messageData[Constants.COLOR] as? String {
+                                    messages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
+                                    messageColors.append(color)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            self.delegateAllMessages?.allMessagesReceived(messages: messages, messageColors: messageColors)
+        })
+    }
+
     
 }
