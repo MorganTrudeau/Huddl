@@ -10,16 +10,22 @@ import Foundation
 import FirebaseDatabase
 import FirebaseStorage
 import UIKit
+import JSQMessagesViewController
 
 protocol MessageReceivedDelegate: class {
     func messageReceived(senderID: String, senderName: String, text: String, color: String)
+}
+
+protocol AllMessagesReceivedDelegate: class {
+    func allMessagesReceived(messages: [JSQMessage], messageColors: [String])
 }
 
 class MessagesHandler {
     private static let _instance = MessagesHandler()
     private init() {}
     
-    weak var delegate: MessageReceivedDelegate?
+    weak var delegateMessage: MessageReceivedDelegate?
+    weak var delegateAllMessages: AllMessagesReceivedDelegate?
     
     static var Instance: MessagesHandler {
         return _instance
@@ -39,13 +45,38 @@ class MessagesHandler {
                     if let senderName = data[Constants.SENDER_NAME] as? String {
                         if let text = data[Constants.TEXT] as? String {
                             if let color = data[Constants.COLOR] as? String {
-                                self.delegate?.messageReceived(senderID: senderID, senderName:senderName, text: text, color: color)
+                                self.delegateMessage?.messageReceived(senderID: senderID, senderName:senderName, text: text, color: color)
                             }
                         }
                     }
                 }
             }
         }
+    }
+    
+    func getChatRoomMessges() {
+        var messages = [JSQMessage]()
+        var messageColors = [String]()
+        
+        DBProvider.Instance.chatRoomMessagesRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+            if let data = snapshot.value as? NSDictionary {
+                for (_, value) in data {
+                    if let messageData = value as? NSDictionary {
+                        if let senderID = messageData[Constants.SENDER_ID] as? String {
+                            if let senderName = messageData[Constants.SENDER_NAME] as? String {
+                                if let text = messageData[Constants.TEXT] as? String {
+                                    if let color = messageData[Constants.COLOR] as? String {
+                                        messages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
+                                        messageColors.append(color)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            self.delegateAllMessages?.allMessagesReceived(messages: messages, messageColors: messageColors)
+        })
     }
     
     func removeChatRoomObservers() {

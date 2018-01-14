@@ -13,14 +13,14 @@ import AVKit
 
 class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FetchColorData, ActiveUsersDecreased {
     
-    private var messages = [JSQMessage]()
-    private var messageColors = [String]()
+    var messages = [JSQMessage]()
+    var messageColors = [String]()
     
     var currentChatRoomID: String?
     var currentChatRoomName: String?
     var currentUserColor: String?
     var goingBack = false
-    var viewHasLoadedSubviews = true
+    var shouldScrollToLastRow = true
     
     let picker = UIImagePickerController()
     
@@ -37,10 +37,11 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         self.senderId = AuthProvider.Instance.userID()
         self.senderDisplayName = AuthProvider.Instance.currentUserName()
 
-        MessagesHandler.Instance.delegate = self
+        MessagesHandler.Instance.delegateMessage = self
         MessagesHandler.Instance.observeChatRoomMessges()
         
         setUpUI()
+        shouldScrollToLastRow = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -49,8 +50,18 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
-        scrollToBottom(animated: false)
         DBProvider.Instance.increaseActiveUsers()
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        collectionView.layoutIfNeeded()
+        if (shouldScrollToLastRow)
+        {
+            shouldScrollToLastRow = false;
+            let bottomOffset = CGPoint(x: 0, y: self.collectionView.contentSize.height)
+            self.collectionView.setContentOffset(bottomOffset, animated: true)
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -170,8 +181,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         messages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
         messageColors.append(color)
         collectionView.reloadData()
-        let bottomOffset = CGPoint(x: 0, y: self.collectionView.contentSize.height)
-        self.collectionView.setContentOffset(bottomOffset, animated: false)
+        scrollToBottom(animated: false)
     }
     
     func colorDataReceived(color: String) {

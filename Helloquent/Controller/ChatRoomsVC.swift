@@ -7,8 +7,9 @@
 //
 
 import UIKit
+import JSQMessagesViewController
 
-class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, FetchChatRoomData, SavedChatRoom, UserEnteredRoom {
+class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, FetchChatRoomData, SavedChatRoom, UserEnteredRoom, AllMessagesReceivedDelegate {
     
     @IBOutlet weak var addRoomButton: UIBarButtonItem!
     @IBOutlet weak var chatRoomTableView: UITableView!
@@ -17,6 +18,8 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     var chatRooms = [ChatRoom]()
     var index: Int?
+    var messages = [JSQMessage]()
+    var messageColors = [String]()
     
     let CHAT_SEGUE = "chat_room_segue"
     let CELL_ID = "chat_room_cell"
@@ -26,6 +29,7 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         DBProvider.Instance.delegateChatRooms = self
         DBProvider.Instance.delegateSaveChatRoom = self
         DBProvider.Instance.delegateUserEnteredRoom = self
+        MessagesHandler.Instance.delegateAllMessages = self
         
         setUpUI()
     }
@@ -84,7 +88,8 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         if requiredPassword != "" {
             askPassword(requiredPassword: requiredPassword)
         } else {
-            performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
+            DBProvider.Instance.currentRoomID = chatRooms[index!].id
+            MessagesHandler.Instance.getChatRoomMessges()
         }
     }
     
@@ -93,9 +98,16 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             if let vc = segue.destination as? ChatVC {
                 vc.currentChatRoomID = chatRooms[index!].id
                 vc.currentChatRoomName = chatRooms[index!].name
-                DBProvider.Instance.currentRoomID = chatRooms[index!].id
+                vc.messages = messages
+                vc.messageColors = messageColors
             }
         }
+    }
+    
+    func allMessagesReceived(messages: [JSQMessage], messageColors: [String]) {
+        self.messages = messages
+        self.messageColors = messageColors
+        performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
     }
     
     @IBAction func logout(_ sender: Any) {
