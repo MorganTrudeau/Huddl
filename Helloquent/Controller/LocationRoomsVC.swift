@@ -118,27 +118,28 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
             if let vc = segue.destination as? ChatVC {
                 let currentChatRoomName = placesTableView.cellForRow(at: index!)?.textLabel?.text
                 vc.currentChatRoomName = currentChatRoomName
-                if let autoSuggestionItem = autoSuggestions[index!.row] as? NMAAutoSuggestPlace {
-                    var currentChatRoomID =
+                let autoSuggestionItem = autoSuggestions[index!.row]
+                var currentChatRoomID =
                     "\(autoSuggestionItem.position?.latitude ?? 1)\(autoSuggestionItem.position?.longitude ?? 1)"
-                    currentChatRoomID = currentChatRoomID.replacingOccurrences(of: ".", with: "")
-                    DBProvider.Instance.currentRoomID = currentChatRoomID
-                    vc.currentChatRoomID = currentChatRoomID
-                    DBProvider.Instance.saveLocationChatRoom(id: currentChatRoomID, name: currentChatRoomName!, password: "")
-                }
+                currentChatRoomID = currentChatRoomID.replacingOccurrences(of: ".", with: "")
+                DBProvider.Instance.currentRoomID = currentChatRoomID
+                vc.currentChatRoomID = currentChatRoomID
+                DBProvider.Instance.saveLocationChatRoom(id: currentChatRoomID, name: currentChatRoomName!, password: "")
+                
             }
         }
     }
     
     func placesRequest(query: String) {
-        let vancouver = NMAGeoCoordinates.init(latitude: 48.263392, longitude: -123.12203)
+        let vancouver: NMAGeoCoordinates = NMAGeoCoordinates.init(latitude: 48.263392, longitude: -123.12203)
         let boudingTopLeftCoords: NMAGeoCoordinates = NMAGeoCoordinates.init(latitude: 49.277484, longitude: -123.133693)
         let boundingBottomRightCoords: NMAGeoCoordinates = NMAGeoCoordinates.init(latitude: 49.257209, longitude: -123.11275)
         let bounding: NMAGeoBoundingBox = NMAGeoBoundingBox.init(topLeft: boudingTopLeftCoords, bottomRight: boundingBottomRightCoords)!
         
         let request: NMAAutoSuggestionRequest = (NMAPlaces.sharedInstance()?.createAutoSuggestionRequest(location: vancouver, partialTerm: query))!
-        request.viewport = bounding;
+//        request.viewport = bounding
         request.collectionSize = 10
+        request.viewport = bounding
         request.start({(request: NMARequest, data: Any?, error: Error?) in
             if error == nil && self.searchActive {
                 self.autoSuggestions.removeAll()
@@ -151,6 +152,7 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
             }
         })
     }
+    
     
     
 }

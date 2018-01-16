@@ -70,7 +70,7 @@ class MessagesHandler {
         var messages = [JSQMessage]()
         var messageColors = [String]()
         
-        DBProvider.Instance.chatRoomMessagesRef.queryOrderedByKey().observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+        DBProvider.Instance.chatRoomMessagesRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             
             for child in snapshot.children.allObjects as! [DataSnapshot] {
                 if let messageData = child.value as? NSDictionary {

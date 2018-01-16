@@ -69,8 +69,10 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         self.navigationItem.hidesBackButton = true
         let newBackButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ChatVC.back(sender:)))
         self.navigationItem.leftBarButtonItem = newBackButton
-        collectionView.layoutIfNeeded()
-        scrollToBottom(animated: false)
+        self.collectionView.layoutIfNeeded()
+        if self.collectionView.contentSize.height > self.collectionView.frame.size.height {
+            scrollToBottom(animated: false)
+        }
     }
 
     // Collection view functions

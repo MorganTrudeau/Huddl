@@ -20,6 +20,8 @@
 		F90D105F1FECFAFD0012283B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */; };
 		F93364D81FEDE89D002A3718 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F93364D71FEDE89D002A3718 /* Assets.xcassets */; };
 		F93364DA1FEDE8BF002A3718 /* avatar.gif in Resources */ = {isa = PBXBuildFile; fileRef = F93364D91FEDE8BF002A3718 /* avatar.gif */; };
+		F93CA2A7200D38C200D9132C /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F93CA2A6200D38C200D9132C /* NMAKit.framework */; };
+		F93CA2A8200D38C200D9132C /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F93CA2A6200D38C200D9132C /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F966C9D62005300000E92A39 /* LocationRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F966C9D52005300000E92A39 /* LocationRoomsVC.swift */; };
 		F966C9E32005384600E92A39 /* PlacesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F966C9E22005384600E92A39 /* PlacesProvider.swift */; };
 		F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC381FED050700CC3C58 /* AuthProvider.swift */; };
@@ -33,8 +35,6 @@
 		F9E264DA1FFDA35C00605CA7 /* ChatRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D91FFDA35C00605CA7 /* ChatRoom.swift */; };
 		F9E264DE1FFEDE5C00605CA7 /* PersonalChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264DD1FFEDE5C00605CA7 /* PersonalChatVC.swift */; };
 		F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EA8BEC20008A6400A98421 /* ColorHandler.swift */; };
-		F9EA8C0F200743F300A98421 /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9EA8C0E200743F300A98421 /* NMAKit.framework */; };
-		F9EA8C10200743F300A98421 /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F9EA8C0E200743F300A98421 /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,7 +61,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				F9EA8C10200743F300A98421 /* NMAKit.framework in Embed Frameworks */,
+				F93CA2A8200D38C200D9132C /* NMAKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -94,6 +94,8 @@
 		F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F93364D71FEDE89D002A3718 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F93364D91FEDE8BF002A3718 /* avatar.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = avatar.gif; path = Assets.xcassets/avatar.gif; sourceTree = "<group>"; };
+		F93CA2A6200D38C200D9132C /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NMAKit.framework; path = "../../../Downloads/HERESDK-Premium 4/framework/NMAKit.framework"; sourceTree = "<group>"; };
+		F93CA2A9200D38C500D9132C /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NMAKit.framework; path = "../../../Downloads/HERESDK-Premium 4/framework/NMAKit.framework"; sourceTree = "<group>"; };
 		F966C9D52005300000E92A39 /* LocationRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRoomsVC.swift; sourceTree = "<group>"; };
 		F966C9E22005384600E92A39 /* PlacesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesProvider.swift; sourceTree = "<group>"; };
 		F973BC381FED050700CC3C58 /* AuthProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProvider.swift; sourceTree = "<group>"; };
@@ -107,7 +109,6 @@
 		F9E264D91FFDA35C00605CA7 /* ChatRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRoom.swift; sourceTree = "<group>"; };
 		F9E264DD1FFEDE5C00605CA7 /* PersonalChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalChatVC.swift; sourceTree = "<group>"; };
 		F9EA8BEC20008A6400A98421 /* ColorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHandler.swift; sourceTree = "<group>"; };
-		F9EA8C0E200743F300A98421 /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NMAKit.framework; path = "../../../Downloads/HERESDK-Premium/framework/NMAKit.framework"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -115,7 +116,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F9EA8C0F200743F300A98421 /* NMAKit.framework in Frameworks */,
+				F93CA2A7200D38C200D9132C /* NMAKit.framework in Frameworks */,
 				4C97677652B24F944C9A1913 /* Pods_Helloquent.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -155,6 +156,7 @@
 		F299D65C296DA368F66065C4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F93CA2A9200D38C500D9132C /* NMAKit.framework */,
 				45133CF7D71936EB63E66199 /* Pods_Helloquent.framework */,
 				C9903F0212B6980D79CB696E /* Pods_HelloquentTests.framework */,
 				0B01B6A9C2126C136662B5F3 /* Pods_HelloquentUITests.framework */,
@@ -165,7 +167,7 @@
 		F90D101C1FECDFB90012283B = {
 			isa = PBXGroup;
 			children = (
-				F9EA8C0E200743F300A98421 /* NMAKit.framework */,
+				F93CA2A6200D38C200D9132C /* NMAKit.framework */,
 				F90D10271FECDFB90012283B /* Helloquent */,
 				F90D103C1FECDFB90012283B /* HelloquentTests */,
 				F90D10471FECDFB90012283B /* HelloquentUITests */,
