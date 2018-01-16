@@ -38,6 +38,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
 
         MessagesHandler.Instance.delegateMessage = self
         MessagesHandler.Instance.observeChatRoomMessges()
+        MessagesHandler.Instance.getChatRoomMessages()
         
         setUpUI()
     }
@@ -63,12 +64,18 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         DBProvider.Instance.increaseActiveUsers()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        self.topContentAdditionalInset = CGFloat(-65)
+    }
+    
     func setUpUI() {
         self.collectionView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
         self.navigationItem.title = currentChatRoomName;
         self.navigationItem.hidesBackButton = true
         let newBackButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ChatVC.back(sender:)))
         self.navigationItem.leftBarButtonItem = newBackButton
+        self.view.layoutIfNeeded()
         self.collectionView.layoutIfNeeded()
         if self.collectionView.contentSize.height > self.collectionView.frame.size.height {
             scrollToBottom(animated: false)
@@ -119,9 +126,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
                 return nil
             }
             return NSAttributedString(string: senderDisplayName)
-            
         }
-        
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat
@@ -167,8 +172,21 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     func messageReceived(senderID: String, senderName: String, text: String, color: String) {
         messages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
         messageColors.append(color)
-        collectionView.reloadData()
-        super.scrollToBottom(animated: true)
+        self.collectionView.reloadData()
+        self.collectionView.layoutIfNeeded()
+        super.scrollToBottom(animated: false)
+    }
+    
+    func allMessagesReceived(messages: [JSQMessage], messageColors: [String]) {
+        self.messages = messages
+        self.messageColors = messageColors
+        self.collectionView.reloadData()
+        self.collectionView.layoutIfNeeded()
+        super.scrollToBottom(animated: false)
+    }
+    
+    override func scrollToBottom(animated: Bool) {
+        
     }
     
     func colorDataReceived(color: String) {

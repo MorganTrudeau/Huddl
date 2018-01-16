@@ -1,5 +1,5 @@
 ////
-////  PersonalChatVC.swift
+////  ChatVC.swift
 ////  Helloquent
 ////
 ////  Created by Morgan Trudeau on 2017-12-22.
@@ -11,64 +11,106 @@
 //import MobileCoreServices
 //import AVKit
 //
-//class PersonalChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
-//    
-//    private var messages = [JSQMessage]()
-//    
-//    var selectedContactID: String?
-//    var selectedContactName: String?
-//    
+//class TestChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FetchColorData, ActiveUsersDecreased {
+//
+//    var messages = [JSQMessage]()
+//    var messageColors = [String]()
+//
+//    var currentChatRoomID: String?
+//    var currentChatRoomName: String?
+//    var currentUserColor: String?
+//    var goingBack = false
+//
 //    let picker = UIImagePickerController()
-//    
+//
 //    override func viewDidLoad() {
 //        super.viewDidLoad()
+//
+//        NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleResignActive), name: NSNotification.Name(rawValue: "ResignActiveNotification"), object: nil)
+//        NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleBecomeActive), name: NSNotification.Name(rawValue: "BecomeActiveNotification"), object: nil)
+//
+//        DBProvider.Instance.delegateColor = self
+//        DBProvider.Instance.delegateActiveUsersDecreased = self
+//        DBProvider.Instance.currentUserColor()
+//
 //        self.senderId = AuthProvider.Instance.userID()
 //        self.senderDisplayName = AuthProvider.Instance.currentUserName()
-//        
-//        self.navigationItem.title = selectedContactName;
-//        
-//        MessagesHandler.Instance.delegate = self
-//        MessagesHandler.Instance.observePersonalChatMessges()
+//
+//        MessagesHandler.Instance.delegateMessage = self
+//        MessagesHandler.Instance.observeChatRoomMessges()
+//
+//        setUpUI()
 //    }
-//    
+//
+//    override func viewDidAppear(_ animated: Bool) {
+//        super.viewDidAppear(true)
+//        DBProvider.Instance.increaseActiveUsers()
+//    }
+//
 //    override func viewWillDisappear(_ animated: Bool) {
 //        super.viewWillDisappear(true)
-//        MessagesHandler.Instance.removePersonalChatObservers()
+//        if !goingBack {
+//            DBProvider.Instance.decreaseActiveUsers()
+//        }
+//        MessagesHandler.Instance.removeChatRoomObservers()
 //    }
-//    
+//
+//    @objc func handleResignActive() {
+//        DBProvider.Instance.decreaseActiveUsers()
+//    }
+//
+//    @objc func handleBecomeActive() {
+//        DBProvider.Instance.increaseActiveUsers()
+//    }
+//
+//    func setUpUI() {
+//        self.collectionView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+//        self.navigationItem.title = currentChatRoomName;
+//        self.navigationItem.hidesBackButton = true
+//        let newBackButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ChatVC.back(sender:)))
+//        self.navigationItem.leftBarButtonItem = newBackButton
+//        self.collectionView.layoutIfNeeded()
+//        if self.collectionView.contentSize.height > self.collectionView.frame.size.height {
+//            scrollToBottom(animated: false)
+//        }
+//    }
+//
 //    // Collection view functions
-//    
+//
 //    override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
 //        return JSQMessagesAvatarImageFactory.avatarImage(with: UIImage(named: "avatar.gif"), diameter: 30)
 //    }
-//    
+//
 //    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
 //        let bubbleFactory = JSQMessagesBubbleImageFactory()
 //        let message = messages[indexPath.item]
+//        let messageColor = ColorHandler.Instance.convertToUIColor(colorString: messageColors[indexPath.row])
 //        if message.senderId == AuthProvider.Instance.userID() {
-//            return bubbleFactory?.outgoingMessagesBubbleImage(with: UIColor.blue)
+//            return bubbleFactory?.outgoingMessagesBubbleImage(with: messageColor)
 //        } else {
-//            return bubbleFactory?.incomingMessagesBubbleImage(with: UIColor.red)
+//            return bubbleFactory?.incomingMessagesBubbleImage(with: messageColor)
 //        }
 //    }
-//    
+//
 //    override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
 //        return messages[indexPath.item]
 //    }
-//    
+//
 //    override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
 //        return messages.count
 //    }
-//    
+//
 //    override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 //        let cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
+//        cell.messageBubbleTopLabel.textColor = UIColor.init(white: 0.9, alpha: 1)
 //        return cell
+//
 //    }
-//    
+//
 //    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString!
 //    {
 //        let message = messages[indexPath.item]
-//        
+//
 //        if message.senderId == senderId {
 //            return nil
 //        } else {
@@ -77,26 +119,25 @@
 //                return nil
 //            }
 //            return NSAttributedString(string: senderDisplayName)
+//
 //        }
+//
 //    }
-//    
+//
 //    override func collectionView(_ collectionView: JSQMessagesCollectionView!, layout collectionViewLayout: JSQMessagesCollectionViewFlowLayout!, heightForMessageBubbleTopLabelAt indexPath: IndexPath!) -> CGFloat
 //    {
-//        //return 17.0
-//        let message = messages[indexPath.item]
-//        
-//        if message.senderId == senderId {
-//            return 0.0
-//        } else {
-//            return 17.0
-//        }
+//        return 17.0
 //    }
-//    
-//    // End collection view functions
-//    
-//    
+//
 //    // Sending buttons functions
-//    
+//
+//    override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
+//        MessagesHandler.Instance.sendChatRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, chatRoomID: currentChatRoomID!, color: currentUserColor!)
+//
+//        // Removes text from text field
+//        finishSendingMessage()
+//    }
+//
 //    override func didPressAccessoryButton(_ sender: UIButton!) {
 //        let alert = UIAlertController(title: "Media Messages", message: "Please select a media", preferredStyle: .actionSheet)
 //        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
@@ -113,51 +154,56 @@
 //        alert.addAction(cancel)
 //        present(alert, animated: true, completion: nil)
 //    }
-//    
-//    // End sending buttons functions
-//    
+//
 //    // Picker view fucntions
-//    
+//
 //    private func chooseMedia(type: CFString) {
 //        picker.mediaTypes = [type as String]
 //        present(picker, animated: true, completion: nil)
 //    }
-//    
-//    // End picker view functions
-//    
-//    
+//
 //    // Delegation functions
-//    
-//    func messageReceived(senderID: String, senderName: String, text: String) {
+//
+//    func messageReceived(senderID: String, senderName: String, text: String, color: String) {
 //        messages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
+//        messageColors.append(color)
 //        collectionView.reloadData()
+//        super.scrollToBottom(animated: true)
 //    }
-//    
-//    // End Delegation functions
-//    
-//    override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-//        MessagesHandler.Instance.sendPersonalChatMessage(senderID: senderId, senderName: senderDisplayName, text: text, selectedContactID: selectedContactID!)
-//        
-//        // Removes text from text field
-//        finishSendingMessage()
+//
+//    func colorDataReceived(color: String) {
+//        currentUserColor = color
 //    }
-//    
-//    
-//    
-//    
-//    
-//    
-//    
-//    
-//    
-//    
-//    
-//    
-//    
-//    
-//    
-//    
-//    
-//    
+//
+//    @objc func back(sender: UIBarButtonItem) {
+//        goingBack = true
+//        DBProvider.Instance.decreaseActiveUsersWithCallback()
+//    }
+//
+//    func activeUsersDecreased() {
+//        _ = navigationController?.popViewController(animated: true)
+//    }
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //}
 //

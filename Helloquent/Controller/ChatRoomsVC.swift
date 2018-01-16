@@ -9,7 +9,7 @@
 import UIKit
 import JSQMessagesViewController
 
-class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, FetchChatRoomData, SavedChatRoom, UserEnteredRoom, AllMessagesReceivedDelegate {
+class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, FetchChatRoomData, SavedChatRoom, UserEnteredRoom {
     
     @IBOutlet weak var addRoomButton: UIBarButtonItem!
     @IBOutlet weak var chatRoomTableView: UITableView!
@@ -29,7 +29,6 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         DBProvider.Instance.delegateChatRooms = self
         DBProvider.Instance.delegateSaveChatRoom = self
         DBProvider.Instance.delegateUserEnteredRoom = self
-        MessagesHandler.Instance.delegateAllMessages = self
         
         setUpUI()
     }
@@ -88,8 +87,7 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         if requiredPassword != "" {
             askPassword(requiredPassword: requiredPassword)
         } else {
-            DBProvider.Instance.currentRoomID = chatRooms[index!].id
-            MessagesHandler.Instance.getChatRoomMessges()
+            performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
         }
     }
     
@@ -98,16 +96,9 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
             if let vc = segue.destination as? ChatVC {
                 vc.currentChatRoomID = chatRooms[index!].id
                 vc.currentChatRoomName = chatRooms[index!].name
-                vc.messages = messages
-                vc.messageColors = messageColors
+                DBProvider.Instance.currentRoomID = chatRooms[index!].id
             }
         }
-    }
-    
-    func allMessagesReceived(messages: [JSQMessage], messageColors: [String]) {
-        self.messages = messages
-        self.messageColors = messageColors
-        performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
     }
     
     @IBAction func logout(_ sender: Any) {

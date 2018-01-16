@@ -14,9 +14,6 @@ import JSQMessagesViewController
 
 protocol MessageReceivedDelegate: class {
     func messageReceived(senderID: String, senderName: String, text: String, color: String)
-}
-
-protocol AllMessagesReceivedDelegate: class {
     func allMessagesReceived(messages: [JSQMessage], messageColors: [String])
 }
 
@@ -25,7 +22,6 @@ class MessagesHandler {
     private init() {}
     
     weak var delegateMessage: MessageReceivedDelegate?
-    weak var delegateAllMessages: AllMessagesReceivedDelegate?
     
     static var Instance: MessagesHandler {
         return _instance
@@ -66,7 +62,7 @@ class MessagesHandler {
         DBProvider.Instance.chatRoomMessagesRef.removeAllObservers()
     }
     
-    func getChatRoomMessges() {
+    func getChatRoomMessages() {
         var messages = [JSQMessage]()
         var messageColors = [String]()
         
@@ -86,7 +82,7 @@ class MessagesHandler {
                     }
                 }
             }
-            self.delegateAllMessages?.allMessagesReceived(messages: messages, messageColors: messageColors)
+            self.delegateMessage?.allMessagesReceived(messages: messages, messageColors: messageColors)
         })
     }
 

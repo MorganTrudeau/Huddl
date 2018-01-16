@@ -67,7 +67,6 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
     }
     
-    
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
         return 1
     }
