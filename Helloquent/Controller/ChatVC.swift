@@ -37,8 +37,12 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         self.senderDisplayName = AuthProvider.Instance.currentUserName()
 
         MessagesHandler.Instance.delegateMessage = self
-        MessagesHandler.Instance.observeChatRoomMessges()
+    MessagesHandler.Instance.observeChatRoomMessges()
         MessagesHandler.Instance.getChatRoomMessages()
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
         
         setUpUI()
     }
@@ -65,11 +69,6 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         DBProvider.Instance.increaseActiveUsers()
     }
     
-    override func viewDidLayoutSubviews() {
-        super.viewDidLayoutSubviews()
-        self.topContentAdditionalInset = CGFloat(-65)
-    }
-    
     func setUpUI() {
         self.collectionView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
         self.navigationItem.title = currentChatRoomName;
@@ -82,6 +81,13 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
             scrollToBottom(animated: false)
         }
         self.tabBarController?.tabBar.isHidden = true
+    }
+    
+    @objc func keyboardWillShow(notification: NSNotification) {
+        self.topContentAdditionalInset = -65
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
     }
 
     // Collection view functions
@@ -176,7 +182,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         messageColors.append(color)
         self.collectionView.reloadData()
         self.collectionView.layoutIfNeeded()
-        super.scrollToBottom(animated: false)
+        scrollToBottom(animated: false)
     }
     
     func allMessagesReceived(messages: [JSQMessage], messageColors: [String]) {
@@ -184,11 +190,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         self.messageColors = messageColors
         self.collectionView.reloadData()
         self.collectionView.layoutIfNeeded()
-        super.scrollToBottom(animated: false)
-    }
-    
-    override func scrollToBottom(animated: Bool) {
-        
+        scrollToBottom(animated: false)
     }
     
     func colorDataReceived(color: String) {

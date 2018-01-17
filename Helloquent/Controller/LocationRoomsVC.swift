@@ -36,19 +36,27 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func setUpUI() {
         placesTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
-        self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
-        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
+    self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
+    self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
+        
+        placesSearchBar.delegate = self
+        
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        placesSearchBar.showsCancelButton = true
         searchActive = true
     }
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        placesSearchBar.showsCancelButton = false
         searchActive = false
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        placesSearchBar.text = ""
+        placesSearchBar.showsCancelButton = false
+        placesSearchBar.resignFirstResponder()
         searchActive = false
     }
     
@@ -65,6 +73,10 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
             self.autoSuggestions.removeAll()
             placesTableView.reloadData()
         }
+    }
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        placesSearchBar.resignFirstResponder()
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {

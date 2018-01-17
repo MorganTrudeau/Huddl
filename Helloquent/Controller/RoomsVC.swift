@@ -1,27 +1,25 @@
 //
-//  ChatRoomsVC.swift
+//  RoomsVC.swift
 //  Helloquent
 //
-//  Created by Morgan Trudeau on 2018-01-03.
+//  Created by Morgan Trudeau on 2018-01-17.
 //  Copyright © 2018 Morgan Trudeau. All rights reserved.
 //
 
+import Foundation
 import UIKit
-import JSQMessagesViewController
 
-class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, FetchChatRoomData, SavedChatRoom, UserEnteredRoom {
+class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, FetchChatRoomData, SavedChatRoom, UserEnteredRoom {
     
-    @IBOutlet weak var chatRoomTableView: UITableView!
-    @IBOutlet weak var chatRoomsToolbar: UIToolbar!
-    @IBOutlet weak var logoutButton: UIBarButtonItem!
+    @IBOutlet weak var roomsTableView: UITableView!
+    
+    @IBOutlet weak var roomSearchBar: UISearchBar!
     
     var chatRooms = [ChatRoom]()
     var index: Int?
-    var messages = [JSQMessage]()
-    var messageColors = [String]()
     
     let CHAT_SEGUE = "chat_room_segue"
-    let CELL_ID = "chat_room_cell"
+    let CELL_ID = "room_cell"
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -35,28 +33,23 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(true)
         DBProvider.Instance.getChatRooms()
-        DBProvider.Instance.observeChatRooms()
+        DBProvider.Instance.observeChatRoomsAdded()
+        DBProvider.Instance.observeChatRoomsChanged()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
-        DBProvider.Instance.removeChatRoomsObservers()
+        DBProvider.Instance.removeChatRoomsObserver(withHandle: Constants.CHILD_ADDED_HANDLE)
+        DBProvider.Instance.removeChatRoomsObserver(withHandle: Constants.CHILD_CHANGED_HANDLE)
     }
     
     func setUpUI() {
-        self.chatRoomTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
-    self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
-    self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
-        
-        self.chatRoomsToolbar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
+        self.roomsTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+        self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
+        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
     }
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-    }
-    
-    func chatRoomDataReceived(chatRooms: [ChatRoom]) {
-        self.chatRooms = chatRooms
-        chatRoomTableView.reloadData()
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -80,7 +73,7 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         cell.selectedBackgroundView = backgroundView
         return cell
     }
-
+    
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         index = indexPath.row
         let requiredPassword = chatRooms[index!].password
@@ -137,14 +130,6 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         present(alert, animated: true, completion: nil)
     }
     
-    func chatRoomSaved(success: Bool) {
-        if success {
-            DBProvider.Instance.getChatRooms()
-        } else {
-            self.alertUser(title: "Room Name Already Exists", message: "Enter another room name")
-        }
-    }
-    
     func alertUser(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
@@ -162,7 +147,7 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
                     self.performSegue(withIdentifier: self.CHAT_SEGUE, sender: nil)
                 } else {
                     self.alertUser(title: "Incorrect Password", message: "Please try again")
-                    self.chatRoomTableView.reloadData()
+                    self.roomsTableView.reloadData()
                 }
             }
         })
@@ -177,13 +162,31 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
         present(alert, animated: true, completion: nil)
     }
     
+    // Delegation functions
+    
     func userEnteredRoom() {
-        DBProvider.Instance.getChatRooms()
+       DBProvider.Instance.getChatRooms()
+    }
+    
+    func chatRoomDataReceived(chatRoom: ChatRoom) {
+        self.chatRooms.append(chatRoom)
+        roomsTableView.reloadData()
+    }
+    
+    func allChatRoomDataReceived(chatRooms: [ChatRoom]) {
+        self.chatRooms = chatRooms
+        roomsTableView.reloadData()
+    }
+    
+    func chatRoomSaved(success: Bool) {
+        if !success {
+            self.alertUser(title: "Room Name Already Exists", message: "Enter another room name")
+        }
     }
     
     
     
     
     
-
+    
 }

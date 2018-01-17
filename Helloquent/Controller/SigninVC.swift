@@ -6,6 +6,7 @@
 //  Copyright © 2017 Morgan Trudeau. All rights reserved.
 //
 
+import Foundation
 import UIKit
 import FBSDKCoreKit
 import FBSDKLoginKit

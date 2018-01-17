@@ -16,7 +16,8 @@ protocol FetchContactData: class {
 }
 
 protocol FetchChatRoomData: class {
-    func chatRoomDataReceived(chatRooms: [ChatRoom])
+    func chatRoomDataReceived(chatRoom: ChatRoom)
+    func allChatRoomDataReceived(chatRooms: [ChatRoom])
 }
 
 protocol FetchColorData: class {
@@ -51,6 +52,8 @@ class DBProvider {
     
     var currentRoomID: String?
     var selectedContactID: String?
+    var roomAddedHandle: UInt?
+    var roomChangedHandle: UInt?
     
     var dbRef: DatabaseReference {
         return Database.database().reference()
@@ -97,34 +100,6 @@ class DBProvider {
         contactsRef.child(withID).setValue(data)
     }
     
-    func getContacts() {
-        contactsRef.observeSingleEvent(of: DataEventType.value) {
-            (snapshot: DataSnapshot) in
-            
-            var contacts = [Contact]()
-            
-            if let myContacts = snapshot.value as? NSDictionary {
-                
-                for (key, value) in myContacts {
-                    
-                    if let contactData = value as? NSDictionary {
-                       
-                        if key as! String != AuthProvider.Instance.userID() {
-                            
-                            if let email = contactData[Constants.EMAIL] as? String {
-                                
-                                let id = key as! String
-                                let newContact = Contact(id: id, name: email, color: nil)
-                                contacts.append(newContact)
-                            }
-                        }
-                    }
-                }
-            }
-            self.delegateContacts?.contactDataReceived(contacts: contacts)
-        }
-    }
-    
     func currentUserColor() {
         var currentUserColor = ""
         contactsRef.child(AuthProvider.Instance.userID()).observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
@@ -144,8 +119,8 @@ class DBProvider {
             if !snapshot.hasChild(name) {
                 self.chatRoomsRef.child(name).setValue(data)
                 success = true
-                self.delegateSaveChatRoom?.chatRoomSaved(success: success)
             }
+            self.delegateSaveChatRoom?.chatRoomSaved(success: success)
         })
     }
     
@@ -159,6 +134,44 @@ class DBProvider {
                 self.delegateSaveChatRoom?.chatRoomSaved(success: success)
             }
         })
+    }
+    
+    func observeChatRoomsChanged() {
+        self.roomChangedHandle = chatRoomsRef.observe(DataEventType.childChanged) { (snapshot: DataSnapshot) in
+            self.delegateUserEnteredRoom?.userEnteredRoom()
+        }
+    }
+    
+    func observeChatRoomsAdded() {
+        var firstObserve = true
+        self.roomAddedHandle = chatRoomsRef.queryLimited(toLast: 1).observe(DataEventType.value) {(snapshot: DataSnapshot) in
+            
+            if firstObserve {
+                firstObserve = false
+            } else {
+                
+                if let data = snapshot.value as? NSDictionary {
+                    
+                    for (_, value) in data {
+                        
+                        if let roomData = value as? NSDictionary {
+                            
+                            if let roomName = roomData[Constants.ROOM_NAME] as? String {
+                                
+                                if let password =  roomData[Constants.PASSWORD] as? String {
+                                    
+                                    if let activeUsers = roomData[Constants.ACTIVE_USERS] as? Int {
+                                        let id = snapshot.key as String
+                                        let newRoom = ChatRoom(id: id, name: roomName, password: password, activeUsers: activeUsers)
+                                        self.delegateChatRooms?.chatRoomDataReceived(chatRoom: newRoom)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
     
     func getChatRooms() {
@@ -187,18 +200,16 @@ class DBProvider {
                     }
                 }
             }
-            self.delegateChatRooms?.chatRoomDataReceived(chatRooms: chatRooms)
+            self.delegateChatRooms?.allChatRoomDataReceived(chatRooms: chatRooms)
         }
     }
     
-    func observeChatRooms() {
-        chatRoomsRef.observe(DataEventType.childChanged) { (snapshot: DataSnapshot) in
-            self.delegateUserEnteredRoom?.userEnteredRoom()
+    func removeChatRoomsObserver(withHandle: String) {
+        if withHandle == Constants.CHILD_ADDED_HANDLE {
+            chatRoomsRef.removeObserver(withHandle: roomAddedHandle!)
+        } else if withHandle == Constants.CHILD_CHANGED_HANDLE {
+            chatRoomsRef.removeObserver(withHandle: roomChangedHandle!)
         }
-    }
-    
-    func removeChatRoomsObservers() {
-        chatRoomsRef.removeAllObservers()
     }
     
     func increaseActiveUsers() {
@@ -240,6 +251,34 @@ class DBProvider {
             }
             return TransactionResult.success(withValue: data)})
     }
+    
+//    func getContacts() {
+//        contactsRef.observeSingleEvent(of: DataEventType.value) {
+//            (snapshot: DataSnapshot) in
+//
+//            var contacts = [Contact]()
+//
+//            if let myContacts = snapshot.value as? NSDictionary {
+//
+//                for (key, value) in myContacts {
+//
+//                    if let contactData = value as? NSDictionary {
+//
+//                        if key as! String != AuthProvider.Instance.userID() {
+//
+//                            if let email = contactData[Constants.EMAIL] as? String {
+//
+//                                let id = key as! String
+//                                let newContact = Contact(id: id, name: email, color: nil)
+//                                contacts.append(newContact)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//            self.delegateContacts?.contactDataReceived(contacts: contacts)
+//        }
+//    }
     
     
 }
