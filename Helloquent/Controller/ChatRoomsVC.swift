@@ -11,7 +11,6 @@ import JSQMessagesViewController
 
 class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, FetchChatRoomData, SavedChatRoom, UserEnteredRoom {
     
-    @IBOutlet weak var addRoomButton: UIBarButtonItem!
     @IBOutlet weak var chatRoomTableView: UITableView!
     @IBOutlet weak var chatRoomsToolbar: UIToolbar!
     @IBOutlet weak var logoutButton: UIBarButtonItem!
@@ -46,8 +45,9 @@ class ChatRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource,
     
     func setUpUI() {
         self.chatRoomTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
-        self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
-        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
+    self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
+    self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
+        
         self.chatRoomsToolbar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
     }
     

@@ -53,7 +53,8 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         if !goingBack {
             DBProvider.Instance.decreaseActiveUsers()
         }
-        MessagesHandler.Instance.removeChatRoomObservers()
+    MessagesHandler.Instance.removeChatRoomObservers()
+        self.tabBarController?.tabBar.isHidden = false
     }
     
     @objc func handleResignActive() {
@@ -80,6 +81,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         if self.collectionView.contentSize.height > self.collectionView.frame.size.height {
             scrollToBottom(animated: false)
         }
+        self.tabBarController?.tabBar.isHidden = true
     }
 
     // Collection view functions

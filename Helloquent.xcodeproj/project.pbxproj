@@ -18,6 +18,7 @@
 		F90D105B1FECE33B0012283B /* SigninVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D105A1FECE33B0012283B /* SigninVC.swift */; };
 		F90D105D1FECEA7D0012283B /* ContactsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D105C1FECEA7D0012283B /* ContactsVC.swift */; };
 		F90D105F1FECFAFD0012283B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */; };
+		F9179B77200EBDFC0057AAEF /* TabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B76200EBDFC0057AAEF /* TabBarVC.swift */; };
 		F93364D81FEDE89D002A3718 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F93364D71FEDE89D002A3718 /* Assets.xcassets */; };
 		F93364DA1FEDE8BF002A3718 /* avatar.gif in Resources */ = {isa = PBXBuildFile; fileRef = F93364D91FEDE8BF002A3718 /* avatar.gif */; };
 		F93CA2A7200D38C200D9132C /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F93CA2A6200D38C200D9132C /* NMAKit.framework */; };
@@ -92,6 +93,7 @@
 		F90D105A1FECE33B0012283B /* SigninVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigninVC.swift; sourceTree = "<group>"; };
 		F90D105C1FECEA7D0012283B /* ContactsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsVC.swift; sourceTree = "<group>"; };
 		F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		F9179B76200EBDFC0057AAEF /* TabBarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarVC.swift; sourceTree = "<group>"; };
 		F93364D71FEDE89D002A3718 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F93364D91FEDE8BF002A3718 /* avatar.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = avatar.gif; path = Assets.xcassets/avatar.gif; sourceTree = "<group>"; };
 		F93CA2A6200D38C200D9132C /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NMAKit.framework; path = "../../../Downloads/HERESDK-Premium 4/framework/NMAKit.framework"; sourceTree = "<group>"; };
@@ -242,6 +244,7 @@
 				F973BC401FEDDA8700CC3C58 /* ChatVC.swift */,
 				F9E264DD1FFEDE5C00605CA7 /* PersonalChatVC.swift */,
 				F966C9D52005300000E92A39 /* LocationRoomsVC.swift */,
+				F9179B76200EBDFC0057AAEF /* TabBarVC.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -593,6 +596,7 @@
 				F966C9E32005384600E92A39 /* PlacesProvider.swift in Sources */,
 				F90D105D1FECEA7D0012283B /* ContactsVC.swift in Sources */,
 				F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */,
+				F9179B77200EBDFC0057AAEF /* TabBarVC.swift in Sources */,
 				F985FD4D200C294A00F1934B /* JSQMessage.swift in Sources */,
 				F973BC3F1FEDB47E00CC3C58 /* Contact.swift in Sources */,
 			);
