@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, FetchChatRoomData, SavedChatRoom, UserEnteredRoom {
+class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, FetchChatRoomData, SavedChatRoom, UserEnteredRoom {
     
     @IBOutlet weak var roomsTableView: UITableView!
     
@@ -26,6 +26,8 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Fet
         DBProvider.Instance.delegateChatRooms = self
         DBProvider.Instance.delegateSaveChatRoom = self
         DBProvider.Instance.delegateUserEnteredRoom = self
+        
+        roomSearchBar.delegate = self
         
         setUpUI()
     }
@@ -86,6 +88,10 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Fet
         } else {
             performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
         }
+    }
+    
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        roomSearchBar.resignFirstResponder()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
