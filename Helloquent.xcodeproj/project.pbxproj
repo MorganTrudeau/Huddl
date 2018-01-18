@@ -22,16 +22,17 @@
 		F9179B79200FD9060057AAEF /* RoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B78200FD9060057AAEF /* RoomsVC.swift */; };
 		F93364D81FEDE89D002A3718 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F93364D71FEDE89D002A3718 /* Assets.xcassets */; };
 		F93364DA1FEDE8BF002A3718 /* avatar.gif in Resources */ = {isa = PBXBuildFile; fileRef = F93364D91FEDE8BF002A3718 /* avatar.gif */; };
-		F93CA2A7200D38C200D9132C /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F93CA2A6200D38C200D9132C /* NMAKit.framework */; };
-		F93CA2A8200D38C200D9132C /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F93CA2A6200D38C200D9132C /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F966C9D62005300000E92A39 /* LocationRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F966C9D52005300000E92A39 /* LocationRoomsVC.swift */; };
-		F966C9E32005384600E92A39 /* PlacesProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F966C9E22005384600E92A39 /* PlacesProvider.swift */; };
 		F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC381FED050700CC3C58 /* AuthProvider.swift */; };
 		F973BC3B1FEDA66800CC3C58 /* DBProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */; };
 		F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3C1FEDA7B000CC3C58 /* Constants.swift */; };
 		F973BC3F1FEDB47E00CC3C58 /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3E1FEDB47E00CC3C58 /* Contact.swift */; };
 		F973BC411FEDDA8700CC3C58 /* ChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC401FEDDA8700CC3C58 /* ChatVC.swift */; };
 		F985FD4D200C294A00F1934B /* JSQMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F985FD4C200C294A00F1934B /* JSQMessage.swift */; };
+		F9C747D220107F4E00F311D8 /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9C747D120107F4E00F311D8 /* NMAKit.framework */; };
+		F9C747D320107F4E00F311D8 /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F9C747D120107F4E00F311D8 /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F9C747D720108FBA00F311D8 /* SavedRooms.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F9C747D520108FBA00F311D8 /* SavedRooms.xcdatamodeld */; };
+		F9C747D92010914C00F311D8 /* CoreDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C747D82010914C00F311D8 /* CoreDataHandler.swift */; };
 		F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */; };
 		F9E264D41FFD4EED00605CA7 /* SavedRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */; };
 		F9E264DA1FFDA35C00605CA7 /* ChatRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D91FFDA35C00605CA7 /* ChatRoom.swift */; };
@@ -57,13 +58,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		F966C9E1200537E000E92A39 /* Embed Frameworks */ = {
+		F9C747D420107F4E00F311D8 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				F93CA2A8200D38C200D9132C /* NMAKit.framework in Embed Frameworks */,
+				F9C747D320107F4E00F311D8 /* NMAKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -101,13 +102,15 @@
 		F93CA2A6200D38C200D9132C /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NMAKit.framework; path = "../../../Downloads/HERESDK-Premium 4/framework/NMAKit.framework"; sourceTree = "<group>"; };
 		F93CA2A9200D38C500D9132C /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NMAKit.framework; path = "../../../Downloads/HERESDK-Premium 4/framework/NMAKit.framework"; sourceTree = "<group>"; };
 		F966C9D52005300000E92A39 /* LocationRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRoomsVC.swift; sourceTree = "<group>"; };
-		F966C9E22005384600E92A39 /* PlacesProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlacesProvider.swift; sourceTree = "<group>"; };
 		F973BC381FED050700CC3C58 /* AuthProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProvider.swift; sourceTree = "<group>"; };
 		F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBProvider.swift; sourceTree = "<group>"; };
 		F973BC3C1FEDA7B000CC3C58 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		F973BC3E1FEDB47E00CC3C58 /* Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contact.swift; sourceTree = "<group>"; };
 		F973BC401FEDDA8700CC3C58 /* ChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatVC.swift; sourceTree = "<group>"; };
 		F985FD4C200C294A00F1934B /* JSQMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSQMessage.swift; sourceTree = "<group>"; };
+		F9C747D120107F4E00F311D8 /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NMAKit.framework; sourceTree = "<group>"; };
+		F9C747D620108FBA00F311D8 /* SavedRooms.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SavedRooms.xcdatamodel; sourceTree = "<group>"; };
+		F9C747D82010914C00F311D8 /* CoreDataHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataHandler.swift; sourceTree = "<group>"; };
 		F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesHandler.swift; sourceTree = "<group>"; };
 		F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRoomsVC.swift; sourceTree = "<group>"; };
 		F9E264D91FFDA35C00605CA7 /* ChatRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRoom.swift; sourceTree = "<group>"; };
@@ -120,7 +123,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F93CA2A7200D38C200D9132C /* NMAKit.framework in Frameworks */,
+				F9C747D220107F4E00F311D8 /* NMAKit.framework in Frameworks */,
 				4C97677652B24F944C9A1913 /* Pods_Helloquent.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -172,6 +175,7 @@
 			isa = PBXGroup;
 			children = (
 				F93CA2A6200D38C200D9132C /* NMAKit.framework */,
+				F9C747D120107F4E00F311D8 /* NMAKit.framework */,
 				F90D10271FECDFB90012283B /* Helloquent */,
 				F90D103C1FECDFB90012283B /* HelloquentTests */,
 				F90D10471FECDFB90012283B /* HelloquentUITests */,
@@ -204,6 +208,7 @@
 				F90D10311FECDFB90012283B /* LaunchScreen.storyboard */,
 				F90D10341FECDFB90012283B /* Info.plist */,
 				F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */,
+				F9C747D520108FBA00F311D8 /* SavedRooms.xcdatamodeld */,
 			);
 			path = Helloquent;
 			sourceTree = "<group>";
@@ -259,7 +264,7 @@
 				F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */,
 				F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */,
 				F9EA8BEC20008A6400A98421 /* ColorHandler.swift */,
-				F966C9E22005384600E92A39 /* PlacesProvider.swift */,
+				F9C747D82010914C00F311D8 /* CoreDataHandler.swift */,
 			);
 			path = Plugins;
 			sourceTree = "<group>";
@@ -277,7 +282,7 @@
 				F90D10231FECDFB90012283B /* Resources */,
 				305C6280B34B32D4666D380F /* [CP] Embed Pods Frameworks */,
 				B7DAFF3DF0D00F6FA42464A8 /* [CP] Copy Pods Resources */,
-				F966C9E1200537E000E92A39 /* Embed Frameworks */,
+				F9C747D420107F4E00F311D8 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -586,6 +591,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				F9E264DE1FFEDE5C00605CA7 /* PersonalChatVC.swift in Sources */,
+				F9C747D92010914C00F311D8 /* CoreDataHandler.swift in Sources */,
+				F9C747D720108FBA00F311D8 /* SavedRooms.xcdatamodeld in Sources */,
 				F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */,
 				F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */,
 				F9E264D41FFD4EED00605CA7 /* SavedRoomsVC.swift in Sources */,
@@ -596,7 +603,6 @@
 				F966C9D62005300000E92A39 /* LocationRoomsVC.swift in Sources */,
 				F973BC3B1FEDA66800CC3C58 /* DBProvider.swift in Sources */,
 				F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */,
-				F966C9E32005384600E92A39 /* PlacesProvider.swift in Sources */,
 				F90D105D1FECEA7D0012283B /* ContactsVC.swift in Sources */,
 				F9179B79200FD9060057AAEF /* RoomsVC.swift in Sources */,
 				F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */,
@@ -929,6 +935,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		F9C747D520108FBA00F311D8 /* SavedRooms.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				F9C747D620108FBA00F311D8 /* SavedRooms.xcdatamodel */,
+			);
+			currentVersion = F9C747D620108FBA00F311D8 /* SavedRooms.xcdatamodel */;
+			path = SavedRooms.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = F90D101D1FECDFB90012283B /* Project object */;
 }

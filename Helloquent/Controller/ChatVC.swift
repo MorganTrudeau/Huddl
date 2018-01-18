@@ -11,12 +11,16 @@ import JSQMessagesViewController
 import MobileCoreServices
 import AVKit
 
-class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FetchColorData, ActiveUsersDecreased {
+class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FetchColorData, ActiveUsersDecreased, FetchRoomCoreData {
+    
+    let m_coreDataHandler = CoreDataHandler.Instance
     
     var messages = [JSQMessage]()
     var messageColors = [String]()
     
-    var currentChatRoomID: String?
+    var m_isLiked = false
+    var m_savedRoomIDs = [String]()
+    var m_currentChatRoomID: String?
     var currentChatRoomName: String?
     var currentUserColor: String?
     var goingBack = false
@@ -37,7 +41,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         self.senderDisplayName = AuthProvider.Instance.currentUserName()
 
         MessagesHandler.Instance.delegateMessage = self
-    MessagesHandler.Instance.observeChatRoomMessges()
+        MessagesHandler.Instance.observeChatRoomMessges()
         MessagesHandler.Instance.getChatRoomMessages()
         
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
@@ -45,28 +49,6 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
         
         setUpUI()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(true)
-        DBProvider.Instance.increaseActiveUsers()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(true)
-        if !goingBack {
-            DBProvider.Instance.decreaseActiveUsers()
-        }
-    MessagesHandler.Instance.removeChatRoomObservers()
-        self.tabBarController?.tabBar.isHidden = false
-    }
-    
-    @objc func handleResignActive() {
-        DBProvider.Instance.decreaseActiveUsers()
-    }
-    
-    @objc func handleBecomeActive() {
-        DBProvider.Instance.increaseActiveUsers()
     }
     
     func setUpUI() {
@@ -82,6 +64,36 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         }
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        m_coreDataHandler.delegate = self
+        m_coreDataHandler.fetchRoomCoreData()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
+        DBProvider.Instance.increaseActiveUsers()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        if !goingBack {
+            DBProvider.Instance.decreaseActiveUsers()
+        }
+        MessagesHandler.Instance.removeChatRoomObservers()
+        self.tabBarController?.tabBar.isHidden = false
+    }
+    
+    @objc func handleResignActive() {
+        DBProvider.Instance.decreaseActiveUsers()
+    }
+    
+    @objc func handleBecomeActive() {
+        DBProvider.Instance.increaseActiveUsers()
+    }
+    
+    // Keyboard Functions
+    
     @objc func keyboardWillShow(notification: NSNotification) {
         self.topContentAdditionalInset = -65
     }
@@ -89,7 +101,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     @objc func keyboardWillHide(notification: NSNotification) {
     }
 
-    // Collection view functions
+    // CollectionView Functions
 
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
         return JSQMessagesAvatarImageFactory.avatarImage(with: UIImage(named: "avatar.gif"), diameter: 30)
@@ -144,7 +156,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     // Sending buttons functions
     
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        MessagesHandler.Instance.sendChatRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, chatRoomID: currentChatRoomID!, color: currentUserColor!)
+        MessagesHandler.Instance.sendChatRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, chatRoomID: m_currentChatRoomID!, color: currentUserColor!)
         
         // Removes text from text field
         finishSendingMessage()
@@ -204,6 +216,15 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     func activeUsersDecreased() {
         _ = navigationController?.popViewController(animated: true)
     }
+    
+    @IBAction func saveRoom(_ sender: Any) {
+        m_coreDataHandler.saveRoomCoreData(id: m_currentChatRoomID!)
+    }
+    
+    func coreRoomDataReceived(savedRoomIDs: [String]) {
+        m_savedRoomIDs = savedRoomIDs
+    }
+    
     
     
     

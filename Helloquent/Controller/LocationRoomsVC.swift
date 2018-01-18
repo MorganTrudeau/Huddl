@@ -67,6 +67,7 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         placesSearchBar.showsCancelButton = false
+        placesSearchBar.text = ""
         placesSearchBar.resignFirstResponder()
         searchActive = false
     }
@@ -77,7 +78,6 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText != "" {
-            self.searchActive = true
             placesRequest(query: searchText)
         } else {
             self.searchActive = false
@@ -141,7 +141,7 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
                     "\(autoSuggestionItem.position?.latitude ?? 1)\(autoSuggestionItem.position?.longitude ?? 1)"
                 currentChatRoomID = currentChatRoomID.replacingOccurrences(of: ".", with: "")
                 DBProvider.Instance.currentRoomID = currentChatRoomID
-                vc.currentChatRoomID = currentChatRoomID
+                vc.m_currentChatRoomID = currentChatRoomID
                 DBProvider.Instance.saveLocationChatRoom(id: currentChatRoomID, name: currentChatRoomName!, password: "")
                 
             }

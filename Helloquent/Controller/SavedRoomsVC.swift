@@ -9,10 +9,13 @@
 import Foundation
 import UIKit
 
-class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UserEnteredRoom, FetchChatRoomData {
+class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UserEnteredRoom, FetchChatRoomData, FetchRoomCoreData {
     
     @IBOutlet weak var savedRoomsTableView: UITableView!
     
+    let m_dbProvider = DBProvider.Instance
+    
+    var m_savedRoomIDs = [String]()
     var savedChatRooms = [ChatRoom]()
     var index: Int?
     
@@ -20,20 +23,27 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     let CELL_ID = "room_cell"
     
     override func viewDidLoad() {
-        super.viewDidLoad()
-        DBProvider.Instance.delegateUserEnteredRoom = self
         
         setUpUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        m_dbProvider.delegateChatRooms = self
+        m_dbProvider.delegateUserEnteredRoom = self
+        CoreDataHandler.Instance.delegate = self
+        CoreDataHandler.Instance.fetchRoomCoreData()
+        m_dbProvider.getChatRooms()
+    }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        DBProvider.Instance.observeChatRoomsChanged()
+        m_dbProvider.observeChatRoomsChanged()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         DBProvider.Instance.removeChatRoomsObserver(withHandle: Constants.CHILD_CHANGED_HANDLE)
+        savedChatRooms.removeAll()
     }
     
     func setUpUI() {
@@ -80,7 +90,7 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                vc.currentChatRoomID = savedChatRooms[index!].id
+                vc.m_currentChatRoomID = savedChatRooms[index!].id
                 vc.currentChatRoomName = savedChatRooms[index!].name
                 DBProvider.Instance.currentRoomID = savedChatRooms[index!].id
             }
@@ -130,8 +140,17 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     }
     
     func allChatRoomDataReceived(chatRooms: [ChatRoom]) {
-        self.savedChatRooms = chatRooms
-        savedRoomsTableView.reloadData()
+        if m_savedRoomIDs.count > 0 {
+            for id in m_savedRoomIDs {
+                let index = chatRooms.index { $0.id == id }
+                savedChatRooms.append(chatRooms[index!])
+            }
+            savedRoomsTableView.reloadData()
+        }
+    }
+    
+    func coreRoomDataReceived(savedRoomIDs: [String]) {
+        m_savedRoomIDs = savedRoomIDs
     }
     
     

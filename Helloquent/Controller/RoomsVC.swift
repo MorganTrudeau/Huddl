@@ -11,49 +11,89 @@ import UIKit
 
 class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, FetchChatRoomData, SavedChatRoom, UserEnteredRoom {
     
-    @IBOutlet weak var roomsTableView: UITableView!
+    @IBOutlet weak var m_roomsTableView: UITableView!
+    @IBOutlet weak var m_roomsSearchBar: UISearchBar!
     
-    @IBOutlet weak var roomSearchBar: UISearchBar!
+    let m_dbProvider = DBProvider.Instance
     
-    var chatRooms = [ChatRoom]()
-    var index: Int?
+    var m_chatRooms = [ChatRoom]()
+    var m_index: Int?
+    var m_searchActive = false
     
     let CHAT_SEGUE = "chat_room_segue"
     let CELL_ID = "room_cell"
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        DBProvider.Instance.delegateChatRooms = self
-        DBProvider.Instance.delegateSaveChatRoom = self
-        DBProvider.Instance.delegateUserEnteredRoom = self
+        m_dbProvider.delegateSaveChatRoom = self
         
-        roomSearchBar.delegate = self
+        m_roomsTableView.delegate = self
+        m_roomsTableView.dataSource = self
+        
+        m_roomsSearchBar.delegate = self
         
         setUpUI()
     }
     
+    func setUpUI() {
+        m_roomsTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+        self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
+        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        DBProvider.Instance.observeChatRoomsAdded()
+        m_dbProvider.delegateChatRooms = self
+        m_dbProvider.delegateUserEnteredRoom = self
+        m_dbProvider.observeChatRoomsAdded()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        DBProvider.Instance.observeChatRoomsChanged()
+        m_dbProvider.observeChatRoomsChanged()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
-        DBProvider.Instance.removeChatRoomsObserver(withHandle: Constants.CHILD_ADDED_HANDLE)
-        DBProvider.Instance.removeChatRoomsObserver(withHandle: Constants.CHILD_CHANGED_HANDLE)
-        chatRooms.removeAll()
+        m_dbProvider.removeChatRoomsObserver(withHandle: Constants.CHILD_ADDED_HANDLE)
+        m_dbProvider.removeChatRoomsObserver(withHandle: Constants.CHILD_CHANGED_HANDLE)
+        m_chatRooms.removeAll()
     }
     
-    func setUpUI() {
-        self.roomsTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
-        self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
-        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
+    // SearchBar Functions
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        m_roomsSearchBar.showsCancelButton = true
+        m_searchActive = true
     }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchText != "" {
+            m_chatRooms = m_chatRooms.filter { $0.name.lowercased().contains(searchText.lowercased()) }
+            m_roomsTableView.reloadData()
+        } else {
+            m_searchActive = false
+            m_dbProvider.getChatRooms()
+        }
+    }
+    
+    func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
+        if m_roomsSearchBar.text == "" {
+            m_searchActive = false
+            m_dbProvider.getChatRooms()
+        }
+        m_roomsSearchBar.showsCancelButton = false
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        m_roomsSearchBar.showsCancelButton = false
+        m_dbProvider.getChatRooms()
+        m_roomsSearchBar.text = ""
+        m_roomsSearchBar.resignFirstResponder()
+        m_searchActive = false
+    }
+    
+    // TableView Functions
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
     }
@@ -63,14 +103,14 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return chatRooms.count
+        return m_chatRooms.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCellStyle.subtitle,
                                    reuseIdentifier: CELL_ID)
-        cell.textLabel?.text = chatRooms[indexPath.row].name
-        cell.detailTextLabel?.text = String(chatRooms[indexPath.row].activeUsers) + " Active Users"
+        cell.textLabel?.text = m_chatRooms[indexPath.row].name
+        cell.detailTextLabel?.text = String(m_chatRooms[indexPath.row].activeUsers) + " Active Users"
         cell.textLabel?.textColor = UIColor.white
         cell.detailTextLabel?.textColor = UIColor.white
         cell.contentView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
@@ -81,8 +121,8 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        index = indexPath.row
-        let requiredPassword = chatRooms[index!].password
+        m_index = indexPath.row
+        let requiredPassword = m_chatRooms[m_index!].password
         if requiredPassword != "" {
             askPassword(requiredPassword: requiredPassword)
         } else {
@@ -91,15 +131,15 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        roomSearchBar.resignFirstResponder()
+        m_roomsSearchBar.resignFirstResponder()
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                vc.currentChatRoomID = chatRooms[index!].id
-                vc.currentChatRoomName = chatRooms[index!].name
-                DBProvider.Instance.currentRoomID = chatRooms[index!].id
+                vc.m_currentChatRoomID = m_chatRooms[m_index!].id
+                vc.currentChatRoomName = m_chatRooms[m_index!].name
+                DBProvider.Instance.currentRoomID = m_chatRooms[m_index!].id
             }
         }
     }
@@ -157,7 +197,7 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
                     self.performSegue(withIdentifier: self.CHAT_SEGUE, sender: nil)
                 } else {
                     self.alertUser(title: "Incorrect Password", message: "Please try again")
-                    self.roomsTableView.reloadData()
+                    self.m_roomsTableView.reloadData()
                 }
             }
         })
@@ -172,20 +212,26 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
         present(alert, animated: true, completion: nil)
     }
     
-    // Delegation functions
+    // Delegation Functions
     
     func userEnteredRoom() {
-       DBProvider.Instance.getChatRooms()
+        if !m_searchActive {
+            DBProvider.Instance.getChatRooms()
+        }
     }
     
     func chatRoomDataReceived(chatRoom: ChatRoom) {
-        self.chatRooms.append(chatRoom)
-        roomsTableView.reloadData()
+        if !m_searchActive {
+            m_chatRooms.append(chatRoom)
+            m_roomsTableView.reloadData()
+        }
     }
     
     func allChatRoomDataReceived(chatRooms: [ChatRoom]) {
-        self.chatRooms = chatRooms
-        roomsTableView.reloadData()
+        if !m_searchActive {
+            m_chatRooms = chatRooms
+            m_roomsTableView.reloadData()
+        }
     }
     
     func chatRoomSaved(success: Bool) {

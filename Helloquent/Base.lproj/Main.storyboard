@@ -160,7 +160,11 @@
                         <viewLayoutGuide key="safeArea" id="eAe-gp-8vD"/>
                     </view>
                     <navigationItem key="navigationItem" id="Oau-bZ-HA7">
-                        <barButtonItem key="rightBarButtonItem" image="heart" id="Dzn-ig-NGV"/>
+                        <barButtonItem key="rightBarButtonItem" image="heart" id="Dzn-ig-NGV">
+                            <connections>
+                                <action selector="saveRoom:" destination="vCp-1D-NmO" id="QNW-s2-DFP"/>
+                            </connections>
+                        </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="navigationItem" destination="Oau-bZ-HA7" id="8vs-or-6cS"/>
@@ -193,7 +197,6 @@
         <!--Saved-->
         <scene sceneID="Y2h-8D-T0g">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Noc-YC-ZTP" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="byw-mV-f38" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Saved" image="heart" id="eS5-Yr-F6G"/>
                     <toolbarItems/>
@@ -206,6 +209,7 @@
                         <segue destination="uUz-x9-H7g" kind="relationship" relationship="rootViewController" id="zdy-lV-x9a"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Noc-YC-ZTP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="454" y="-1891"/>
         </scene>
@@ -231,10 +235,6 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </prototypes>
-                                <connections>
-                                    <outlet property="dataSource" destination="UAd-1Q-fqH" id="20U-Kh-bR7"/>
-                                    <outlet property="delegate" destination="UAd-1Q-fqH" id="GgE-Px-wkA"/>
-                                </connections>
                             </tableView>
                             <searchBar contentMode="redraw" fixedFrame="YES" placeholder="Search Room" translatesAutoresizingMaskIntoConstraints="NO" id="tN4-NB-8bX">
                                 <rect key="frame" x="0.0" y="64" width="375" height="56"/>
@@ -263,8 +263,8 @@
                         </barButtonItem>
                     </navigationItem>
                     <connections>
-                        <outlet property="roomSearchBar" destination="tN4-NB-8bX" id="An3-SZ-v4q"/>
-                        <outlet property="roomsTableView" destination="gim-hP-xC7" id="9cQ-mx-SI0"/>
+                        <outlet property="m_roomsSearchBar" destination="tN4-NB-8bX" id="AVV-tw-d3D"/>
+                        <outlet property="m_roomsTableView" destination="gim-hP-xC7" id="YIc-6l-gkf"/>
                         <segue destination="vCp-1D-NmO" kind="show" identifier="chat_room_segue" id="c8E-JZ-ZGQ"/>
                     </connections>
                 </viewController>
@@ -318,6 +318,6 @@
         <image name="search" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="G47-XT-NOq"/>
+        <segue reference="c8E-JZ-ZGQ"/>
     </inferredMetricsTieBreakers>
 </document>
