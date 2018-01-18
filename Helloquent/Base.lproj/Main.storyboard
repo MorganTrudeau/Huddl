@@ -152,14 +152,16 @@
         <!--ChatVC-->
         <scene sceneID="LDk-FZ-jkK">
             <objects>
-                <viewController id="vCp-1D-NmO" customClass="ChatVC" customModule="Helloquent" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController hidesBottomBarWhenPushed="YES" id="vCp-1D-NmO" customClass="ChatVC" customModule="Helloquent" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="anf-on-JuP">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="618"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <viewLayoutGuide key="safeArea" id="eAe-gp-8vD"/>
                     </view>
-                    <navigationItem key="navigationItem" id="Oau-bZ-HA7"/>
+                    <navigationItem key="navigationItem" id="Oau-bZ-HA7">
+                        <barButtonItem key="rightBarButtonItem" image="heart" id="Dzn-ig-NGV"/>
+                    </navigationItem>
                     <connections>
                         <outlet property="navigationItem" destination="Oau-bZ-HA7" id="8vs-or-6cS"/>
                     </connections>
@@ -316,6 +318,6 @@
         <image name="search" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="c8E-JZ-ZGQ"/>
+        <segue reference="G47-XT-NOq"/>
     </inferredMetricsTieBreakers>
 </document>

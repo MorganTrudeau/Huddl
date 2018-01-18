@@ -143,30 +143,18 @@ class DBProvider {
     }
     
     func observeChatRoomsAdded() {
-        var firstObserve = true
-        self.roomAddedHandle = chatRoomsRef.queryLimited(toLast: 1).observe(DataEventType.value) {(snapshot: DataSnapshot) in
-            
-            if firstObserve {
-                firstObserve = false
-            } else {
+        self.roomAddedHandle = chatRoomsRef.observe(DataEventType.childAdded) {(snapshot: DataSnapshot) in
                 
-                if let data = snapshot.value as? NSDictionary {
-                    
-                    for (_, value) in data {
-                        
-                        if let roomData = value as? NSDictionary {
+            if let data = snapshot.value as? NSDictionary {
                             
-                            if let roomName = roomData[Constants.ROOM_NAME] as? String {
-                                
-                                if let password =  roomData[Constants.PASSWORD] as? String {
-                                    
-                                    if let activeUsers = roomData[Constants.ACTIVE_USERS] as? Int {
-                                        let id = snapshot.key as String
-                                        let newRoom = ChatRoom(id: id, name: roomName, password: password, activeUsers: activeUsers)
-                                        self.delegateChatRooms?.chatRoomDataReceived(chatRoom: newRoom)
-                                    }
-                                }
-                            }
+                if let roomName = data[Constants.ROOM_NAME] as? String {
+                    
+                    if let password =  data[Constants.PASSWORD] as? String {
+                        
+                        if let activeUsers = data[Constants.ACTIVE_USERS] as? Int {
+                            let id = snapshot.key as String
+                                let newRoom = ChatRoom(id: id, name: roomName, password: password, activeUsers: activeUsers)
+                            self.delegateChatRooms?.chatRoomDataReceived(chatRoom: newRoom)
                         }
                     }
                 }

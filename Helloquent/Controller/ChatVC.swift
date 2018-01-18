@@ -80,7 +80,6 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         if self.collectionView.contentSize.height > self.collectionView.frame.size.height {
             scrollToBottom(animated: false)
         }
-        self.tabBarController?.tabBar.isHidden = true
     }
     
     @objc func keyboardWillShow(notification: NSNotification) {

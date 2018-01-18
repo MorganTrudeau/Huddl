@@ -31,9 +31,12 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Fet
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(true)
-        DBProvider.Instance.getChatRooms()
+        super.viewWillAppear(animated)
         DBProvider.Instance.observeChatRoomsAdded()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         DBProvider.Instance.observeChatRoomsChanged()
     }
     
@@ -41,6 +44,7 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Fet
         super.viewWillDisappear(true)
         DBProvider.Instance.removeChatRoomsObserver(withHandle: Constants.CHILD_ADDED_HANDLE)
         DBProvider.Instance.removeChatRoomsObserver(withHandle: Constants.CHILD_CHANGED_HANDLE)
+        chatRooms.removeAll()
     }
     
     func setUpUI() {

@@ -34,6 +34,18 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
         setUpUI()
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        placesSearchBar.text = ""
+        autoSuggestions.removeAll()
+        placesTableView.reloadData()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        placesSearchBar.resignFirstResponder()
+    }
+    
     func setUpUI() {
         placesTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
     self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
@@ -54,7 +66,6 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        placesSearchBar.text = ""
         placesSearchBar.showsCancelButton = false
         placesSearchBar.resignFirstResponder()
         searchActive = false
@@ -84,10 +95,6 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print(autoSuggestions.count)
-        for place in autoSuggestions {
-            print(place.highlightedTitle!)
-        }
         return autoSuggestions.count
     }
     
