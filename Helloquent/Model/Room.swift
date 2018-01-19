@@ -1,5 +1,5 @@
 //
-//  ChatRoom.swift
+//  Room.swift
 //  Helloquent
 //
 //  Created by Morgan Trudeau on 2018-01-03.
@@ -8,7 +8,7 @@
 
 import Foundation
 
-class ChatRoom {
+class Room {
     
     private var _name = ""
     private var _id = ""

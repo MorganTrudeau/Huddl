@@ -26,41 +26,36 @@ class CoreDataHandler {
     
     private var m_roomIDs = [String]()
     
-    func saveRoomCoreData(id: String) {
+    func saveRoomCoreData(currentRoomID: String) {
         
-        if !m_roomIDs.contains(id) {
+        if !m_roomIDs.contains(currentRoomID) {
             guard let appDelegate =
                 UIApplication.shared.delegate as? AppDelegate else {
                     return
             }
             
-            // 1
             let managedContext =
                 appDelegate.persistentContainer.viewContext
             
-            // 2
             let entity =
-                NSEntityDescription.entity(forEntityName: "Room",
+                NSEntityDescription.entity(forEntityName: "RoomData",
                                            in: managedContext)!
             
             let room = NSManagedObject(entity: entity,
                                        insertInto: managedContext)
             
-            // 3
-            room.setValue(id, forKeyPath: "id")
+            room.setValue(currentRoomID, forKeyPath: "id")
             
-            // 4
             do {
                 try managedContext.save()
-            } catch let error as NSError {
-                print("Could not save. \(error), \(error.userInfo)")
+            } catch {
+                print("save error")
             }
         }
     }
     
-    func fetchRoomCoreData() {
+    func deleteRoomCoreData(currentRoomID: String) {
         
-        //1
         guard let appDelegate =
             UIApplication.shared.delegate as? AppDelegate else {
                 return
@@ -69,11 +64,32 @@ class CoreDataHandler {
         let managedContext =
             appDelegate.persistentContainer.viewContext
         
-        //2
-        let fetchRequest =
-            NSFetchRequest<NSManagedObject>(entityName: "Room")
+        let fetchRequest = NSFetchRequest<NSManagedObject>(entityName: "RoomData")
         
-        //3
+        do{
+            let rooms = try managedContext.fetch(fetchRequest)
+            if let indexToDelete = rooms.index(where: { $0.value(forKey: "id") as! String == currentRoomID }) {
+                managedContext.delete(rooms[indexToDelete])
+            }
+        } catch {
+            print("delete error")
+        }
+
+    }
+    
+    func fetchRoomCoreData() {
+        
+        guard let appDelegate =
+            UIApplication.shared.delegate as? AppDelegate else {
+                return
+        }
+        
+        let managedContext =
+            appDelegate.persistentContainer.viewContext
+        
+        let fetchRequest =
+            NSFetchRequest<NSManagedObject>(entityName: "RoomData")
+        
         do {
             let coreData = try managedContext.fetch(fetchRequest)
             m_roomIDs.removeAll()
@@ -82,8 +98,16 @@ class CoreDataHandler {
             }
             self.delegate?.coreRoomDataReceived(savedRoomIDs: m_roomIDs)
             
-        } catch let error as NSError {
-            print("Could not fetch. \(error), \(error.userInfo)")
+        } catch {
+            print("fetch error")
         }
     }
+    
+    func isCurrentRoomSaved(currentRoomID: String) -> Bool {
+        let isSaved = m_roomIDs.contains(where: { $0 == currentRoomID })
+        return isSaved
+    }
+    
+    
+    
 }

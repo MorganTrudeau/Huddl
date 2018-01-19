@@ -72,7 +72,7 @@ class AuthProvider {
             } else if user?.uid != nil {
                 //Store in db
                 let userColor = ColorHandler.Instance.userColor()
-                DBProvider.Instance.saveUser(withID: user!.uid, email: email, password: password, color: userColor)
+                DBProvider.Instance.createUser(withID: user!.uid, email: email, password: password, color: userColor)
                 
                 //Sign in user
                 self.login(email: email, password: password, loginHandler: loginHandler)

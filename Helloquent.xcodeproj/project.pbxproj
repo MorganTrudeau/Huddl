@@ -16,7 +16,6 @@
 		F90D103E1FECDFB90012283B /* HelloquentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D103D1FECDFB90012283B /* HelloquentTests.swift */; };
 		F90D10491FECDFB90012283B /* HelloquentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D10481FECDFB90012283B /* HelloquentUITests.swift */; };
 		F90D105B1FECE33B0012283B /* SigninVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D105A1FECE33B0012283B /* SigninVC.swift */; };
-		F90D105D1FECEA7D0012283B /* ContactsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D105C1FECEA7D0012283B /* ContactsVC.swift */; };
 		F90D105F1FECFAFD0012283B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */; };
 		F9179B77200EBDFC0057AAEF /* TabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B76200EBDFC0057AAEF /* TabBarVC.swift */; };
 		F9179B79200FD9060057AAEF /* RoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B78200FD9060057AAEF /* RoomsVC.swift */; };
@@ -35,8 +34,7 @@
 		F9C747D92010914C00F311D8 /* CoreDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C747D82010914C00F311D8 /* CoreDataHandler.swift */; };
 		F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */; };
 		F9E264D41FFD4EED00605CA7 /* SavedRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */; };
-		F9E264DA1FFDA35C00605CA7 /* ChatRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D91FFDA35C00605CA7 /* ChatRoom.swift */; };
-		F9E264DE1FFEDE5C00605CA7 /* PersonalChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264DD1FFEDE5C00605CA7 /* PersonalChatVC.swift */; };
+		F9E264DA1FFDA35C00605CA7 /* Room.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D91FFDA35C00605CA7 /* Room.swift */; };
 		F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EA8BEC20008A6400A98421 /* ColorHandler.swift */; };
 /* End PBXBuildFile section */
 
@@ -93,7 +91,6 @@
 		F90D10481FECDFB90012283B /* HelloquentUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelloquentUITests.swift; sourceTree = "<group>"; };
 		F90D104A1FECDFB90012283B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F90D105A1FECE33B0012283B /* SigninVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigninVC.swift; sourceTree = "<group>"; };
-		F90D105C1FECEA7D0012283B /* ContactsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsVC.swift; sourceTree = "<group>"; };
 		F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F9179B76200EBDFC0057AAEF /* TabBarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarVC.swift; sourceTree = "<group>"; };
 		F9179B78200FD9060057AAEF /* RoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomsVC.swift; sourceTree = "<group>"; };
@@ -113,8 +110,7 @@
 		F9C747D82010914C00F311D8 /* CoreDataHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataHandler.swift; sourceTree = "<group>"; };
 		F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesHandler.swift; sourceTree = "<group>"; };
 		F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRoomsVC.swift; sourceTree = "<group>"; };
-		F9E264D91FFDA35C00605CA7 /* ChatRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatRoom.swift; sourceTree = "<group>"; };
-		F9E264DD1FFEDE5C00605CA7 /* PersonalChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalChatVC.swift; sourceTree = "<group>"; };
+		F9E264D91FFDA35C00605CA7 /* Room.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Room.swift; sourceTree = "<group>"; };
 		F9EA8BEC20008A6400A98421 /* ColorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHandler.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -236,7 +232,7 @@
 			children = (
 				F973BC3C1FEDA7B000CC3C58 /* Constants.swift */,
 				F973BC3E1FEDB47E00CC3C58 /* Contact.swift */,
-				F9E264D91FFDA35C00605CA7 /* ChatRoom.swift */,
+				F9E264D91FFDA35C00605CA7 /* Room.swift */,
 				F985FD4C200C294A00F1934B /* JSQMessage.swift */,
 			);
 			path = Model;
@@ -250,8 +246,6 @@
 				F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */,
 				F966C9D52005300000E92A39 /* LocationRoomsVC.swift */,
 				F973BC401FEDDA8700CC3C58 /* ChatVC.swift */,
-				F90D105C1FECEA7D0012283B /* ContactsVC.swift */,
-				F9E264DD1FFEDE5C00605CA7 /* PersonalChatVC.swift */,
 				F9179B76200EBDFC0057AAEF /* TabBarVC.swift */,
 			);
 			path = Controller;
@@ -590,7 +584,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F9E264DE1FFEDE5C00605CA7 /* PersonalChatVC.swift in Sources */,
 				F9C747D92010914C00F311D8 /* CoreDataHandler.swift in Sources */,
 				F9C747D720108FBA00F311D8 /* SavedRooms.xcdatamodeld in Sources */,
 				F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */,
@@ -599,11 +592,10 @@
 				F973BC411FEDDA8700CC3C58 /* ChatVC.swift in Sources */,
 				F90D105B1FECE33B0012283B /* SigninVC.swift in Sources */,
 				F90D10291FECDFB90012283B /* AppDelegate.swift in Sources */,
-				F9E264DA1FFDA35C00605CA7 /* ChatRoom.swift in Sources */,
+				F9E264DA1FFDA35C00605CA7 /* Room.swift in Sources */,
 				F966C9D62005300000E92A39 /* LocationRoomsVC.swift in Sources */,
 				F973BC3B1FEDA66800CC3C58 /* DBProvider.swift in Sources */,
 				F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */,
-				F90D105D1FECEA7D0012283B /* ContactsVC.swift in Sources */,
 				F9179B79200FD9060057AAEF /* RoomsVC.swift in Sources */,
 				F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */,
 				F9179B77200EBDFC0057AAEF /* TabBarVC.swift in Sources */,

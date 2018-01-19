@@ -11,8 +11,8 @@ import Foundation
 class Constants {
     
     // DBProvider
-    static let CONTACTS = "Contacts"
-    static let CHAT_ROOMS = "Chat_Rooms"
+    static let USERS = "Users"
+    static let ROOMS = "Rooms"
     static let MESSAGES = "Messages"
     static let MEDIA_MESSAGES = "Media_Messages"
     static let IMAGE_STORAGE = "Image_Storage"
@@ -29,7 +29,7 @@ class Constants {
     static let SENDER_NAME = "sender_name"
     static let URL = "url"
     
-    // Chat Room
+    // Room
     static let ROOM_NAME = "room_name"
     static let ROOM_ID = "room_id"
     static let ACTIVE_USERS = "active_users"

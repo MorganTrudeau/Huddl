@@ -15,6 +15,7 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     @IBOutlet weak var m_placesSearchBar: UISearchBar!
     @IBOutlet weak var m_placesTableView: UITableView!
     
+    let m_dbProvider = DBProvider.Instance
     
     var m_index: IndexPath?
     var m_autoSuggestions = [NMAAutoSuggestPlace]()
@@ -73,7 +74,7 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText == "" {
-            self.m_autoSuggestions.removeAll()
+            m_autoSuggestions.removeAll()
             m_placesTableView.reloadData()
         }
     }
@@ -126,15 +127,15 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                let currentChatRoomName = m_placesTableView.cellForRow(at: m_index!)?.textLabel?.text
-                vc.currentChatRoomName = currentChatRoomName
+                let currentRoomName = m_placesTableView.cellForRow(at: m_index!)?.textLabel?.text
                 let autoSuggestionItem = m_autoSuggestions[m_index!.row]
-                var currentChatRoomID =
+                var currentRoomID =
                     "\(autoSuggestionItem.position?.latitude ?? 1)\(autoSuggestionItem.position?.longitude ?? 1)"
-                currentChatRoomID = currentChatRoomID.replacingOccurrences(of: ".", with: "")
-                DBProvider.Instance.currentRoomID = currentChatRoomID
-                vc.m_currentChatRoomID = currentChatRoomID
-                DBProvider.Instance.saveLocationChatRoom(id: currentChatRoomID, name: currentChatRoomName!, password: "")
+                currentRoomID = currentRoomID.replacingOccurrences(of: ".", with: "")
+                vc.m_currentRoomName = currentRoomName
+                vc.m_currentRoomID = currentRoomID
+                m_dbProvider.m_currentRoomID = currentRoomID
+                m_dbProvider.createLocationRoom(id: currentRoomID, name: currentRoomName!, password: "")
                 
             }
         }

@@ -27,15 +27,15 @@ class MessagesHandler {
         return _instance
     }
     
-    func sendChatRoomMessage(senderID: String, senderName: String, text: String, chatRoomID: String, color: String) {
+    func sendRoomMessage(senderID: String, senderName: String, text: String, RoomID: String, color: String) {
         let data: Dictionary<String, Any> = [Constants.SENDER_ID: senderID, Constants.SENDER_NAME: senderName, Constants.TEXT: text, Constants.COLOR: color]
-        DBProvider.Instance.currentRoomID = chatRoomID
-    DBProvider.Instance.chatRoomMessagesRef.childByAutoId().setValue(data)
+        DBProvider.Instance.m_currentRoomID = RoomID
+    DBProvider.Instance.roomMessagesRef.childByAutoId().setValue(data)
     }
     
-    func observeChatRoomMessges() {
+    func observeRoomMessges() {
         var firstObserve = true
-        DBProvider.Instance.chatRoomMessagesRef.queryLimited(toLast: 1).observe(DataEventType.value) { (snapshot: DataSnapshot) in
+        DBProvider.Instance.roomMessagesRef.queryLimited(toLast: 1).observe(DataEventType.value) { (snapshot: DataSnapshot) in
             if firstObserve {
                 firstObserve = false
             } else {
@@ -58,15 +58,15 @@ class MessagesHandler {
         }
     }
     
-    func removeChatRoomObservers() {
-        DBProvider.Instance.chatRoomMessagesRef.removeAllObservers()
+    func removeRoomObservers() {
+        DBProvider.Instance.roomMessagesRef.removeAllObservers()
     }
     
-    func getChatRoomMessages() {
+    func getRoomMessages() {
         var messages = [JSQMessage]()
         var messageColors = [String]()
         
-        DBProvider.Instance.chatRoomMessagesRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+        DBProvider.Instance.roomMessagesRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             
             for child in snapshot.children.allObjects as! [DataSnapshot] {
                 if let messageData = child.value as? NSDictionary {

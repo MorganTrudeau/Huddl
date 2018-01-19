@@ -10,14 +10,15 @@ import Foundation
 import UIKit
 import NMAKit
 
-class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, FetchChatRoomData, SavedChatRoom, UserEnteredRoom {
+class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, FetchRoomData, CreateRoom, UserEnteredRoom {
     
     @IBOutlet weak var m_roomsTableView: UITableView!
     @IBOutlet weak var m_roomsSearchBar: UISearchBar!
     
     let m_dbProvider = DBProvider.Instance
     
-    var m_chatRooms = [ChatRoom]()
+    var m_rooms = [Room]()
+    var m_filteredRooms = [Room]()
     var m_index: Int?
     var m_searchActive = false
     
@@ -26,14 +27,14 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        m_dbProvider.delegateSaveChatRoom = self
+        m_dbProvider.delegateCreateRoom = self
         
         m_roomsTableView.delegate = self
         m_roomsTableView.dataSource = self
         
         m_roomsSearchBar.delegate = self
         
-       NMAPositioningManager.sharedInstance().startPositioning()
+        NMAPositioningManager.sharedInstance().startPositioning()
         
         setUpUI()
     }
@@ -46,51 +47,49 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        m_dbProvider.delegateChatRooms = self
+        m_dbProvider.delegateRooms = self
         m_dbProvider.delegateUserEnteredRoom = self
-        m_dbProvider.observeChatRoomsAdded()
+        m_dbProvider.observeRoomsAdded()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        m_dbProvider.observeChatRoomsChanged()
+        m_dbProvider.observeRoomsChanged()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
-        m_dbProvider.removeChatRoomsObserver(withHandle: Constants.CHILD_ADDED_HANDLE)
-        m_dbProvider.removeChatRoomsObserver(withHandle: Constants.CHILD_CHANGED_HANDLE)
-        m_chatRooms.removeAll()
+        m_dbProvider.removeRoomsObserver(withHandle: Constants.CHILD_ADDED_HANDLE)
+        m_dbProvider.removeRoomsObserver(withHandle: Constants.CHILD_CHANGED_HANDLE)
+        m_rooms.removeAll()
+        m_roomsSearchBar.resignFirstResponder()
+        m_roomsSearchBar.text = ""
     }
     
     // SearchBar Functions
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
         m_roomsSearchBar.showsCancelButton = true
-        m_searchActive = true
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText != "" {
-            m_chatRooms = m_chatRooms.filter { $0.name.lowercased().contains(searchText.lowercased()) }
+            m_searchActive = true
+            m_filteredRooms = m_rooms.filter { $0.name.lowercased().contains(searchText.lowercased()) }
             m_roomsTableView.reloadData()
         } else {
             m_searchActive = false
-            m_dbProvider.getChatRooms()
+            m_roomsTableView.reloadData()
         }
     }
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        if m_roomsSearchBar.text == "" {
-            m_searchActive = false
-            m_dbProvider.getChatRooms()
-        }
         m_roomsSearchBar.showsCancelButton = false
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         m_roomsSearchBar.showsCancelButton = false
-        m_dbProvider.getChatRooms()
+        m_dbProvider.getRooms()
         m_roomsSearchBar.text = ""
         m_roomsSearchBar.resignFirstResponder()
         m_searchActive = false
@@ -106,30 +105,50 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return m_chatRooms.count
+        if !m_searchActive {
+            return m_rooms.count
+        } else {
+            return m_filteredRooms.count
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCellStyle.subtitle,
                                    reuseIdentifier: CELL_ID)
-        cell.textLabel?.text = m_chatRooms[indexPath.row].name
-        cell.detailTextLabel?.text = String(m_chatRooms[indexPath.row].activeUsers) + " Active Users"
         cell.textLabel?.textColor = UIColor.white
         cell.detailTextLabel?.textColor = UIColor.white
         cell.contentView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
         let backgroundView = UIView()
         backgroundView.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
         cell.selectedBackgroundView = backgroundView
+        
+        if !m_searchActive {
+            cell.textLabel?.text = m_rooms[indexPath.row].name
+            cell.detailTextLabel?.text = String(m_rooms[indexPath.row].activeUsers) + " Active Users"
+        } else {
+            cell.textLabel?.text = m_filteredRooms[indexPath.row].name
+            cell.detailTextLabel?.text = String(m_filteredRooms[indexPath.row].activeUsers) + " Active Users"
+        }
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         m_index = indexPath.row
-        let requiredPassword = m_chatRooms[m_index!].password
-        if requiredPassword != "" {
-            askPassword(requiredPassword: requiredPassword)
+        m_roomsTableView.deselectRow(at: indexPath, animated: false)
+        if !m_searchActive {
+            let requiredPassword = m_rooms[indexPath.row].password
+            if requiredPassword != "" {
+                askPassword(requiredPassword: requiredPassword)
+            } else {
+                performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
+            }
         } else {
-            performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
+            let requiredPassword = m_filteredRooms[indexPath.row].password
+            if requiredPassword != "" {
+                askPassword(requiredPassword: requiredPassword)
+            } else {
+                performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
+            }
         }
     }
     
@@ -140,9 +159,15 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                vc.m_currentChatRoomID = m_chatRooms[m_index!].id
-                vc.currentChatRoomName = m_chatRooms[m_index!].name
-                DBProvider.Instance.currentRoomID = m_chatRooms[m_index!].id
+                if !m_searchActive {
+                    vc.m_currentRoomID = m_rooms[m_index!].id
+                    vc.m_currentRoomName = m_rooms[m_index!].name
+                    m_dbProvider.m_currentRoomID = m_rooms[m_index!].id
+                } else {
+                    vc.m_currentRoomID = m_filteredRooms[m_index!].id
+                    vc.m_currentRoomName = m_filteredRooms[m_index!].name
+                    m_dbProvider.m_currentRoomID = m_filteredRooms[m_index!].id
+                }
             }
         }
     }
@@ -164,7 +189,7 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
                 let nameTextField: UITextField = alert.textFields![0]
                 let passWordTextField: UITextField = alert.textFields![1]
                 if nameTextField.text != "" {
-                    DBProvider.Instance.saveChatRoom(name: nameTextField.text!, password: passWordTextField.text)
+                    DBProvider.Instance.createRoom(name: nameTextField.text!, password: passWordTextField.text)
                 }
             }
         })
@@ -219,25 +244,27 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
     
     func userEnteredRoom() {
         if !m_searchActive {
-            DBProvider.Instance.getChatRooms()
+            m_dbProvider.getRooms()
         }
     }
     
-    func chatRoomDataReceived(chatRoom: ChatRoom) {
+    func roomDataReceived(room: Room) {
         if !m_searchActive {
-            m_chatRooms.append(chatRoom)
+            m_rooms.append(room)
+            m_filteredRooms.append(room)
             m_roomsTableView.reloadData()
         }
     }
     
-    func allChatRoomDataReceived(chatRooms: [ChatRoom]) {
+    func allRoomDataReceived(rooms: [Room]) {
         if !m_searchActive {
-            m_chatRooms = chatRooms
+            m_rooms = rooms
+            m_filteredRooms = m_rooms
             m_roomsTableView.reloadData()
         }
     }
     
-    func chatRoomSaved(success: Bool) {
+    func roomCreated(success: Bool) {
         if !success {
             self.alertUser(title: "Room Name Already Exists", message: "Enter another room name")
         }

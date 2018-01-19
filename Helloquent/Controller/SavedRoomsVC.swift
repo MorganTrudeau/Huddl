@@ -1,5 +1,5 @@
 //
-//  ChatRoomsVC.swift
+//  SavedRoomsVC.swift
 //  Helloquent
 //
 //  Created by Morgan Trudeau on 2018-01-03.
@@ -9,45 +9,49 @@
 import Foundation
 import UIKit
 
-class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UserEnteredRoom, FetchChatRoomData, FetchRoomCoreData {
+class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UserEnteredRoom, FetchRoomData, FetchRoomCoreData {
     
-    @IBOutlet weak var savedRoomsTableView: UITableView!
+    @IBOutlet weak var m_savedRoomsTableView: UITableView!
     
     let m_dbProvider = DBProvider.Instance
     
     var m_savedRoomIDs = [String]()
-    var savedChatRooms = [ChatRoom]()
-    var index: Int?
+    var m_savedRooms = [Room]()
+    var m_index: Int?
     
     let CHAT_SEGUE = "chat_room_segue"
     let CELL_ID = "room_cell"
     
     override func viewDidLoad() {
-        
         setUpUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        m_dbProvider.delegateChatRooms = self
+        m_dbProvider.delegateRooms = self
         m_dbProvider.delegateUserEnteredRoom = self
+        m_dbProvider.getRooms()
+        
         CoreDataHandler.Instance.delegate = self
         CoreDataHandler.Instance.fetchRoomCoreData()
-        m_dbProvider.getChatRooms()
+        
+        m_savedRoomsTableView.delegate = self
+        m_savedRoomsTableView.dataSource = self
     }
+    
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        m_dbProvider.observeChatRoomsChanged()
+        m_dbProvider.observeRoomsChanged()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
-        DBProvider.Instance.removeChatRoomsObserver(withHandle: Constants.CHILD_CHANGED_HANDLE)
-        savedChatRooms.removeAll()
+        m_dbProvider.removeRoomsObserver(withHandle: Constants.CHILD_CHANGED_HANDLE)
+        m_savedRooms.removeAll()
     }
     
     func setUpUI() {
-        self.savedRoomsTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+        m_savedRoomsTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
     }
@@ -60,14 +64,14 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return savedChatRooms.count
+        return m_savedRooms.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCellStyle.subtitle,
                                    reuseIdentifier: CELL_ID)
-        cell.textLabel?.text = savedChatRooms[indexPath.row].name
-        cell.detailTextLabel?.text = String(savedChatRooms[indexPath.row].activeUsers) + " Active Users"
+        cell.textLabel?.text = m_savedRooms[indexPath.row].name
+        cell.detailTextLabel?.text = String(m_savedRooms[indexPath.row].activeUsers) + " Active Users"
         cell.textLabel?.textColor = UIColor.white
         cell.detailTextLabel?.textColor = UIColor.white
         cell.contentView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
@@ -78,8 +82,8 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        index = indexPath.row
-        let requiredPassword = savedChatRooms[index!].password
+        m_index = indexPath.row
+        let requiredPassword = m_savedRooms[m_index!].password
         if requiredPassword != "" {
             askPassword(requiredPassword: requiredPassword)
         } else {
@@ -90,9 +94,9 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                vc.m_currentChatRoomID = savedChatRooms[index!].id
-                vc.currentChatRoomName = savedChatRooms[index!].name
-                DBProvider.Instance.currentRoomID = savedChatRooms[index!].id
+                vc.m_currentRoomID = m_savedRooms[m_index!].id
+                vc.m_currentRoomName = m_savedRooms[m_index!].name
+                m_dbProvider.m_currentRoomID = m_savedRooms[m_index!].id
             }
         }
     }
@@ -114,7 +118,7 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
                     self.performSegue(withIdentifier: self.CHAT_SEGUE, sender: nil)
                 } else {
                     self.alertUser(title: "Incorrect Password", message: "Please try again")
-                    self.savedRoomsTableView.reloadData()
+                    self.m_savedRoomsTableView.reloadData()
                 }
             }
         })
@@ -132,25 +136,26 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     // Delegation functions
     
     func userEnteredRoom() {
-        DBProvider.Instance.getChatRooms()
+        m_dbProvider.getRooms()
     }
     
-    func chatRoomDataReceived(chatRoom: ChatRoom) {
+    func roomDataReceived(room: Room) {
         
     }
     
-    func allChatRoomDataReceived(chatRooms: [ChatRoom]) {
+    func allRoomDataReceived(rooms: [Room]) {
         if m_savedRoomIDs.count > 0 {
             for id in m_savedRoomIDs {
-                let index = chatRooms.index { $0.id == id }
-                savedChatRooms.append(chatRooms[index!])
+                let index = rooms.index { $0.id == id }
+                m_savedRooms.append(rooms[index!])
             }
-            savedRoomsTableView.reloadData()
+            m_savedRoomsTableView.reloadData()
         }
     }
     
     func coreRoomDataReceived(savedRoomIDs: [String]) {
         m_savedRoomIDs = savedRoomIDs
+        m_savedRoomsTableView.reloadData()
     }
     
     

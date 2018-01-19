@@ -97,10 +97,6 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </prototypes>
-                                <connections>
-                                    <outlet property="dataSource" destination="uUz-x9-H7g" id="czR-sb-TsC"/>
-                                    <outlet property="delegate" destination="uUz-x9-H7g" id="myH-LO-RPY"/>
-                                </connections>
                             </tableView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -108,7 +104,7 @@
                     </view>
                     <navigationItem key="navigationItem" title="Saved Rooms" id="3lz-97-jai"/>
                     <connections>
-                        <outlet property="savedRoomsTableView" destination="lq2-hG-mPz" id="rcr-BO-5K9"/>
+                        <outlet property="m_savedRoomsTableView" destination="lq2-hG-mPz" id="jbf-s7-qEu"/>
                         <segue destination="vCp-1D-NmO" kind="show" identifier="chat_room_segue" id="G47-XT-NOq"/>
                     </connections>
                 </viewController>
@@ -159,13 +155,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <viewLayoutGuide key="safeArea" id="eAe-gp-8vD"/>
                     </view>
-                    <navigationItem key="navigationItem" id="Oau-bZ-HA7">
-                        <barButtonItem key="rightBarButtonItem" image="heart" id="Dzn-ig-NGV">
-                            <connections>
-                                <action selector="saveRoom:" destination="vCp-1D-NmO" id="QNW-s2-DFP"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" id="Oau-bZ-HA7"/>
                     <connections>
                         <outlet property="navigationItem" destination="Oau-bZ-HA7" id="8vs-or-6cS"/>
                     </connections>
@@ -318,6 +308,6 @@
         <image name="search" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="tSG-gr-oaw"/>
+        <segue reference="c8E-JZ-ZGQ"/>
     </inferredMetricsTieBreakers>
 </document>

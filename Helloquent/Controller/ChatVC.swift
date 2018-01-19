@@ -13,19 +13,22 @@ import AVKit
 
 class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FetchColorData, ActiveUsersDecreased, FetchRoomCoreData {
     
+    var m_saveRoomButton: UIBarButtonItem?
+    
     let m_coreDataHandler = CoreDataHandler.Instance
+    let m_messagesHandler = MessagesHandler.Instance
+    let m_databaseProvider = DBProvider.Instance
     
-    var messages = [JSQMessage]()
-    var messageColors = [String]()
+    var m_messages = [JSQMessage]()
+    var m_messageColors = [String]()
     
-    var m_isLiked = false
-    var m_savedRoomIDs = [String]()
-    var m_currentChatRoomID: String?
-    var currentChatRoomName: String?
-    var currentUserColor: String?
-    var goingBack = false
+    var m_isRoomSaved = false
+    var m_currentRoomID: String?
+    var m_currentRoomName: String?
+    var m_currentUserColor: String?
+    var m_goingBack = false
     
-    let picker = UIImagePickerController()
+    let m_picker = UIImagePickerController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -33,16 +36,16 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleResignActive), name: NSNotification.Name(rawValue: "ResignActiveNotification"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleBecomeActive), name: NSNotification.Name(rawValue: "BecomeActiveNotification"), object: nil)
         
-        DBProvider.Instance.delegateColor = self
-        DBProvider.Instance.delegateActiveUsersDecreased = self
-        DBProvider.Instance.currentUserColor()
+        m_databaseProvider.delegateColor = self
+        m_databaseProvider.delegateActiveUsersDecreased = self
+        m_databaseProvider.currentUserColor()
         
         self.senderId = AuthProvider.Instance.userID()
         self.senderDisplayName = AuthProvider.Instance.currentUserName()
 
-        MessagesHandler.Instance.delegateMessage = self
-        MessagesHandler.Instance.observeChatRoomMessges()
-        MessagesHandler.Instance.getChatRoomMessages()
+        m_messagesHandler.delegateMessage = self
+        m_messagesHandler.observeRoomMessges()
+        m_messagesHandler.getRoomMessages()
         
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         
@@ -53,10 +56,12 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     func setUpUI() {
         self.collectionView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
-        self.navigationItem.title = currentChatRoomName;
+        self.navigationItem.title = m_currentRoomName;
         self.navigationItem.hidesBackButton = true
         let newBackButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ChatVC.back(sender:)))
+        m_saveRoomButton = UIBarButtonItem(image: UIImage(named: "heart"), style: .plain, target: self, action: #selector(ChatVC.saveRoomButtonClicked))
         self.navigationItem.leftBarButtonItem = newBackButton
+        self.navigationItem.rightBarButtonItem  = m_saveRoomButton
         self.view.layoutIfNeeded()
         self.collectionView.layoutIfNeeded()
         if self.collectionView.contentSize.height > self.collectionView.frame.size.height {
@@ -72,24 +77,24 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
-        DBProvider.Instance.increaseActiveUsers()
+        m_databaseProvider.increaseActiveUsers()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
-        if !goingBack {
-            DBProvider.Instance.decreaseActiveUsers()
+        if !m_goingBack {
+            m_databaseProvider.decreaseActiveUsers()
         }
-        MessagesHandler.Instance.removeChatRoomObservers()
+        m_messagesHandler.removeRoomObservers()
         self.tabBarController?.tabBar.isHidden = false
     }
     
     @objc func handleResignActive() {
-        DBProvider.Instance.decreaseActiveUsers()
+        m_databaseProvider.decreaseActiveUsers()
     }
     
     @objc func handleBecomeActive() {
-        DBProvider.Instance.increaseActiveUsers()
+        m_databaseProvider.increaseActiveUsers()
     }
     
     // Keyboard Functions
@@ -109,8 +114,8 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
 
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
         let bubbleFactory = JSQMessagesBubbleImageFactory()
-        let message = messages[indexPath.item]
-        let messageColor = ColorHandler.Instance.convertToUIColor(colorString: messageColors[indexPath.row])
+        let message = m_messages[indexPath.item]
+        let messageColor = ColorHandler.Instance.convertToUIColor(colorString: m_messageColors[indexPath.row])
         if message.senderId == AuthProvider.Instance.userID() {
             return bubbleFactory?.outgoingMessagesBubbleImage(with: messageColor)
         } else {
@@ -119,11 +124,11 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     }
 
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageDataForItemAt indexPath: IndexPath!) -> JSQMessageData! {
-        return messages[indexPath.item]
+        return m_messages[indexPath.item]
     }
     
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return messages.count
+        return m_messages.count
     }
     
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -135,7 +140,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString!
     {
-        let message = messages[indexPath.item]
+        let message = m_messages[indexPath.item]
         
         if message.senderId == senderId {
             return nil
@@ -156,9 +161,8 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     // Sending buttons functions
     
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        MessagesHandler.Instance.sendChatRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, chatRoomID: m_currentChatRoomID!, color: currentUserColor!)
+        m_messagesHandler.sendRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, RoomID: m_currentRoomID!, color: m_currentUserColor!)
         
-        // Removes text from text field
         finishSendingMessage()
     }
     
@@ -179,72 +183,71 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         present(alert, animated: true, completion: nil)
     }
     
+    @objc func saveRoomButtonClicked() {
+        if !m_isRoomSaved {
+            m_saveRoomButton?.tintColor = self.view.tintColor
+            m_isRoomSaved = true
+            saveRoom()
+        } else {
+            m_saveRoomButton?.tintColor = UIColor.gray
+            m_isRoomSaved = false
+            unsaveRoom()
+        }
+    }
+    
+    func saveRoom() {
+        m_coreDataHandler.saveRoomCoreData(currentRoomID: m_currentRoomID!)
+    }
+    
+    func unsaveRoom() {
+        m_coreDataHandler.deleteRoomCoreData(currentRoomID: m_currentRoomID!)
+    }
+    
     // Picker view fucntions
     
     private func chooseMedia(type: CFString) {
-        picker.mediaTypes = [type as String]
-        present(picker, animated: true, completion: nil)
+        m_picker.mediaTypes = [type as String]
+        present(m_picker, animated: true, completion: nil)
     }
     
     // Delegation functions
     
     func messageReceived(senderID: String, senderName: String, text: String, color: String) {
-        messages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
-        messageColors.append(color)
+        m_messages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
+        m_messageColors.append(color)
         self.collectionView.reloadData()
         self.collectionView.layoutIfNeeded()
         scrollToBottom(animated: false)
     }
     
     func allMessagesReceived(messages: [JSQMessage], messageColors: [String]) {
-        self.messages = messages
-        self.messageColors = messageColors
+        m_messages = messages
+        m_messageColors = messageColors
         self.collectionView.reloadData()
         self.collectionView.layoutIfNeeded()
         scrollToBottom(animated: false)
     }
     
     func colorDataReceived(color: String) {
-        currentUserColor = color
+        m_currentUserColor = color
     }
     
     @objc func back(sender: UIBarButtonItem) {
-        goingBack = true
-        DBProvider.Instance.decreaseActiveUsersWithCallback()
+        m_goingBack = true
+        m_databaseProvider.decreaseActiveUsersWithCallback()
     }
     
     func activeUsersDecreased() {
         _ = navigationController?.popViewController(animated: true)
     }
     
-    @IBAction func saveRoom(_ sender: Any) {
-        m_coreDataHandler.saveRoomCoreData(id: m_currentChatRoomID!)
-    }
-    
     func coreRoomDataReceived(savedRoomIDs: [String]) {
-        m_savedRoomIDs = savedRoomIDs
+        m_isRoomSaved = m_coreDataHandler.isCurrentRoomSaved(currentRoomID: m_currentRoomID!)
+        if !m_isRoomSaved {
+            m_saveRoomButton?.tintColor = UIColor.gray
+        }
     }
     
     
     
-    
-
-    
-    
-    
-
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-
 }

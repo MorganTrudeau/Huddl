@@ -11,21 +11,17 @@ import FirebaseDatabase
 import FirebaseCore
 import FirebaseStorage
 
-protocol FetchContactData: class {
-    func contactDataReceived(contacts: [Contact])
-}
-
-protocol FetchChatRoomData: class {
-    func chatRoomDataReceived(chatRoom: ChatRoom)
-    func allChatRoomDataReceived(chatRooms: [ChatRoom])
+protocol FetchRoomData: class {
+    func roomDataReceived(room: Room)
+    func allRoomDataReceived(rooms: [Room])
 }
 
 protocol FetchColorData: class {
     func colorDataReceived(color: String)
 }
 
-protocol SavedChatRoom: class {
-    func chatRoomSaved(success: Bool)
+protocol CreateRoom: class {
+    func roomCreated(success: Bool)
 }
 
 protocol ActiveUsersDecreased: class {
@@ -43,40 +39,35 @@ class DBProvider {
         return _instance
     }
     
-    weak var delegateContacts: FetchContactData?
-    weak var delegateChatRooms: FetchChatRoomData?
+    weak var delegateRooms: FetchRoomData?
     weak var delegateColor: FetchColorData?
-    weak var delegateSaveChatRoom: SavedChatRoom?
+    weak var delegateCreateRoom: CreateRoom?
     weak var delegateActiveUsersDecreased: ActiveUsersDecreased?
     weak var delegateUserEnteredRoom: UserEnteredRoom?
     
-    var currentRoomID: String?
-    var selectedContactID: String?
-    var roomAddedHandle: UInt?
-    var roomChangedHandle: UInt?
+    var m_currentRoomID: String?
+    var m_selectedContactID: String?
+    var m_roomAddedHandle: UInt?
+    var m_roomChangedHandle: UInt?
     
     var dbRef: DatabaseReference {
         return Database.database().reference()
     }
     
-    var contactsRef: DatabaseReference {
-        return dbRef.child(Constants.CONTACTS)
+    var usersRef: DatabaseReference {
+        return dbRef.child(Constants.USERS)
     }
     
-    var chatRoomsRef: DatabaseReference {
-        return dbRef.child(Constants.CHAT_ROOMS)
+    var roomsRef: DatabaseReference {
+        return dbRef.child(Constants.ROOMS)
     }
     
     var messagesRef: DatabaseReference {
         return dbRef.child(Constants.MESSAGES)
     }
     
-    var chatRoomMessagesRef: DatabaseReference {
-        return messagesRef.child(currentRoomID!)
-    }
-    
-    var personalChatMessagesRef: DatabaseReference {
-        return messagesRef.child(AuthProvider.Instance.userID() + selectedContactID!)
+    var roomMessagesRef: DatabaseReference {
+        return messagesRef.child(m_currentRoomID!)
     }
     
     var mediaMessagesRef: DatabaseReference {
@@ -95,14 +86,14 @@ class DBProvider {
         return storageRef.child(Constants.VIDEO_STORAGE)
     }
     
-    func saveUser(withID: String, email: String, password: String, color: String) {
+    func createUser(withID: String, email: String, password: String, color: String) {
         let data: Dictionary<String, Any> = [Constants.EMAIL: email, Constants.PASSWORD: password, Constants.COLOR: color]
-        contactsRef.child(withID).setValue(data)
+        usersRef.child(withID).setValue(data)
     }
     
     func currentUserColor() {
         var currentUserColor = ""
-        contactsRef.child(AuthProvider.Instance.userID()).observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+        usersRef.child(AuthProvider.Instance.userID()).observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             if let data = snapshot.value as? NSDictionary {
                 if let color = data[Constants.COLOR] as? String {
                     currentUserColor = color
@@ -112,38 +103,38 @@ class DBProvider {
         })
     }
     
-    func saveChatRoom(name: String, password: String?) {
+    func createRoom(name: String, password: String?) {
         var success = false
         let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0]
-        chatRoomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+        roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             if !snapshot.hasChild(name) {
-                self.chatRoomsRef.child(name).setValue(data)
+                self.roomsRef.child(name).setValue(data)
                 success = true
             }
-            self.delegateSaveChatRoom?.chatRoomSaved(success: success)
+            self.delegateCreateRoom?.roomCreated(success: success)
         })
     }
     
-    func saveLocationChatRoom(id: String, name: String, password: String?) {
+    func createLocationRoom(id: String, name: String, password: String?) {
         var success = false
         let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0]
-        chatRoomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+        roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             if !snapshot.hasChild(name) {
-                self.chatRoomsRef.child(id).setValue(data)
+                self.roomsRef.child(id).setValue(data)
                 success = true
-                self.delegateSaveChatRoom?.chatRoomSaved(success: success)
             }
+            self.delegateCreateRoom?.roomCreated(success: success)
         })
     }
     
-    func observeChatRoomsChanged() {
-        self.roomChangedHandle = chatRoomsRef.observe(DataEventType.childChanged) { (snapshot: DataSnapshot) in
+    func observeRoomsChanged() {
+        m_roomChangedHandle = roomsRef.observe(DataEventType.childChanged) { (snapshot: DataSnapshot) in
             self.delegateUserEnteredRoom?.userEnteredRoom()
         }
     }
     
-    func observeChatRoomsAdded() {
-        self.roomAddedHandle = chatRoomsRef.observe(DataEventType.childAdded) {(snapshot: DataSnapshot) in
+    func observeRoomsAdded() {
+        m_roomAddedHandle = roomsRef.observe(DataEventType.childAdded) {(snapshot: DataSnapshot) in
                 
             if let data = snapshot.value as? NSDictionary {
                             
@@ -153,8 +144,8 @@ class DBProvider {
                         
                         if let activeUsers = data[Constants.ACTIVE_USERS] as? Int {
                             let id = snapshot.key as String
-                                let newRoom = ChatRoom(id: id, name: roomName, password: password, activeUsers: activeUsers)
-                            self.delegateChatRooms?.chatRoomDataReceived(chatRoom: newRoom)
+                                let newRoom = Room(id: id, name: roomName, password: password, activeUsers: activeUsers)
+                            self.delegateRooms?.roomDataReceived(room: newRoom)
                         }
                     }
                 }
@@ -162,63 +153,63 @@ class DBProvider {
         }
     }
     
-    func getChatRooms() {
-        chatRoomsRef.observeSingleEvent(of: DataEventType.value) {
+    func getRooms() {
+        roomsRef.observeSingleEvent(of: DataEventType.value) {
             (snapshot: DataSnapshot) in
             
-            var chatRooms = [ChatRoom]()
+            var rooms = [Room]()
             
-            if let myChatRooms = snapshot.value as? NSDictionary {
+            if let roomData = snapshot.value as? NSDictionary {
                 
-                for (key, value) in myChatRooms {
+                for (key, value) in roomData {
                     
-                    if let chatRoomData = value as? NSDictionary {
+                    if let room = value as? NSDictionary {
                         
-                        if let roomName = chatRoomData[Constants.ROOM_NAME] as? String {
+                        if let roomName = room[Constants.ROOM_NAME] as? String {
                             
-                            if let password = chatRoomData[Constants.PASSWORD] as? String {
+                            if let password = room[Constants.PASSWORD] as? String {
                                 
-                                if let activeUsers = chatRoomData[Constants.ACTIVE_USERS] as? Int {
+                                if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
                                     let id = key as! String
-                                    let newRoom = ChatRoom(id: id, name: roomName, password: password, activeUsers: activeUsers)
-                                    chatRooms.append(newRoom)
+                                    let newRoom = Room(id: id, name: roomName, password: password, activeUsers: activeUsers)
+                                    rooms.append(newRoom)
                                 }
                             }
                         }
                     }
                 }
             }
-            self.delegateChatRooms?.allChatRoomDataReceived(chatRooms: chatRooms)
+            self.delegateRooms?.allRoomDataReceived(rooms: rooms)
         }
     }
     
-    func removeChatRoomsObserver(withHandle: String) {
+    func removeRoomsObserver(withHandle: String) {
         if withHandle == Constants.CHILD_ADDED_HANDLE {
-            chatRoomsRef.removeObserver(withHandle: roomAddedHandle!)
+            roomsRef.removeObserver(withHandle: m_roomAddedHandle!)
         } else if withHandle == Constants.CHILD_CHANGED_HANDLE {
-            chatRoomsRef.removeObserver(withHandle: roomChangedHandle!)
+            roomsRef.removeObserver(withHandle: m_roomChangedHandle!)
         }
     }
     
     func increaseActiveUsers() {
-        chatRoomsRef.child(currentRoomID!).runTransactionBlock({(data: MutableData) in
-            if var chatRoom = data.value as? [String: Any] {
-                var activeUsers = chatRoom[Constants.ACTIVE_USERS] as? Int
+        roomsRef.child(m_currentRoomID!).runTransactionBlock({(data: MutableData) in
+            if var room = data.value as? [String: Any] {
+                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
                 activeUsers = activeUsers! + 1
-                chatRoom[Constants.ACTIVE_USERS] = activeUsers
-                data.value = chatRoom
+                room[Constants.ACTIVE_USERS] = activeUsers
+                data.value = room
             }
             return TransactionResult.success(withValue: data)
         })
     }
     
     func decreaseActiveUsersWithCallback() {
-        chatRoomsRef.child(currentRoomID!).runTransactionBlock({(data: MutableData) in
-            if var chatRoom = data.value as? [String: Any] {
-                var activeUsers = chatRoom[Constants.ACTIVE_USERS] as? Int
+        roomsRef.child(m_currentRoomID!).runTransactionBlock({(data: MutableData) in
+            if var room = data.value as? [String: Any] {
+                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
                 activeUsers = activeUsers! - 1
-                chatRoom[Constants.ACTIVE_USERS] = activeUsers
-                data.value = chatRoom
+                room[Constants.ACTIVE_USERS] = activeUsers
+                data.value = room
             }
             return TransactionResult.success(withValue: data)}
             
@@ -230,43 +221,15 @@ class DBProvider {
     }
     
     func decreaseActiveUsers() {
-        chatRoomsRef.child(currentRoomID!).runTransactionBlock({(data: MutableData) in
-            if var chatRoom = data.value as? [String: Any] {
-                var activeUsers = chatRoom[Constants.ACTIVE_USERS] as? Int
+        roomsRef.child(m_currentRoomID!).runTransactionBlock({(data: MutableData) in
+            if var room = data.value as? [String: Any] {
+                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
                 activeUsers = activeUsers! - 1
-                chatRoom[Constants.ACTIVE_USERS] = activeUsers
-                data.value = chatRoom
+                room[Constants.ACTIVE_USERS] = activeUsers
+                data.value = room
             }
             return TransactionResult.success(withValue: data)})
     }
-    
-//    func getContacts() {
-//        contactsRef.observeSingleEvent(of: DataEventType.value) {
-//            (snapshot: DataSnapshot) in
-//
-//            var contacts = [Contact]()
-//
-//            if let myContacts = snapshot.value as? NSDictionary {
-//
-//                for (key, value) in myContacts {
-//
-//                    if let contactData = value as? NSDictionary {
-//
-//                        if key as! String != AuthProvider.Instance.userID() {
-//
-//                            if let email = contactData[Constants.EMAIL] as? String {
-//
-//                                let id = key as! String
-//                                let newContact = Contact(id: id, name: email, color: nil)
-//                                contacts.append(newContact)
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            self.delegateContacts?.contactDataReceived(contacts: contacts)
-//        }
-//    }
     
     
 }
