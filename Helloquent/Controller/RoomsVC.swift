@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import NMAKit
 
 class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, FetchChatRoomData, SavedChatRoom, UserEnteredRoom {
     
@@ -31,6 +32,8 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
         m_roomsTableView.dataSource = self
         
         m_roomsSearchBar.delegate = self
+        
+       NMAPositioningManager.sharedInstance().startPositioning()
         
         setUpUI()
     }

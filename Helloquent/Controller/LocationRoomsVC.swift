@@ -12,82 +12,74 @@ import NMAKit
 
 class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
     
+    @IBOutlet weak var m_placesSearchBar: UISearchBar!
+    @IBOutlet weak var m_placesTableView: UITableView!
     
-    @IBOutlet weak var placesSearchBar: UISearchBar!
     
-    @IBOutlet weak var placesTableView: UITableView!
-    
-    var searchActive : Bool = false
-    var autoSuggestions = [NMAAutoSuggestPlace]()
+    var m_index: IndexPath?
+    var m_autoSuggestions = [NMAAutoSuggestPlace]()
     
     let CELL_ID = "cell"
     let CHAT_SEGUE = "chat_room_segue"
     
-    var index: IndexPath?
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        placesTableView.delegate = self
-        placesTableView.dataSource = self
-        placesSearchBar.delegate = self
+        m_placesTableView.delegate = self
+        m_placesTableView.dataSource = self
+        m_placesSearchBar.delegate = self
         
         setUpUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        placesSearchBar.text = ""
-        autoSuggestions.removeAll()
-        placesTableView.reloadData()
+        m_placesSearchBar.text = ""
+        m_autoSuggestions.removeAll()
+        m_placesTableView.reloadData()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        placesSearchBar.resignFirstResponder()
+        m_placesSearchBar.resignFirstResponder()
     }
     
     func setUpUI() {
-        placesTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
-    self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
-    self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
+        m_placesTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+        self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
+        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
         
-        placesSearchBar.delegate = self
-        
+        m_placesSearchBar.delegate = self
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
-        placesSearchBar.showsCancelButton = true
-        searchActive = true
+        m_placesSearchBar.showsCancelButton = true
     }
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
-        placesSearchBar.showsCancelButton = false
-        searchActive = false
+        m_placesSearchBar.showsCancelButton = false
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        placesSearchBar.showsCancelButton = false
-        placesSearchBar.text = ""
-        placesSearchBar.resignFirstResponder()
-        searchActive = false
+        m_placesSearchBar.showsCancelButton = false
+        m_placesSearchBar.text = ""
+        m_placesSearchBar.resignFirstResponder()
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        searchActive = false
+        if m_placesSearchBar.text != "" {
+            placesRequest(query: m_placesSearchBar.text!)
+        }
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchText != "" {
-            placesRequest(query: searchText)
-        } else {
-            self.searchActive = false
-            self.autoSuggestions.removeAll()
-            placesTableView.reloadData()
+        if searchText == "" {
+            self.m_autoSuggestions.removeAll()
+            m_placesTableView.reloadData()
         }
     }
     
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        placesSearchBar.resignFirstResponder()
+        m_placesSearchBar.resignFirstResponder()
     }
     
     func numberOfSectionsInTableView(tableView: UITableView) -> Int {
@@ -95,7 +87,7 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return autoSuggestions.count
+        return m_autoSuggestions.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -107,8 +99,8 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
         backgroundView.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
         cell.selectedBackgroundView = backgroundView
         
-        if autoSuggestions[0].isKind(of: NMAAutoSuggest.self) {
-            let autoSuggestionPlace = autoSuggestions[indexPath.row]
+        if m_autoSuggestions[0].isKind(of: NMAAutoSuggest.self) {
+            let autoSuggestionPlace = m_autoSuggestions[indexPath.row]
             let htmlString: String? = autoSuggestionPlace.highlightedTitle
             let detailText: String? = autoSuggestionPlace.vicinityDescription?.replacingOccurrences(of: "<br/>", with: ", ")
                 cell.detailTextLabel?.text = detailText
@@ -127,16 +119,16 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        index = indexPath
+        m_index = indexPath
         performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                let currentChatRoomName = placesTableView.cellForRow(at: index!)?.textLabel?.text
+                let currentChatRoomName = m_placesTableView.cellForRow(at: m_index!)?.textLabel?.text
                 vc.currentChatRoomName = currentChatRoomName
-                let autoSuggestionItem = autoSuggestions[index!.row]
+                let autoSuggestionItem = m_autoSuggestions[m_index!.row]
                 var currentChatRoomID =
                     "\(autoSuggestionItem.position?.latitude ?? 1)\(autoSuggestionItem.position?.longitude ?? 1)"
                 currentChatRoomID = currentChatRoomID.replacingOccurrences(of: ".", with: "")
@@ -149,24 +141,23 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func placesRequest(query: String) {
-        let vancouver: NMAGeoCoordinates = NMAGeoCoordinates.init(latitude: 48.263392, longitude: -123.12203)
-        let boudingTopLeftCoords: NMAGeoCoordinates = NMAGeoCoordinates.init(latitude: 49.277484, longitude: -123.133693)
-        let boundingBottomRightCoords: NMAGeoCoordinates = NMAGeoCoordinates.init(latitude: 49.257209, longitude: -123.11275)
-        let bounding: NMAGeoBoundingBox = NMAGeoBoundingBox.init(topLeft: boudingTopLeftCoords, bottomRight: boundingBottomRightCoords)!
+        let currentPosition = NMAPositioningManager.sharedInstance().currentPosition?.coordinates
+        print(currentPosition)
+        let bounding = NMAGeoBoundingBox.init(center: currentPosition!, width: 45, height: 45)
+        print(bounding)
         
-        let request: NMAAutoSuggestionRequest = (NMAPlaces.sharedInstance()?.createAutoSuggestionRequest(location: vancouver, partialTerm: query))!
-//        request.viewport = bounding
+        let request: NMAAutoSuggestionRequest = (NMAPlaces.sharedInstance()?.createAutoSuggestionRequest(location: currentPosition, partialTerm: query))!
+        request.viewport = bounding!
         request.collectionSize = 10
-        request.viewport = bounding
         request.start({(request: NMARequest, data: Any?, error: Error?) in
-            if error == nil && self.searchActive {
-                self.autoSuggestions.removeAll()
+            if error == nil {
+                self.m_autoSuggestions.removeAll()
                 for item in data as! [NMAAutoSuggest] {
                     if let place = item as? NMAAutoSuggestPlace {
-                        self.autoSuggestions.append(place)
+                        self.m_autoSuggestions.append(place)
                     }
                 }
-                self.placesTableView.reloadData()
+                self.m_placesTableView.reloadData()
             }
         })
     }

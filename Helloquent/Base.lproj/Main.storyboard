@@ -140,8 +140,8 @@
                     </view>
                     <navigationItem key="navigationItem" title="Search" id="fMP-Ym-7hz"/>
                     <connections>
-                        <outlet property="placesSearchBar" destination="veh-96-scX" id="g2C-VS-t7Z"/>
-                        <outlet property="placesTableView" destination="hcE-WO-BY9" id="de3-9v-cC6"/>
+                        <outlet property="m_placesSearchBar" destination="veh-96-scX" id="sn4-6U-NN0"/>
+                        <outlet property="m_placesTableView" destination="hcE-WO-BY9" id="dsP-5T-iUA"/>
                         <segue destination="vCp-1D-NmO" kind="show" identifier="chat_room_segue" id="tSG-gr-oaw"/>
                     </connections>
                 </viewController>
@@ -236,7 +236,7 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
-                            <searchBar contentMode="redraw" fixedFrame="YES" placeholder="Search Room" translatesAutoresizingMaskIntoConstraints="NO" id="tN4-NB-8bX">
+                            <searchBar contentMode="redraw" fixedFrame="YES" placeholder="Filter" translatesAutoresizingMaskIntoConstraints="NO" id="tN4-NB-8bX">
                                 <rect key="frame" x="0.0" y="64" width="375" height="56"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                                 <textInputTraits key="textInputTraits"/>
@@ -318,6 +318,6 @@
         <image name="search" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="c8E-JZ-ZGQ"/>
+        <segue reference="tSG-gr-oaw"/>
     </inferredMetricsTieBreakers>
 </document>
