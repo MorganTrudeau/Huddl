@@ -11,13 +11,13 @@ import JSQMessagesViewController
 import MobileCoreServices
 import AVKit
 
-class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FetchColorData, ActiveUsersDecreased, FetchRoomCoreData {
+class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FetchColorData, ActiveUsersDecreased, FetchRoomCoreData, UIPickerViewDelegate {
     
     var m_saveRoomButton: UIBarButtonItem?
     
     let m_coreDataHandler = CoreDataHandler.Instance
     let m_messagesHandler = MessagesHandler.Instance
-    let m_databaseProvider = DBProvider.Instance
+    let m_dbProvider = DBProvider.Instance
     
     var m_messages = [JSQMessage]()
     var m_messageColors = [String]()
@@ -29,23 +29,24 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     var m_goingBack = false
     
     let m_picker = UIImagePickerController()
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        m_messagesHandler.delegateMessage = self
+        m_messagesHandler.getRoomMessages()
         
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleResignActive), name: NSNotification.Name(rawValue: "ResignActiveNotification"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleBecomeActive), name: NSNotification.Name(rawValue: "BecomeActiveNotification"), object: nil)
         
-        m_databaseProvider.delegateColor = self
-        m_databaseProvider.delegateActiveUsersDecreased = self
-        m_databaseProvider.currentUserColor()
+        m_dbProvider.delegateColor = self
+        m_dbProvider.delegateActiveUsersDecreased = self
+        m_dbProvider.currentUserColor()
         
         self.senderId = AuthProvider.Instance.userID()
         self.senderDisplayName = AuthProvider.Instance.currentUserName()
-
-        m_messagesHandler.delegateMessage = self
-        m_messagesHandler.observeRoomMessges()
-        m_messagesHandler.getRoomMessages()
+        
+        m_picker.delegate = self
         
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
         
@@ -71,30 +72,33 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        m_messagesHandler.observeRoomMessges()
+        
         m_coreDataHandler.delegate = self
         m_coreDataHandler.fetchRoomCoreData()
+        self.tabBarController?.tabBar.isHidden = true
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(true)
-        m_databaseProvider.increaseActiveUsers()
+        m_dbProvider.increaseActiveUsers()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
         if !m_goingBack {
-            m_databaseProvider.decreaseActiveUsers()
+            m_dbProvider.decreaseActiveUsers()
         }
         m_messagesHandler.removeRoomObservers()
         self.tabBarController?.tabBar.isHidden = false
     }
     
     @objc func handleResignActive() {
-        m_databaseProvider.decreaseActiveUsers()
+        m_dbProvider.decreaseActiveUsers()
     }
     
     @objc func handleBecomeActive() {
-        m_databaseProvider.increaseActiveUsers()
+        m_dbProvider.increaseActiveUsers()
     }
     
     // Keyboard Functions
@@ -161,7 +165,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     // Sending buttons functions
     
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        m_messagesHandler.sendRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, RoomID: m_currentRoomID!, color: m_currentUserColor!)
+        m_messagesHandler.sendRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, url: nil, roomID: m_currentRoomID!, color: m_currentUserColor!)
         
         finishSendingMessage()
     }
@@ -210,10 +214,31 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         present(m_picker, animated: true, completion: nil)
     }
     
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
+        
+        if let mediaPick = info[UIImagePickerControllerOriginalImage] as? UIImage {
+            let image = JSQPhotoMediaItem.init(image: mediaPick)
+            m_messages.append(JSQMessage(senderId: self.senderId, displayName: self.senderDisplayName, media: image))
+            m_messageColors.append("blue")
+            self.collectionView.reloadData()
+            let data = UIImageJPEGRepresentation(mediaPick, 0.8)
+            m_messagesHandler.saveMedia(image: data!, video: nil, senderID: self.senderId, senderName: self.senderDisplayName, roomID: m_currentRoomID!, color: m_currentUserColor!)
+            dismiss(animated: true, completion: nil)
+            
+        } else if let mediaPick = info[UIImagePickerControllerMediaURL] as? URL {
+            let video = JSQVideoMediaItem.init(fileURL: mediaPick, isReadyToPlay: true)
+            let senderID = AuthProvider.Instance.userID()
+            let displayName = AuthProvider.Instance.currentUserName()
+            m_messages.append(JSQMessage(senderId: senderID, displayName: displayName, media: video))
+            dismiss(animated: true, completion: nil)
+            self.collectionView.reloadData()
+        }
+    }
+    
     // Delegation functions
     
-    func messageReceived(senderID: String, senderName: String, text: String, color: String) {
-        m_messages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
+    func messageReceived(message: JSQMessage, color: String) {
+        m_messages.append(message)
         m_messageColors.append(color)
         self.collectionView.reloadData()
         self.collectionView.layoutIfNeeded()
@@ -228,13 +253,19 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         scrollToBottom(animated: false)
     }
     
+    func mediaMessageReceived(message: JSQMessage, forIndex: Int) {
+        m_messages[forIndex] = message
+        let indexPath = IndexPath(row: forIndex, section: 0)
+        self.collectionView.reloadItems(at: [indexPath])
+    }
+    
     func colorDataReceived(color: String) {
         m_currentUserColor = color
     }
     
     @objc func back(sender: UIBarButtonItem) {
         m_goingBack = true
-        m_databaseProvider.decreaseActiveUsersWithCallback()
+        m_dbProvider.decreaseActiveUsersWithCallback()
     }
     
     func activeUsersDecreased() {

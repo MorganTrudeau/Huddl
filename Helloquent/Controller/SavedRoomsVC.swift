@@ -143,6 +143,10 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
         
     }
     
+    func activeUserDataReceived(activeUsers: Int, index: Int) {
+        
+    }
+    
     func allRoomDataReceived(rooms: [Room]) {
         if m_savedRoomIDs.count > 0 {
             for id in m_savedRoomIDs {

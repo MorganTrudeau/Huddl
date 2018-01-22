@@ -14,6 +14,7 @@ import FirebaseStorage
 protocol FetchRoomData: class {
     func roomDataReceived(room: Room)
     func allRoomDataReceived(rooms: [Room])
+    func activeUserDataReceived(activeUsers: Int, index: Int)
 }
 
 protocol FetchColorData: class {
@@ -103,11 +104,12 @@ class DBProvider {
         })
     }
     
-    func createRoom(name: String, password: String?) {
+    func createRoom(name: String, description: String?, password: String?){
         var success = false
-        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0]
+        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.DESCRIPTION: description ?? "", Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0]
         roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             if !snapshot.hasChild(name) {
+                
                 self.roomsRef.child(name).setValue(data)
                 success = true
             }
@@ -115,9 +117,24 @@ class DBProvider {
         })
     }
     
-    func createLocationRoom(id: String, name: String, password: String?) {
+    func hasRoom(roomID: String, index: Int) {
+        roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+            
+            if snapshot.hasChild(roomID) {
+                
+                let child = snapshot.childSnapshot(forPath: "\(roomID)/active_users")
+                    
+                if let activeUsers = child.value as? Int {
+        
+                    self.delegateRooms?.activeUserDataReceived(activeUsers: activeUsers, index: index)
+                }
+            }
+        })
+    }
+    
+    func createLocationRoom(id: String, name: String, description: String?, password: String?) {
         var success = false
-        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0]
+        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.DESCRIPTION: description ?? "", Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0]
         roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             if !snapshot.hasChild(name) {
                 self.roomsRef.child(id).setValue(data)
@@ -140,12 +157,16 @@ class DBProvider {
                             
                 if let roomName = data[Constants.ROOM_NAME] as? String {
                     
-                    if let password =  data[Constants.PASSWORD] as? String {
+                    if let description = data[Constants.DESCRIPTION] as? String {
+                    
+                        if let password =  data[Constants.PASSWORD] as? String {
                         
-                        if let activeUsers = data[Constants.ACTIVE_USERS] as? Int {
-                            let id = snapshot.key as String
-                                let newRoom = Room(id: id, name: roomName, password: password, activeUsers: activeUsers)
-                            self.delegateRooms?.roomDataReceived(room: newRoom)
+                            if let activeUsers = data[Constants.ACTIVE_USERS] as? Int {
+                                
+                                let id = snapshot.key as String
+                                let newRoom = Room(id: id, name: roomName, description: description, password: password, activeUsers: activeUsers)
+                                self.delegateRooms?.roomDataReceived(room: newRoom)
+                            }
                         }
                     }
                 }
@@ -167,12 +188,16 @@ class DBProvider {
                         
                         if let roomName = room[Constants.ROOM_NAME] as? String {
                             
-                            if let password = room[Constants.PASSWORD] as? String {
+                            if let description = room[Constants.DESCRIPTION] as? String {
+                            
+                                if let password = room[Constants.PASSWORD] as? String {
                                 
-                                if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
-                                    let id = key as! String
-                                    let newRoom = Room(id: id, name: roomName, password: password, activeUsers: activeUsers)
-                                    rooms.append(newRoom)
+                                    if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
+                                        
+                                        let id = key as! String
+                                        let newRoom = Room(id: id, name: roomName, description: description, password: password, activeUsers: activeUsers)
+                                        rooms.append(newRoom)
+                                    }
                                 }
                             }
                         }
@@ -211,13 +236,11 @@ class DBProvider {
                 room[Constants.ACTIVE_USERS] = activeUsers
                 data.value = room
             }
-            return TransactionResult.success(withValue: data)}
-            
-            , andCompletionBlock: {(error: Error?, success: Bool, snapshot: DataSnapshot?) in
-                if success {
+            return TransactionResult.success(withValue: data)}, andCompletionBlock:     {(error: Error?, success: Bool, snapshot: DataSnapshot?) in
+                    if success {
                     self.delegateActiveUsersDecreased?.activeUsersDecreased()
-                }
-                })
+                    }
+            })
     }
     
     func decreaseActiveUsers() {

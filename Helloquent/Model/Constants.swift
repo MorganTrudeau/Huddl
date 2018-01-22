@@ -31,6 +31,7 @@ class Constants {
     
     // Room
     static let ROOM_NAME = "room_name"
+    static let DESCRIPTION = "description"
     static let ROOM_ID = "room_id"
     static let ACTIVE_USERS = "active_users"
     

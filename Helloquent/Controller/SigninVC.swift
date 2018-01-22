@@ -41,17 +41,16 @@ class SigninVC: UIViewController, FBSDKLoginButtonDelegate {
             print(error.localizedDescription)
             return
         } else {
-            if let credential: AuthCredential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString) as? AuthCredential {
+            let credential: AuthCredential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
                 AuthProvider.Instance.facebookAuth(credential: credential, loginHandler: {(message) in
                     
-                    if message != nil {
-                        self.alertUser(title: "Problem With Authentication", message: message!)
-                    } else {
-                        print("Login Successful")
-                        self.performSegue(withIdentifier: self.CHATROOMS_SEGUE, sender: nil)
-                    }
-                })
-            }
+                if message != nil {
+                    self.alertUser(title: "Problem With Authentication", message: message!)
+                } else {
+                    print("Login Successful")
+                    self.performSegue(withIdentifier: self.CHATROOMS_SEGUE, sender: nil)
+                }
+            })
         }
     }
     

@@ -15,6 +15,7 @@ pod 'JSQMessagesViewController'
 pod 'FacebookCore'
 pod 'FacebookLogin'
 pod 'FacebookShare'
+pod ‘SDWebImage’
 
 
   target 'HelloquentTests' do
