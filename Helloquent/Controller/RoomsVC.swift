@@ -122,12 +122,28 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
         backgroundView.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
         cell.selectedBackgroundView = backgroundView
         
+        let activeUserImage = UIImage.init(named: "user")
+        let activeUserImageView = UIImageView.init(frame: CGRect(x: self.view.frame.size.width*0.93, y: cell.contentView.bounds.height/4.3, width: 20, height: 20))
+        activeUserImageView.image = activeUserImage
+        
+        let activeUserTextView = UITextView.init(frame: CGRect(x: self.view.frame.size.width*0.73, y: cell.contentView.bounds.height/5.2, width: 80, height: 20))
+        activeUserTextView.textAlignment = NSTextAlignment.right
+        activeUserTextView.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        activeUserTextView.isEditable = false
+        activeUserTextView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+        activeUserTextView.text = String(m_rooms[indexPath.row].activeUsers)
+        activeUserTextView.textColor = UIColor.white
+        activeUserTextView.font = UIFont.boldSystemFont(ofSize: 18)
+        
+        cell.contentView.addSubview(activeUserImageView)
+        cell.contentView.addSubview(activeUserTextView)
+        
         if !m_searchActive {
             cell.textLabel?.text = m_rooms[indexPath.row].name
-            cell.detailTextLabel?.text = String(m_rooms[indexPath.row].activeUsers) + " Active Users"
+            cell.detailTextLabel?.text = m_rooms[indexPath.row].description
         } else {
             cell.textLabel?.text = m_filteredRooms[indexPath.row].name
-            cell.detailTextLabel?.text = String(m_filteredRooms[indexPath.row].activeUsers) + " Active Users"
+            cell.detailTextLabel?.text = m_filteredRooms[indexPath.row].description
         }
         return cell
     }
@@ -187,9 +203,28 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
             
             if (alert.textFields!.count > 0 ) {
                 let nameTextField: UITextField = alert.textFields![0]
-                let passWordTextField: UITextField = alert.textFields![1]
+                let descriptionTextField: UITextField = alert.textFields![1]
+                let passWordTextField: UITextField = alert.textFields![2]
                 if nameTextField.text != "" {
-                    DBProvider.Instance.createRoom(name: nameTextField.text!, password: passWordTextField.text)
+                    
+                    if descriptionTextField.text != "" {
+                    
+                        if nameTextField.text!.size(withAttributes: [NSAttributedStringKey.font : UIFont.systemFont(ofSize: 17)]).width < CGFloat(self.view.frame.size.width*0.65) {
+                        
+                            if descriptionTextField.text!.size(withAttributes: [NSAttributedStringKey.font : UIFont.systemFont(ofSize: 12)]).width < CGFloat(self.view.frame.size.width*0.65) {
+                            
+                                DBProvider.Instance.createRoom(name: nameTextField.text!, description: descriptionTextField.text,   password: passWordTextField.text)
+                            } else {
+                                self.alertUser(title: "Invalid Format", message: "Room description too long")
+                            }
+                        } else {
+                            self.alertUser(title: "Invalid Format", message: "Room name too long")
+                        }
+                    } else {
+                        self.alertUser(title: "Invalid Format", message: "Enter a room description")
+                    }
+                } else {
+                    self.alertUser(title: "Invalid Format", message: "Enter a room name.")
                 }
             }
         })
@@ -200,7 +235,9 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
         alert.addAction(cancel)
         alert.addTextField(configurationHandler: {(nameTextField: UITextField) in
             nameTextField.placeholder = "Room Name"
-            nameTextField.leftView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: 10))
+        })
+        alert.addTextField(configurationHandler: {(descriptionTextField: UITextField) in
+            descriptionTextField.placeholder = "Description"
         })
         alert.addTextField(configurationHandler: {(passwordTextField: UITextField) in
             passwordTextField.placeholder = "Password"
@@ -262,6 +299,10 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
             m_filteredRooms = m_rooms
             m_roomsTableView.reloadData()
         }
+    }
+    
+    func activeUserDataReceived(activeUsers: Int, index: Int) {
+        
     }
     
     func roomCreated(success: Bool) {

@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import NMAKit
 
-class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
+class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, FetchRoomData {
     
     @IBOutlet weak var m_placesSearchBar: UISearchBar!
     @IBOutlet weak var m_placesTableView: UITableView!
@@ -18,7 +18,7 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     let m_dbProvider = DBProvider.Instance
     
     var m_index: IndexPath?
-    var m_autoSuggestions = [NMAAutoSuggestPlace]()
+    var m_rooms = [Room]()
     
     let CELL_ID = "cell"
     let CHAT_SEGUE = "chat_room_segue"
@@ -34,8 +34,9 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        m_dbProvider.delegateRooms = self
         m_placesSearchBar.text = ""
-        m_autoSuggestions.removeAll()
+        m_rooms.removeAll()
         m_placesTableView.reloadData()
     }
     
@@ -74,7 +75,7 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText == "" {
-            m_autoSuggestions.removeAll()
+            m_rooms.removeAll()
             m_placesTableView.reloadData()
         }
     }
@@ -88,7 +89,7 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return m_autoSuggestions.count
+        return m_rooms.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -100,21 +101,23 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
         backgroundView.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
         cell.selectedBackgroundView = backgroundView
         
-        if m_autoSuggestions[0].isKind(of: NMAAutoSuggest.self) {
-            let autoSuggestionPlace = m_autoSuggestions[indexPath.row]
-            let htmlString: String? = autoSuggestionPlace.highlightedTitle
-            let detailText: String? = autoSuggestionPlace.vicinityDescription?.replacingOccurrences(of: "<br/>", with: ", ")
-                cell.detailTextLabel?.text = detailText
-            
-            do {
-                let attrString = try NSAttributedString.init(data: (htmlString?.data(using: String.Encoding.unicode))!, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
-                    cell.textLabel?.text = attrString.string
-            } catch _ {
-
-            }
-            
-            
-        }
+        let activeUserImage = UIImage.init(named: "user")
+        let activeUserImageView = UIImageView.init(frame: CGRect(x: self.view.frame.size.width*0.93, y: cell.contentView.bounds.height/4.3, width: 20, height: 20))
+        activeUserImageView.image = activeUserImage
+        let activeUserTextView = UITextView.init(frame: CGRect(x: self.view.frame.size.width*0.73, y: cell.contentView.bounds.height/5.2, width: 80, height: 20))
+        activeUserTextView.textAlignment = NSTextAlignment.right
+        activeUserTextView.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        activeUserTextView.isEditable = false
+        activeUserTextView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+        activeUserTextView.text = String(m_rooms[indexPath.row].activeUsers)
+        activeUserTextView.textColor = UIColor.white
+        activeUserTextView.font = UIFont.boldSystemFont(ofSize: 18)
+        
+        cell.contentView.addSubview(activeUserImageView)
+        cell.contentView.addSubview(activeUserTextView)
+        
+        cell.textLabel?.text = m_rooms[indexPath.row].name
+        cell.detailTextLabel?.text = m_rooms[indexPath.row].description
         
         return cell;
     }
@@ -127,35 +130,43 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                let currentRoomName = m_placesTableView.cellForRow(at: m_index!)?.textLabel?.text
-                let autoSuggestionItem = m_autoSuggestions[m_index!.row]
-                var currentRoomID =
-                    "\(autoSuggestionItem.position?.latitude ?? 1)\(autoSuggestionItem.position?.longitude ?? 1)"
-                currentRoomID = currentRoomID.replacingOccurrences(of: ".", with: "")
+                let currentRoomName = m_rooms[m_index!.row].name
+                let description = m_rooms[m_index!.row].description
+                let currentRoomID = m_rooms[m_index!.row].id
                 vc.m_currentRoomName = currentRoomName
                 vc.m_currentRoomID = currentRoomID
                 m_dbProvider.m_currentRoomID = currentRoomID
-                m_dbProvider.createLocationRoom(id: currentRoomID, name: currentRoomName!, password: "")
-                
+                m_dbProvider.createLocationRoom(id: currentRoomID, name: currentRoomName, description: description, password: "")
             }
         }
     }
     
     func placesRequest(query: String) {
         let currentPosition = NMAPositioningManager.sharedInstance().currentPosition?.coordinates
-        print(currentPosition)
         let bounding = NMAGeoBoundingBox.init(center: currentPosition!, width: 45, height: 45)
-        print(bounding)
         
         let request: NMAAutoSuggestionRequest = (NMAPlaces.sharedInstance()?.createAutoSuggestionRequest(location: currentPosition, partialTerm: query))!
         request.viewport = bounding!
         request.collectionSize = 10
         request.start({(request: NMARequest, data: Any?, error: Error?) in
             if error == nil {
-                self.m_autoSuggestions.removeAll()
+                self.m_rooms.removeAll()
                 for item in data as! [NMAAutoSuggest] {
                     if let place = item as? NMAAutoSuggestPlace {
-                        self.m_autoSuggestions.append(place)
+                        
+                        var id = "\(place.position?.latitude ?? 1)\(place.position?.longitude ?? 1)"
+                        id = id.replacingOccurrences(of: ".", with: "")
+                        let htmlString: String? = place.highlightedTitle
+                        let description: String? = place.vicinityDescription?.replacingOccurrences(of: "<br/>", with: ", ")
+                        do {
+                            let name = try NSAttributedString.init(data: (htmlString?.data(using: String.Encoding.unicode))!, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
+                            let newRoom = Room(id: id, name: String(describing: name.string), description: description!, password: "", activeUsers: 0)
+                            let index = self.m_rooms.count
+                            self.m_rooms.append(newRoom)
+                            self.m_dbProvider.hasRoom(roomID: self.m_rooms[index].id, index: index)
+                        } catch _ {
+                            
+                        }
                     }
                 }
                 self.m_placesTableView.reloadData()
@@ -163,6 +174,21 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
         })
     }
     
+    // Delegate Function
+    
+    func roomDataReceived(room: Room) {
+        
+    }
+    
+    func allRoomDataReceived(rooms: [Room]) {
+        
+    }
+    
+    func activeUserDataReceived(activeUsers: Int, index: Int) {
+        m_rooms[index].activeUsers = activeUsers
+        let indexPath = IndexPath(row: index, section: 0)
+        m_placesTableView.reloadRows(at: [indexPath], with: .none)
+    }
     
     
 }
