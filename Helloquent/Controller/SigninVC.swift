@@ -20,6 +20,10 @@ class SigninVC: UIViewController, FBSDKLoginButtonDelegate {
     
     @IBOutlet weak var passwordTextField: UITextField!
     
+    @IBOutlet weak var loginButton: UIButton!
+    
+    @IBOutlet weak var signUpButton: UIButton!
+    
     let authProvider = AuthProvider()
     
     override func viewDidLoad() {
@@ -28,6 +32,24 @@ class SigninVC: UIViewController, FBSDKLoginButtonDelegate {
         loginButton.center = CGPoint.init(x: self.view.bounds.size.width / 2, y: self.view.frame.size.height / 2 + 150)
         view.addSubview(loginButton)
         loginButton.delegate = self
+        
+        setUpUI()
+    }
+    
+    func setUpUI() {
+        let roomImage = UIImage(named: "big_room")
+        let imageView = UIImageView(image: roomImage)
+        imageView.center.x = self.view.center.x
+        imageView.frame.origin.y = self.view.frame.size.height / 7
+        self.view.addSubview(imageView)
+        
+        loginButton.layer.borderWidth = 2.0
+        loginButton.layer.borderColor = UIColor.white.cgColor
+        loginButton.layer.cornerRadius = 5
+        
+        signUpButton.layer.borderWidth = 2.0
+        signUpButton.layer.borderColor = UIColor.white.cgColor
+        signUpButton.layer.cornerRadius = 5
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -41,17 +63,17 @@ class SigninVC: UIViewController, FBSDKLoginButtonDelegate {
             print(error.localizedDescription)
             return
         } else {
-            let credential: AuthCredential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
-                AuthProvider.Instance.facebookAuth(credential: credential, loginHandler: {(message) in
+            let credential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
+            AuthProvider.Instance.facebookAuth(credential: credential, loginHandler: {(message) in
                     
-                if message != nil {
-                    self.alertUser(title: "Problem With Authentication", message: message!)
-                } else {
-                    print("Login Successful")
-                    self.performSegue(withIdentifier: self.CHATROOMS_SEGUE, sender: nil)
-                }
-            })
-        }
+                    if message != nil {
+                        self.alertUser(title: "Problem With Authentication", message: message!)
+                    } else {
+                        print("Login Successful")
+                        self.performSegue(withIdentifier: self.CHATROOMS_SEGUE, sender: nil)
+                    }
+                })
+            }
     }
     
     func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
