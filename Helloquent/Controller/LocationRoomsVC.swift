@@ -102,10 +102,11 @@ class LocationRooms: UIViewController, UITableViewDelegate, UITableViewDataSourc
         cell.selectedBackgroundView = backgroundView
         
         let activeUserImage = UIImage.init(named: "user")
-        let activeUserImageView = UIImageView.init(frame: CGRect(x: self.view.frame.size.width*0.9, y: cell.contentView.bounds.height/3, width: 30, height: 30))
+        let activeUserImageView = UIImageView.init(frame: CGRect(x: self.view.frame.size.width*0.93, y: cell.contentView.bounds.height/5.2, width: 20, height: 20))
         activeUserImageView.image = activeUserImage
-        let activeUserTextView = UITextView.init(frame: CGRect(x: self.view.frame.size.width*0.7, y: cell.contentView.bounds.height/4.4, width: 80, height: 30))
+        let activeUserTextView = UITextView.init(frame: CGRect(x: self.view.frame.size.width*0.73, y: cell.contentView.bounds.height/5.5, width: 80, height: 20))
         activeUserTextView.textAlignment = NSTextAlignment.right
+        activeUserTextView.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         activeUserTextView.isEditable = false
         activeUserTextView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
         activeUserTextView.text = String(m_rooms[indexPath.row].activeUsers)
