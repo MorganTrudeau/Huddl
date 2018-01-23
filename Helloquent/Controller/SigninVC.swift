@@ -12,27 +12,24 @@ import FBSDKCoreKit
 import FBSDKLoginKit
 import FirebaseAuth
 
-class SigninVC: UIViewController, FBSDKLoginButtonDelegate {
+class SigninVC: UIViewController {
     
     private let CHATROOMS_SEGUE: String = "chat_rooms_segue"
     
-    @IBOutlet weak var emailTextField: UITextField!
+    @IBOutlet weak var m_displayNameTextField: UITextField!
     
-    @IBOutlet weak var passwordTextField: UITextField!
+    @IBOutlet weak var m_passwordTextField: UITextField!
     
-    @IBOutlet weak var loginButton: UIButton!
+    @IBOutlet weak var m_loginButton: UIButton!
     
-    @IBOutlet weak var signUpButton: UIButton!
+    @IBOutlet weak var m_FBLoginButton: UIButton!
     
     let authProvider = AuthProvider()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        let loginButton = FBSDKLoginButton.init()
-        loginButton.center = CGPoint.init(x: self.view.bounds.size.width / 2, y: self.view.frame.size.height / 2 + 150)
-        view.addSubview(loginButton)
-        loginButton.delegate = self
-        
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(SigninVC.dismissKeyboard))
+        view.addGestureRecognizer(tap)
         setUpUI()
     }
     
@@ -40,16 +37,39 @@ class SigninVC: UIViewController, FBSDKLoginButtonDelegate {
         let roomImage = UIImage(named: "big_room")
         let imageView = UIImageView(image: roomImage)
         imageView.center.x = self.view.center.x
-        imageView.frame.origin.y = self.view.frame.size.height / 7
+        imageView.center.y = self.view.frame.size.height*0.2
         self.view.addSubview(imageView)
         
-        loginButton.layer.borderWidth = 2.0
-        loginButton.layer.borderColor = UIColor.white.cgColor
-        loginButton.layer.cornerRadius = 5
+        m_displayNameTextField.center.y = self.view.frame.size.height*0.4
         
-        signUpButton.layer.borderWidth = 2.0
-        signUpButton.layer.borderColor = UIColor.white.cgColor
-        signUpButton.layer.cornerRadius = 5
+        m_passwordTextField.center.y = self.view.frame.size.height*0.49
+        
+        m_loginButton.layer.borderWidth = 2.0
+        m_loginButton.layer.borderColor = UIColor.white.cgColor
+        m_loginButton.layer.cornerRadius = 5
+        m_loginButton.center.y = self.view.frame.size.height*0.58
+        
+        let orTextView = UITextView(frame: CGRect(x: 0, y: 0, width: 200, height: 35))
+        orTextView.text = "OR"
+        orTextView.backgroundColor = UIColor.clear
+        orTextView.textColor = UIColor.white
+        orTextView.textAlignment = NSTextAlignment.center
+        orTextView.font = UIFont.boldSystemFont(ofSize: 18)
+        orTextView.center.x = self.view.center.x
+        orTextView.center.y = self.view.frame.size.height*0.655
+        self.view.addSubview(orTextView)
+        
+        
+        let FBImage = UIImage.init(named: "facebook_icon")
+        let FBImageView = UIImageView.init(frame: CGRect(x: 10, y: 7, width: 20, height: 20))
+        FBImageView.image = FBImage
+        
+        m_FBLoginButton.layer.borderWidth = 2.0
+        m_FBLoginButton.layer.borderColor = UIColor.white.cgColor
+        m_FBLoginButton.layer.cornerRadius = 5
+        m_FBLoginButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)
+        m_FBLoginButton.center.y = self.view.frame.size.height*0.73
+        m_FBLoginButton.addSubview(FBImageView)
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -58,13 +78,18 @@ class SigninVC: UIViewController, FBSDKLoginButtonDelegate {
         }
     }
     
-    func loginButton(_ loginButton: FBSDKLoginButton!, didCompleteWith result: FBSDKLoginManagerLoginResult!, error: Error!) {
-        if error != nil {
-            print(error.localizedDescription)
-            return
-        } else {
-            let credential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
-            AuthProvider.Instance.facebookAuth(credential: credential, loginHandler: {(message) in
+    @IBAction func FBLoginButonPressed(_ sender: Any) {
+        let login: FBSDKLoginManager = FBSDKLoginManager.init()
+        login.logIn(withReadPermissions: ["public_profile"], from: self, handler: {(result, error) in
+            
+            if error != nil {
+                self.alertUser(title: "Problem With Authentication", message: String(describing: error))
+            } else if (result?.isCancelled)! {
+                print("FBLogin Cancelled")
+            } else {
+                print("FBLogin Success")
+                let credential = FacebookAuthProvider.credential(withAccessToken: FBSDKAccessToken.current().tokenString)
+                AuthProvider.Instance.facebookAuth(credential: credential, loginHandler: {(message) in
                     
                     if message != nil {
                         self.alertUser(title: "Problem With Authentication", message: message!)
@@ -74,6 +99,7 @@ class SigninVC: UIViewController, FBSDKLoginButtonDelegate {
                     }
                 })
             }
+        })
     }
     
     func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
@@ -81,33 +107,14 @@ class SigninVC: UIViewController, FBSDKLoginButtonDelegate {
     
     @IBAction func login(_ sender: Any) {
         
-        if emailTextField.text != "" && passwordTextField.text != "" {
+        if m_displayNameTextField.text != "" && m_passwordTextField.text != "" {
             
-            AuthProvider.Instance.login(email: emailTextField.text!, password: passwordTextField.text!, loginHandler: {(message) in
+            AuthProvider.Instance.login(email: m_displayNameTextField.text!, password: m_passwordTextField.text!, loginHandler: {(message) in
                 
                 if message != nil {
                     self.alertUser(title: "Problem With Authentication", message: message!)
                 } else {
                     print("Login Successful")
-                    self.performSegue(withIdentifier: self.CHATROOMS_SEGUE, sender: nil)
-                }
-            })
-        } else {
-            alertUser(title: "Email and Password Required", message: "Please enter an email and password")
-        }
-    }
-    
-    
-    @IBAction func signUp(_ sender: Any) {
-        
-        if emailTextField.text != "" && passwordTextField.text != "" {
-            
-            AuthProvider.Instance.signUp(email: emailTextField.text!, password: passwordTextField.text!, loginHandler: {(message) in
-                
-                if message != nil {
-                    self.alertUser(title: "Problem Creating User", message: message!)
-                } else {
-                    print("Successfully created user")
                     self.performSegue(withIdentifier: self.CHATROOMS_SEGUE, sender: nil)
                 }
             })
@@ -122,6 +129,10 @@ class SigninVC: UIViewController, FBSDKLoginButtonDelegate {
         let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
         alert.addAction(ok)
         present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
     }
     
     

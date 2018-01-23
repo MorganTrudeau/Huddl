@@ -61,7 +61,7 @@ class AuthProvider {
     }
     
     func currentUserName() -> String {
-        return (Auth.auth().currentUser?.displayName)!
+        return (Auth.auth().currentUser?.email)!
     }
     
     func signUp(email: String, password: String, loginHandler: LoginHandler?) {

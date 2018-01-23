@@ -21,6 +21,7 @@
 		F9179B79200FD9060057AAEF /* RoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B78200FD9060057AAEF /* RoomsVC.swift */; };
 		F93364D81FEDE89D002A3718 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F93364D71FEDE89D002A3718 /* Assets.xcassets */; };
 		F93364DA1FEDE8BF002A3718 /* avatar.gif in Resources */ = {isa = PBXBuildFile; fileRef = F93364D91FEDE8BF002A3718 /* avatar.gif */; };
+		F947B3432016B83600E8CB41 /* SignUpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F947B3422016B83600E8CB41 /* SignUpVC.swift */; };
 		F966C9D62005300000E92A39 /* LocationRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F966C9D52005300000E92A39 /* LocationRoomsVC.swift */; };
 		F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC381FED050700CC3C58 /* AuthProvider.swift */; };
 		F973BC3B1FEDA66800CC3C58 /* DBProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */; };
@@ -98,6 +99,7 @@
 		F93364D91FEDE8BF002A3718 /* avatar.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = avatar.gif; path = Assets.xcassets/avatar.gif; sourceTree = "<group>"; };
 		F93CA2A6200D38C200D9132C /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NMAKit.framework; path = "../../../Downloads/HERESDK-Premium 4/framework/NMAKit.framework"; sourceTree = "<group>"; };
 		F93CA2A9200D38C500D9132C /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NMAKit.framework; path = "../../../Downloads/HERESDK-Premium 4/framework/NMAKit.framework"; sourceTree = "<group>"; };
+		F947B3422016B83600E8CB41 /* SignUpVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpVC.swift; sourceTree = "<group>"; };
 		F966C9D52005300000E92A39 /* LocationRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRoomsVC.swift; sourceTree = "<group>"; };
 		F973BC381FED050700CC3C58 /* AuthProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProvider.swift; sourceTree = "<group>"; };
 		F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBProvider.swift; sourceTree = "<group>"; };
@@ -242,6 +244,7 @@
 			isa = PBXGroup;
 			children = (
 				F90D105A1FECE33B0012283B /* SigninVC.swift */,
+				F947B3422016B83600E8CB41 /* SignUpVC.swift */,
 				F9179B78200FD9060057AAEF /* RoomsVC.swift */,
 				F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */,
 				F966C9D52005300000E92A39 /* LocationRoomsVC.swift */,
@@ -596,6 +599,7 @@
 				F90D10291FECDFB90012283B /* AppDelegate.swift in Sources */,
 				F9E264DA1FFDA35C00605CA7 /* Room.swift in Sources */,
 				F966C9D62005300000E92A39 /* LocationRoomsVC.swift in Sources */,
+				F947B3432016B83600E8CB41 /* SignUpVC.swift in Sources */,
 				F973BC3B1FEDA66800CC3C58 /* DBProvider.swift in Sources */,
 				F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */,
 				F9179B79200FD9060057AAEF /* RoomsVC.swift in Sources */,

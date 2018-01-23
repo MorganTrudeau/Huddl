@@ -162,6 +162,10 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         return 17.0
     }
     
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, didTapMessageBubbleAt indexPath: IndexPath!) {
+        
+    }
+    
     // Sending buttons functions
     
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
@@ -221,7 +225,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
             m_messages.append(JSQMessage(senderId: self.senderId, displayName: self.senderDisplayName, media: image))
             m_messageColors.append("blue")
             self.collectionView.reloadData()
-            let data = UIImageJPEGRepresentation(mediaPick, 0.8)
+            let data = UIImageJPEGRepresentation(mediaPick, 0.5)
             m_messagesHandler.saveMedia(image: data!, video: nil, senderID: self.senderId, senderName: self.senderDisplayName, roomID: m_currentRoomID!, color: m_currentUserColor!)
             dismiss(animated: true, completion: nil)
             
