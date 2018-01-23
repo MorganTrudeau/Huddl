@@ -18,17 +18,17 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Display Name" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hoE-ZV-n25">
-                                <rect key="frame" x="88" y="277" width="199" height="30"/>
+                            <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Email" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="hoE-ZV-n25">
+                                <rect key="frame" x="88" y="276.5" width="199" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" returnKeyType="next" textContentType="name"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="emailAddress" returnKeyType="next" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no" textContentType="email"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="8wD-ym-80n">
-                                <rect key="frame" x="88" y="404" width="199" height="35"/>
+                                <rect key="frame" x="88" y="403.5" width="199" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="19"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <state key="normal" title="Login">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -51,16 +51,16 @@
                                 </connections>
                             </button>
                             <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="AbX-lA-vdV">
-                                <rect key="frame" x="88" y="343" width="199" height="30"/>
+                                <rect key="frame" x="88" y="342.5" width="199" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" returnKeyType="go" secureTextEntry="YES" textContentType="password"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" preservesSuperviewLayoutMargins="YES" contentHorizontalAlignment="right" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="D1x-VB-6KW">
-                                <rect key="frame" x="88" y="488" width="199" height="35"/>
+                                <rect key="frame" x="88" y="487.5" width="199" height="35"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <color key="tintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <state key="normal" title="Continue with Facebook">
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -75,15 +75,15 @@
                     </view>
                     <connections>
                         <outlet property="m_FBLoginButton" destination="D1x-VB-6KW" id="hhC-4l-itQ"/>
-                        <outlet property="m_displayNameTextField" destination="hoE-ZV-n25" id="8zW-KN-h3X"/>
+                        <outlet property="m_emailTextField" destination="hoE-ZV-n25" id="flZ-Hu-X41"/>
                         <outlet property="m_loginButton" destination="8wD-ym-80n" id="ytZ-CT-seY"/>
                         <outlet property="m_passwordTextField" destination="AbX-lA-vdV" id="KK9-4C-wBU"/>
-                        <segue destination="tzb-w5-mO4" kind="show" identifier="chat_rooms_segue" id="QqI-uA-2bT"/>
+                        <segue destination="tzb-w5-mO4" kind="show" identifier="sign_in_segue" id="QqI-uA-2bT"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="454" y="-3509"/>
+            <point key="canvasLocation" x="453.60000000000002" y="-4283.2083958020994"/>
         </scene>
         <!--Sign UpVC-->
         <scene sceneID="gyY-oH-6fl">
@@ -97,28 +97,28 @@
                                 <rect key="frame" x="88" y="182" width="199" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" returnKeyType="next" textContentType="name"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" returnKeyType="next" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no" textContentType="name"/>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Email" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="s9t-3b-7cq">
                                 <rect key="frame" x="88" y="257" width="199" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits" keyboardType="emailAddress" returnKeyType="next" textContentType="name"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <textInputTraits key="textInputTraits" autocorrectionType="no" spellCheckingType="no" keyboardType="emailAddress" returnKeyType="next" smartDashesType="no" smartInsertDeleteType="no" smartQuotesType="no" textContentType="name"/>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="u42-zU-6O2">
                                 <rect key="frame" x="88" y="333" width="199" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" returnKeyType="next" secureTextEntry="YES" textContentType="password"/>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Confirm Password" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="iKe-yv-DT2">
                                 <rect key="frame" x="88" y="412" width="199" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMinY="YES" flexibleMaxY="YES"/>
                                 <nil key="textColor"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <textInputTraits key="textInputTraits" returnKeyType="next" secureTextEntry="YES" textContentType="password"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="DTK-Po-DzK">
@@ -128,7 +128,7 @@
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="signUp:" destination="IzS-AS-YVp" eventType="touchUpInside" id="Ms0-OA-Jpi"/>
+                                    <action selector="signUp:" destination="IzS-AS-YVp" eventType="touchUpInside" id="r4N-M5-Tfr"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="U7e-SY-ovP">
@@ -138,7 +138,6 @@
                                     <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
                                 <connections>
-                                    <action selector="signUp:" destination="IzS-AS-YVp" eventType="touchUpInside" id="gcf-JC-LMY"/>
                                     <segue destination="BYZ-38-t0r" kind="show" id="7h9-SF-dMR"/>
                                 </connections>
                             </button>
@@ -153,7 +152,7 @@
                         <outlet property="m_emailTextField" destination="s9t-3b-7cq" id="AyT-kI-jla"/>
                         <outlet property="m_passwordTextField" destination="u42-zU-6O2" id="vUV-pD-hkC"/>
                         <outlet property="m_signUpButton" destination="DTK-Po-DzK" id="OaO-kw-IWQ"/>
-                        <segue destination="tzb-w5-mO4" kind="show" identifier="rooms_segue" id="9aw-Mb-IoH"/>
+                        <segue destination="tzb-w5-mO4" kind="show" identifier="sign_up_segue" id="8uE-RO-32W"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="n8O-cQ-xSc" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -204,12 +203,12 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Ylv-px-rOj" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="454" y="-1142"/>
+            <point key="canvasLocation" x="1382" y="-1253"/>
         </scene>
-        <!--Search-->
+        <!--Rooms-->
         <scene sceneID="8aL-Ok-ojZ">
             <objects>
-                <viewController automaticallyAdjustsScrollViewInsets="NO" id="djL-q3-ApR" customClass="LocationRooms" customModule="Helloquent" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController automaticallyAdjustsScrollViewInsets="NO" id="djL-q3-ApR" customClass="Rooms" customModule="Helloquent" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="Tlo-4b-Oxj">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="618"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -228,16 +227,33 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <viewLayoutGuide key="safeArea" id="Sec-C1-lAa"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Search" id="fMP-Ym-7hz"/>
+                    <navigationItem key="navigationItem" title="Rooms" id="fMP-Ym-7hz">
+                        <barButtonItem key="leftBarButtonItem" title="Logout" id="SDt-rM-1Rc">
+                            <connections>
+                                <action selector="logout:" destination="djL-q3-ApR" id="Vqh-F4-kmJ"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" style="plain" id="BYF-OZ-hAX">
+                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="N0M-1F-C7C">
+                                <rect key="frame" x="329" y="7" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" image="add"/>
+                                <connections>
+                                    <action selector="addRoomButton:" destination="djL-q3-ApR" eventType="touchUpInside" id="fVC-zF-JQC"/>
+                                    <action selector="addRoomButton:" destination="UAd-1Q-fqH" eventType="touchUpInside" id="wqq-4O-4ro"/>
+                                </connections>
+                            </button>
+                        </barButtonItem>
+                    </navigationItem>
                     <connections>
-                        <outlet property="m_placesSearchBar" destination="veh-96-scX" id="sn4-6U-NN0"/>
-                        <outlet property="m_placesTableView" destination="hcE-WO-BY9" id="dsP-5T-iUA"/>
+                        <outlet property="m_roomsSearchBar" destination="veh-96-scX" id="vif-Qk-lwH"/>
+                        <outlet property="m_roomsTableView" destination="hcE-WO-BY9" id="ncs-3z-bmE"/>
                         <segue destination="vCp-1D-NmO" kind="show" identifier="chat_room_segue" id="tSG-gr-oaw"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="pmD-Lo-5PC" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1374" y="-1143"/>
+            <point key="canvasLocation" x="-442" y="-1252"/>
         </scene>
         <!--ChatVC-->
         <scene sceneID="LDk-FZ-jkK">
@@ -256,7 +272,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="z4j-EJ-dIu" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="454" y="-305"/>
+            <point key="canvasLocation" x="454" y="-480"/>
         </scene>
         <!--Tab BarVC-->
         <scene sceneID="CDj-JV-wmS">
@@ -269,18 +285,19 @@
                         <color key="barTintColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </tabBar>
                     <connections>
-                        <segue destination="DWC-jJ-xtf" kind="relationship" relationship="viewControllers" id="bph-LQ-1py"/>
-                        <segue destination="byw-mV-f38" kind="relationship" relationship="viewControllers" id="PFY-3Z-I3r"/>
-                        <segue destination="rxA-Fm-eBX" kind="relationship" relationship="viewControllers" id="bUq-9I-4dd"/>
+                        <segue destination="rxA-Fm-eBX" kind="relationship" relationship="viewControllers" id="EhF-oB-fgC"/>
+                        <segue destination="DWC-jJ-xtf" kind="relationship" relationship="viewControllers" id="6BQ-ZS-hde"/>
+                        <segue destination="byw-mV-f38" kind="relationship" relationship="viewControllers" id="Rdm-Rb-zht"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ka0-Ac-XI5" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="454" y="-2695"/>
+            <point key="canvasLocation" x="454" y="-2739"/>
         </scene>
         <!--Saved-->
         <scene sceneID="Y2h-8D-T0g">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Noc-YC-ZTP" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="byw-mV-f38" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Saved" image="heart" id="eS5-Yr-F6G"/>
                     <toolbarItems/>
@@ -293,14 +310,13 @@
                         <segue destination="uUz-x9-H7g" kind="relationship" relationship="rootViewController" id="zdy-lV-x9a"/>
                     </connections>
                 </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Noc-YC-ZTP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="454" y="-1891"/>
+            <point key="canvasLocation" x="1382" y="-1970"/>
         </scene>
         <!--Rooms-->
         <scene sceneID="ICL-mi-4fJ">
             <objects>
-                <viewController id="UAd-1Q-fqH" customClass="RoomsVC" customModule="Helloquent" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="UAd-1Q-fqH" customClass="ActiveRoomsVC" customModule="Helloquent" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="uEl-o7-IjH">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="618"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -329,23 +345,7 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <viewLayoutGuide key="safeArea" id="jFe-1S-TX4"/>
                     </view>
-                    <navigationItem key="navigationItem" title="Rooms" id="vzz-T5-iKC">
-                        <barButtonItem key="leftBarButtonItem" title="Logout" id="SDt-rM-1Rc">
-                            <connections>
-                                <action selector="logout:" destination="UAd-1Q-fqH" id="1Dx-M5-CVI"/>
-                            </connections>
-                        </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" style="plain" id="BYF-OZ-hAX">
-                            <button key="customView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" id="N0M-1F-C7C">
-                                <rect key="frame" x="329" y="7" width="30" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" image="add"/>
-                                <connections>
-                                    <action selector="addRoomButton:" destination="UAd-1Q-fqH" eventType="touchUpInside" id="wqq-4O-4ro"/>
-                                </connections>
-                            </button>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" title="Rooms" id="vzz-T5-iKC"/>
                     <connections>
                         <outlet property="m_roomsSearchBar" destination="tN4-NB-8bX" id="AVV-tw-d3D"/>
                         <outlet property="m_roomsTableView" destination="gim-hP-xC7" id="YIc-6l-gkf"/>
@@ -354,13 +354,14 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="CQg-rc-HIf" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-487.19999999999999" y="-1144.6776611694154"/>
+            <point key="canvasLocation" x="454" y="-1253"/>
         </scene>
-        <!--Search-->
+        <!--Rooms-->
         <scene sceneID="LFO-xn-FZm">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CYM-oO-OT9" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="rxA-Fm-eBX" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Search" image="search" id="aUz-cN-xM7"/>
+                    <tabBarItem key="tabBarItem" title="Rooms" image="room" id="aUz-cN-xM7"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="Clf-03-fGc">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
@@ -371,15 +372,15 @@
                         <segue destination="djL-q3-ApR" kind="relationship" relationship="rootViewController" id="Kcd-XM-oHS"/>
                     </connections>
                 </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="CYM-oO-OT9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1374" y="-1891"/>
+            <point key="canvasLocation" x="-442" y="-1970"/>
         </scene>
-        <!--Rooms-->
+        <!--Active-->
         <scene sceneID="9VV-hB-xdM">
             <objects>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gPc-gP-QSO" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="DWC-jJ-xtf" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Rooms" image="room" id="ZXV-ZO-mSx"/>
+                    <tabBarItem key="tabBarItem" title="Active" image="active" id="ZXV-ZO-mSx"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="FyG-l3-CKT">
                         <rect key="frame" x="0.0" y="20" width="375" height="44"/>
@@ -390,19 +391,18 @@
                         <segue destination="UAd-1Q-fqH" kind="relationship" relationship="rootViewController" id="ziW-rR-hb1"/>
                     </connections>
                 </navigationController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="gPc-gP-QSO" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-486" y="-1891"/>
+            <point key="canvasLocation" x="454" y="-1969"/>
         </scene>
     </scenes>
     <resources>
+        <image name="active" width="30" height="30"/>
         <image name="add" width="30" height="30"/>
         <image name="heart" width="30" height="30"/>
         <image name="room" width="30" height="30"/>
-        <image name="search" width="30" height="30"/>
     </resources>
     <inferredMetricsTieBreakers>
-        <segue reference="9aw-Mb-IoH"/>
+        <segue reference="QqI-uA-2bT"/>
         <segue reference="c8E-JZ-ZGQ"/>
     </inferredMetricsTieBreakers>
 </document>

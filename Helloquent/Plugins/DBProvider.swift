@@ -87,7 +87,7 @@ class DBProvider {
         return storageRef.child(Constants.VIDEO_STORAGE)
     }
     
-    func createUser(withID: String, email: String, password: String, color: String) {
+    func createUser(withID: String, email: String, displayName: String, password: String, color: String) {
         let data: Dictionary<String, Any> = [Constants.EMAIL: email, Constants.PASSWORD: password, Constants.COLOR: color]
         usersRef.child(withID).setValue(data)
     }

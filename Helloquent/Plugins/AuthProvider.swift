@@ -61,10 +61,10 @@ class AuthProvider {
     }
     
     func currentUserName() -> String {
-        return (Auth.auth().currentUser?.email)!
+        return (Auth.auth().currentUser?.displayName)!
     }
     
-    func signUp(email: String, password: String, loginHandler: LoginHandler?) {
+    func signUp(email: String, displayName: String, password: String, loginHandler: LoginHandler?) {
         Auth.auth().createUser(withEmail: email, password: password, completion: {(user, error) in
             
             if error != nil {
@@ -72,12 +72,24 @@ class AuthProvider {
             } else if user?.uid != nil {
                 //Store in db
                 let userColor = ColorHandler.Instance.userColor()
-                DBProvider.Instance.createUser(withID: user!.uid, email: email, password: password, color: userColor)
+                DBProvider.Instance.createUser(withID: user!.uid, email: email, displayName: displayName, password: password, color: userColor)
                 
                 //Sign in user
                 self.login(email: email, password: password, loginHandler: loginHandler)
-                    
-                loginHandler?(nil)
+                
+                // Set user display name
+                let currentUser = Auth.auth().currentUser
+                if currentUser == user {
+                    let changeRequest = user?.createProfileChangeRequest()
+                    changeRequest?.displayName = displayName
+                    changeRequest?.commitChanges(completion: {(error) in
+                        if error != nil {
+                            print("Error setting display name")
+                        } else {
+                            print("Display name set")
+                        }
+                    })
+                }
             }
         })
     }
