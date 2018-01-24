@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import NMAKit
 
-class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, FetchRoomData, CreateRoom, UserEnteredRoom {
+class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, FetchRoomData {
     
     @IBOutlet weak var m_roomsTableView: UITableView!
     @IBOutlet weak var m_roomsSearchBar: UISearchBar!
@@ -27,14 +27,11 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        m_dbProvider.delegateCreateRoom = self
         
         m_roomsTableView.delegate = self
         m_roomsTableView.dataSource = self
         
         m_roomsSearchBar.delegate = self
-        
-        NMAPositioningManager.sharedInstance().startPositioning()
         
         setUpUI()
     }
@@ -48,19 +45,15 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         m_dbProvider.delegateRooms = self
-        m_dbProvider.delegateUserEnteredRoom = self
-        m_dbProvider.observeRoomsAdded()
+        m_dbProvider.getRooms()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        m_dbProvider.observeRoomsChanged()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
-        m_dbProvider.removeRoomsObserver(withHandle: Constants.CHILD_ADDED_HANDLE)
-        m_dbProvider.removeRoomsObserver(withHandle: Constants.CHILD_CHANGED_HANDLE)
         m_rooms.removeAll()
         m_roomsSearchBar.resignFirstResponder()
         m_roomsSearchBar.text = ""
@@ -212,7 +205,14 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                         
                             if descriptionTextField.text!.size(withAttributes: [NSAttributedStringKey.font : UIFont.systemFont(ofSize: 12)]).width < CGFloat(self.view.frame.size.width*0.65) {
                             
-                                DBProvider.Instance.createRoom(name: nameTextField.text!, description: descriptionTextField.text,   password: passWordTextField.text)
+                                DBProvider.Instance.createRoom(name: nameTextField.text!, description: descriptionTextField.text,   password: passWordTextField.text, roomCreated: {(newRoom, success) in
+                                    if !success {
+                                        self.alertUser(title: "Room Name Already Exists", message: "Enter another room name")
+                                    } else {
+                                        self.m_rooms.append(newRoom)
+                                        self.m_roomsTableView.reloadData()
+                                    }
+                                })
                             } else {
                                 self.alertUser(title: "Invalid Format", message: "Room description too long")
                             }
@@ -297,16 +297,6 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
             m_rooms = rooms
             m_filteredRooms = m_rooms
             m_roomsTableView.reloadData()
-        }
-    }
-    
-    func activeUserDataReceived(activeUsers: Int, index: Int) {
-        
-    }
-    
-    func roomCreated(success: Bool) {
-        if !success {
-            self.alertUser(title: "Room Name Already Exists", message: "Enter another room name")
         }
     }
     

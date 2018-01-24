@@ -42,16 +42,10 @@ class SigninVC: UIViewController {
     }
     
     func setUpUI() {
-        let roomImage = UIImage(named: "big_room")
-        let roomImageView = UIImageView.init(frame: CGRect(x: 0, y: 0, width: 65, height: 65))
-        roomImageView.image = roomImage
-        roomImageView.center.x = self.view.center.x - 110
-        roomImageView.center.y = self.view.frame.size.height*0.2
-        self.view.addSubview(roomImageView)
         
         let roomTextImage = UIImage(named: "rooms_text")
         let roomTextImageView = UIImageView(image: roomTextImage)
-        roomTextImageView.center.x = self.view.center.x + 40
+        roomTextImageView.center.x = self.view.center.x
         roomTextImageView.center.y = self.view.frame.size.height*0.2
         self.view.addSubview(roomTextImageView)
         
@@ -125,12 +119,11 @@ class SigninVC: UIViewController {
         })
     }
     
-    func loginButtonDidLogOut(_ loginButton: FBSDKLoginButton!) {
-    }
-    
     @IBAction func login(_ sender: Any) {
         
         if m_emailTextField.text != "" && m_passwordTextField.text != "" {
+            
+            // Present LoadingOverlay as a modal
             present(m_loadingOverlay, animated: false, completion: nil)
             
             AuthProvider.Instance.login(email: m_emailTextField.text!, password: m_passwordTextField.text!, loginHandler: {(message) in

@@ -10,19 +10,15 @@ import Foundation
 import UIKit
 import CoreData
 
-protocol FetchRoomCoreData: class {
-    func coreRoomDataReceived(savedRoomIDs: [String])
-}
+typealias CoreDataHandler = (_ savedRoomIDs: [String]) -> Void
 
-class CoreDataHandler {
+class CoreDataProvider {
     
-    private static let m_instance = CoreDataHandler()
+    private static let m_instance = CoreDataProvider()
     
-    static var Instance: CoreDataHandler {
+    static var Instance: CoreDataProvider {
         return m_instance
     }
-    
-    weak var delegate: FetchRoomCoreData?
     
     private var m_roomIDs = [String]()
     
@@ -77,7 +73,7 @@ class CoreDataHandler {
 
     }
     
-    func fetchRoomCoreData() {
+    func fetchRoomCoreData(coreRoomDataReceived: CoreDataHandler?) {
         
         guard let appDelegate =
             UIApplication.shared.delegate as? AppDelegate else {
@@ -96,7 +92,7 @@ class CoreDataHandler {
             for room in coreData {
                 m_roomIDs.append(room.value(forKey: "id") as! String)
             }
-            self.delegate?.coreRoomDataReceived(savedRoomIDs: m_roomIDs)
+            coreRoomDataReceived?(m_roomIDs)
             
         } catch {
             print("fetch error")

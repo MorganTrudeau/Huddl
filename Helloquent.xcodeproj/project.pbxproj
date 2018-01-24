@@ -32,7 +32,7 @@
 		F9C747D220107F4E00F311D8 /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9C747D120107F4E00F311D8 /* NMAKit.framework */; };
 		F9C747D320107F4E00F311D8 /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F9C747D120107F4E00F311D8 /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F9C747D720108FBA00F311D8 /* SavedRooms.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F9C747D520108FBA00F311D8 /* SavedRooms.xcdatamodeld */; };
-		F9C747D92010914C00F311D8 /* CoreDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C747D82010914C00F311D8 /* CoreDataHandler.swift */; };
+		F9C747D92010914C00F311D8 /* CoreDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C747D82010914C00F311D8 /* CoreDataProvider.swift */; };
 		F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */; };
 		F9E264D41FFD4EED00605CA7 /* SavedRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */; };
 		F9E264DA1FFDA35C00605CA7 /* Room.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D91FFDA35C00605CA7 /* Room.swift */; };
@@ -110,7 +110,7 @@
 		F985FD4C200C294A00F1934B /* JSQMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSQMessage.swift; sourceTree = "<group>"; };
 		F9C747D120107F4E00F311D8 /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NMAKit.framework; sourceTree = "<group>"; };
 		F9C747D620108FBA00F311D8 /* SavedRooms.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SavedRooms.xcdatamodel; sourceTree = "<group>"; };
-		F9C747D82010914C00F311D8 /* CoreDataHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataHandler.swift; sourceTree = "<group>"; };
+		F9C747D82010914C00F311D8 /* CoreDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProvider.swift; sourceTree = "<group>"; };
 		F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesHandler.swift; sourceTree = "<group>"; };
 		F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRoomsVC.swift; sourceTree = "<group>"; };
 		F9E264D91FFDA35C00605CA7 /* Room.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Room.swift; sourceTree = "<group>"; };
@@ -263,7 +263,7 @@
 				F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */,
 				F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */,
 				F9EA8BEC20008A6400A98421 /* ColorHandler.swift */,
-				F9C747D82010914C00F311D8 /* CoreDataHandler.swift */,
+				F9C747D82010914C00F311D8 /* CoreDataProvider.swift */,
 				F9E69A7D20172CFB0014733D /* LoadingOverlay.swift */,
 			);
 			path = Plugins;
@@ -592,7 +592,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F9C747D92010914C00F311D8 /* CoreDataHandler.swift in Sources */,
+				F9C747D92010914C00F311D8 /* CoreDataProvider.swift in Sources */,
 				F9C747D720108FBA00F311D8 /* SavedRooms.xcdatamodeld in Sources */,
 				F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */,
 				F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */,

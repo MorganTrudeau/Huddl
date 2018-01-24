@@ -11,11 +11,11 @@ import JSQMessagesViewController
 import MobileCoreServices
 import AVKit
 
-class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, FetchColorData, ActiveUsersDecreased, FetchRoomCoreData, UIPickerViewDelegate {
+class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate {
     
     var m_saveRoomButton: UIBarButtonItem?
     
-    let m_coreDataHandler = CoreDataHandler.Instance
+    let m_coreDataProvider = CoreDataProvider.Instance
     let m_messagesHandler = MessagesHandler.Instance
     let m_dbProvider = DBProvider.Instance
     
@@ -39,9 +39,9 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleResignActive), name: NSNotification.Name(rawValue: "ResignActiveNotification"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleBecomeActive), name: NSNotification.Name(rawValue: "BecomeActiveNotification"), object: nil)
         
-        m_dbProvider.delegateColor = self
-        m_dbProvider.delegateActiveUsersDecreased = self
-        m_dbProvider.currentUserColor()
+        m_dbProvider.currentUserColor(colorDataReceived: {(color: String) in
+            self.m_currentUserColor = color
+        })
         
         self.senderId = AuthProvider.Instance.userID()
         self.senderDisplayName = AuthProvider.Instance.currentUserName()
@@ -57,12 +57,18 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     func setUpUI() {
         self.collectionView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
-        self.navigationItem.title = m_currentRoomName;
-        self.navigationItem.hidesBackButton = true
+        
+        // Create custom back button to extend functionality
         let newBackButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ChatVC.back(sender:)))
+        
+        // Create Heart button to save room
         m_saveRoomButton = UIBarButtonItem(image: UIImage(named: "heart"), style: .plain, target: self, action: #selector(ChatVC.saveRoomButtonClicked))
+        
+        self.navigationItem.hidesBackButton = true
         self.navigationItem.leftBarButtonItem = newBackButton
         self.navigationItem.rightBarButtonItem  = m_saveRoomButton
+        self.navigationItem.title = m_currentRoomName;
+        
         self.view.layoutIfNeeded()
         self.collectionView.layoutIfNeeded()
         if self.collectionView.contentSize.height > self.collectionView.frame.size.height {
@@ -72,10 +78,18 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        m_messagesHandler.observeRoomMessges()
         
-        m_coreDataHandler.delegate = self
-        m_coreDataHandler.fetchRoomCoreData()
+        // Receives new messages add to database
+        m_messagesHandler.observeRoomMessages()
+        
+        // Fetch core data to check if current room is saved
+        m_coreDataProvider.fetchRoomCoreData(coreRoomDataReceived: {(_) in
+            self.m_isRoomSaved = self.m_coreDataProvider.isCurrentRoomSaved(currentRoomID: self.m_currentRoomID!)
+            if !self.m_isRoomSaved {
+                self.m_saveRoomButton?.tintColor = UIColor.gray
+            }
+        })
+            
         self.tabBarController?.tabBar.isHidden = true
     }
     
@@ -87,21 +101,23 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
         if !m_goingBack {
-            m_dbProvider.decreaseActiveUsers()
+            m_dbProvider.decreaseActiveUsers(completion: nil)
         }
         m_messagesHandler.removeRoomObservers()
         self.tabBarController?.tabBar.isHidden = false
     }
     
     @objc func handleResignActive() {
-        m_dbProvider.decreaseActiveUsers()
+        m_dbProvider.decreaseActiveUsers(completion: nil)
     }
     
     @objc func handleBecomeActive() {
         m_dbProvider.increaseActiveUsers()
     }
     
-    // Keyboard Functions
+    /**
+        Keyboard Functions
+    **/
     
     @objc func keyboardWillShow(notification: NSNotification) {
         self.topContentAdditionalInset = -65
@@ -110,7 +126,9 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     @objc func keyboardWillHide(notification: NSNotification) {
     }
 
-    // CollectionView Functions
+    /**
+        CollectionView Functions
+    **/
 
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
         return JSQMessagesAvatarImageFactory.avatarImage(with: UIImage(named: "avatar.gif"), diameter: 30)
@@ -166,7 +184,9 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         
     }
     
-    // Sending buttons functions
+    /**
+        Sending buttons functions
+    **/
     
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
         m_messagesHandler.sendRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, url: nil, roomID: m_currentRoomID!, color: m_currentUserColor!)
@@ -191,6 +211,10 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         present(alert, animated: true, completion: nil)
     }
     
+    /**
+        Save/Heart Button Fuctions
+    **/
+    
     @objc func saveRoomButtonClicked() {
         if !m_isRoomSaved {
             m_saveRoomButton?.tintColor = UIColor.init(red: 102/255, green: 0, blue: 1, alpha: 1)
@@ -204,14 +228,16 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     }
     
     func saveRoom() {
-        m_coreDataHandler.saveRoomCoreData(currentRoomID: m_currentRoomID!)
+        m_coreDataProvider.saveRoomCoreData(currentRoomID: m_currentRoomID!)
     }
     
     func unsaveRoom() {
-        m_coreDataHandler.deleteRoomCoreData(currentRoomID: m_currentRoomID!)
+        m_coreDataProvider.deleteRoomCoreData(currentRoomID: m_currentRoomID!)
     }
     
-    // Picker view fucntions
+    /**
+        Picker view fucntions
+    **/
     
     private func chooseMedia(type: CFString) {
         m_picker.mediaTypes = [type as String]
@@ -239,7 +265,9 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         }
     }
     
-    // Delegation functions
+    /**
+        Delegation functions
+    **/
     
     func messageReceived(message: JSQMessage, color: String) {
         m_messages.append(message)
@@ -263,24 +291,11 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         self.collectionView.reloadItems(at: [indexPath])
     }
     
-    func colorDataReceived(color: String) {
-        m_currentUserColor = color
-    }
-    
     @objc func back(sender: UIBarButtonItem) {
         m_goingBack = true
-        m_dbProvider.decreaseActiveUsersWithCallback()
-    }
-    
-    func activeUsersDecreased() {
-        _ = navigationController?.popViewController(animated: true)
-    }
-    
-    func coreRoomDataReceived(savedRoomIDs: [String]) {
-        m_isRoomSaved = m_coreDataHandler.isCurrentRoomSaved(currentRoomID: m_currentRoomID!)
-        if !m_isRoomSaved {
-            m_saveRoomButton?.tintColor = UIColor.gray
-        }
+        m_dbProvider.decreaseActiveUsers(completion: {() in
+            _ = self.navigationController?.popViewController(animated: true)
+        })
     }
     
     

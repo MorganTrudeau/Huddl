@@ -60,7 +60,7 @@ class MessagesHandler {
         }
     }
     
-    func observeRoomMessges() {
+    func observeRoomMessages() {
         var firstObserve = true
         m_dbProvider.roomMessagesRef.queryLimited(toLast: 1).observe(DataEventType.value) { (snapshot: DataSnapshot) in
             if firstObserve {

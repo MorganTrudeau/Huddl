@@ -29,6 +29,8 @@ class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISea
         m_roomsTableView.dataSource = self
         m_roomsSearchBar.delegate = self
         
+        NMAPositioningManager.sharedInstance().startPositioning()
+        
         setUpUI()
     }
     
@@ -138,8 +140,7 @@ class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISea
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
-            if let vc = segue.destination as? ChatVC {
-                let currentRoomName = m_rooms[m_index!.row].name
+            if let vc = segue.destination as? ChatVC {let currentRoomName = m_rooms[m_index!.row].name
                 let description = m_rooms[m_index!.row].description
                 let currentRoomID = m_rooms[m_index!.row].id
                 vc.m_currentRoomName = currentRoomName
@@ -176,7 +177,11 @@ class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISea
                             let newRoom = Room(id: id, name: String(describing: name.string), description: description!, password: "", activeUsers: 0)
                             let index = self.m_rooms.count
                             self.m_rooms.append(newRoom)
-                            self.m_dbProvider.hasRoom(roomID: self.m_rooms[index].id, index: index)
+                            self.m_dbProvider.hasRoom(roomID: self.m_rooms[index].id, index: index, completion: {(activeUsers, index) in
+                                self.m_rooms[index].activeUsers = activeUsers
+                                let indexPath = IndexPath(row: index, section: 0)
+                                self.m_roomsTableView.reloadRows(at: [indexPath], with: .none)
+                            })
                         } catch _ {
                             
                         }
@@ -211,7 +216,7 @@ class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISea
                             
                             if descriptionTextField.text!.size(withAttributes: [NSAttributedStringKey.font : UIFont.systemFont(ofSize: 12)]).width < CGFloat(self.view.frame.size.width*0.65) {
                                 
-                                DBProvider.Instance.createRoom(name: nameTextField.text!, description: descriptionTextField.text,   password: passWordTextField.text)
+                                DBProvider.Instance.createRoom(name: nameTextField.text!, description: descriptionTextField.text,   password: passWordTextField.text, roomCreated: nil)
                             } else {
                                 self.alertUser(title: "Invalid Format", message: "Room description too long")
                             }
@@ -276,12 +281,6 @@ class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISea
     }
     
     // Delegate Function
-    
-    func activeUserDataReceived(activeUsers: Int, index: Int) {
-        m_rooms[index].activeUsers = activeUsers
-        let indexPath = IndexPath(row: index, section: 0)
-        m_roomsTableView.reloadRows(at: [indexPath], with: .none)
-    }
     
     func roomDataReceived(room: Room) {}
     
