@@ -297,7 +297,6 @@
         <!--Saved-->
         <scene sceneID="Y2h-8D-T0g">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Noc-YC-ZTP" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="byw-mV-f38" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Saved" image="heart" id="eS5-Yr-F6G"/>
                     <toolbarItems/>
@@ -310,6 +309,7 @@
                         <segue destination="uUz-x9-H7g" kind="relationship" relationship="rootViewController" id="zdy-lV-x9a"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Noc-YC-ZTP" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1382" y="-1970"/>
         </scene>
@@ -359,7 +359,6 @@
         <!--Rooms-->
         <scene sceneID="LFO-xn-FZm">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="CYM-oO-OT9" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="rxA-Fm-eBX" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Rooms" image="room" id="aUz-cN-xM7"/>
                     <toolbarItems/>
@@ -372,13 +371,13 @@
                         <segue destination="djL-q3-ApR" kind="relationship" relationship="rootViewController" id="Kcd-XM-oHS"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CYM-oO-OT9" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="-442" y="-1970"/>
         </scene>
         <!--Active-->
         <scene sceneID="9VV-hB-xdM">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="gPc-gP-QSO" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="DWC-jJ-xtf" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Active" image="active" id="ZXV-ZO-mSx"/>
                     <toolbarItems/>
@@ -391,6 +390,7 @@
                         <segue destination="UAd-1Q-fqH" kind="relationship" relationship="rootViewController" id="ziW-rR-hb1"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="gPc-gP-QSO" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="454" y="-1969"/>
         </scene>
@@ -405,4 +405,5 @@
         <segue reference="QqI-uA-2bT"/>
         <segue reference="c8E-JZ-ZGQ"/>
     </inferredMetricsTieBreakers>
+    <color key="tintColor" red="0.4001314640045166" green="0.0058397282846271992" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
 </document>

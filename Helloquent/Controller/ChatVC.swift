@@ -193,7 +193,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     @objc func saveRoomButtonClicked() {
         if !m_isRoomSaved {
-            m_saveRoomButton?.tintColor = self.view.tintColor
+            m_saveRoomButton?.tintColor = UIColor.init(red: 102/255, green: 0, blue: 1, alpha: 1)
             m_isRoomSaved = true
             saveRoom()
         } else {
