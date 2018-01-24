@@ -33,15 +33,15 @@ class SignUpVC: UIViewController {
     
     func setUpUI() {
         let roomImage = UIImage(named: "big_room")
-        let roomImageView = UIImageView.init(frame: CGRect(x: 0, y: 0, width: 70, height: 70))
+        let roomImageView = UIImageView.init(frame: CGRect(x: 0, y: 0, width: 65, height: 65))
         roomImageView.image = roomImage
-        roomImageView.center.x = self.view.frame.size.width*0.24
+        roomImageView.center.x = self.view.center.x - 110
         roomImageView.center.y = self.view.frame.size.height*0.2
         self.view.addSubview(roomImageView)
         
         let roomTextImage = UIImage(named: "rooms_text")
         let roomTextImageView = UIImageView(image: roomTextImage)
-        roomTextImageView.center.x = self.view.frame.size.width*0.61
+        roomTextImageView.center.x = self.view.center.x + 40
         roomTextImageView.center.y = self.view.frame.size.height*0.2
         self.view.addSubview(roomTextImageView)
         
