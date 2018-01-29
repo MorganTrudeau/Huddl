@@ -87,6 +87,8 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
             self.m_isRoomSaved = self.m_coreDataProvider.isCurrentRoomSaved(currentRoomID: self.m_currentRoomID!)
             if !self.m_isRoomSaved {
                 self.m_saveRoomButton?.tintColor = UIColor.gray
+            } else {
+                self.m_saveRoomButton?.tintColor = UIColor(red: 133/255, green: 51/255, blue: 1, alpha: 1)
             }
         })
             
@@ -182,6 +184,26 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, didTapMessageBubbleAt indexPath: IndexPath!) {
         
+        if m_messages[indexPath.row].isMediaMessage {
+            
+            if let media = m_messages[indexPath.row].media as? JSQVideoMediaItem {
+                
+                let videoURL = media.fileURL
+                
+                let player = AVPlayer.init(url: videoURL!)
+                let playerViewController = AVPlayerViewController.init()
+                playerViewController.player = player
+                self.present(playerViewController, animated: true, completion: nil)
+                
+            } else if let media = m_messages[indexPath.row].media as? JSQPhotoMediaItem {
+                
+                let image: UIImage = media.image
+                let imageDisplay = ImageDisplayVC.Instance
+                imageDisplay.setImage(image: image)
+                imageDisplay.setView(frame: self.view.frame)
+                present(imageDisplay, animated: true, completion: nil)
+            }
+        }
     }
     
     /**
@@ -217,7 +239,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     @objc func saveRoomButtonClicked() {
         if !m_isRoomSaved {
-            m_saveRoomButton?.tintColor = UIColor.init(red: 102/255, green: 0, blue: 1, alpha: 1)
+            m_saveRoomButton?.tintColor = UIColor(red: 133/255, green: 51/255, blue: 1, alpha: 1)
             m_isRoomSaved = true
             saveRoom()
         } else {
@@ -245,7 +267,6 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     }
     
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String : Any]) {
-        
         if let mediaPick = info[UIImagePickerControllerOriginalImage] as? UIImage {
             let image = JSQPhotoMediaItem.init(image: mediaPick)
             m_messages.append(JSQMessage(senderId: self.senderId, displayName: self.senderDisplayName, media: image))
@@ -257,11 +278,11 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
             
         } else if let mediaPick = info[UIImagePickerControllerMediaURL] as? URL {
             let video = JSQVideoMediaItem.init(fileURL: mediaPick, isReadyToPlay: true)
-            let senderID = AuthProvider.Instance.userID()
-            let displayName = AuthProvider.Instance.currentUserName()
-            m_messages.append(JSQMessage(senderId: senderID, displayName: displayName, media: video))
-            dismiss(animated: true, completion: nil)
+            m_messages.append(JSQMessage(senderId: self.senderId, displayName: self.senderDisplayName, media: video))
+            m_messageColors.append("blue")
             self.collectionView.reloadData()
+            m_messagesHandler.saveMedia(image: nil, video: mediaPick, senderID: self.senderId, senderName: self.senderDisplayName, roomID: m_currentRoomID!, color: m_currentUserColor!)
+            dismiss(animated: true, completion: nil)
         }
     }
     

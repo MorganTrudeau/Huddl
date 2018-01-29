@@ -8,6 +8,7 @@
 
 import Foundation
 import FirebaseAuth
+import FirebaseDatabase
 import FBSDKLoginKit
 
 typealias LoginHandler = (_ msg: String?) -> Void
@@ -45,6 +46,14 @@ class AuthProvider {
                 self.handleErrors(error: error! as NSError, loginHandler: loginHandler)
             } else {
                 loginHandler?(nil)
+                
+                DBProvider.Instance.userRoomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+                    if !snapshot.hasChild(user!.uid) {
+                        //Store in db
+                        let userColor = ColorHandler.Instance.userColor()
+                        DBProvider.Instance.createUser(withID: user!.uid, email: "", displayName: (user!.displayName)!, password: "", color: userColor)
+                    }
+                })
             }
         })
     }
@@ -74,22 +83,23 @@ class AuthProvider {
                 let userColor = ColorHandler.Instance.userColor()
                 DBProvider.Instance.createUser(withID: user!.uid, email: email, displayName: displayName, password: password, color: userColor)
                 
+                self.setDisplayName(displayName: displayName)
+                
                 //Sign in user
                 self.login(email: email, password: password, loginHandler: loginHandler)
-                
-                // Set user display name
-                let currentUser = Auth.auth().currentUser
-                if currentUser == user {
-                    let changeRequest = user?.createProfileChangeRequest()
-                    changeRequest?.displayName = displayName
-                    changeRequest?.commitChanges(completion: {(error) in
-                        if error != nil {
-                            print("Error setting display name")
-                        } else {
-                            print("Display name set")
-                        }
-                    })
-                }
+            }
+        })
+    }
+    
+    func setDisplayName(displayName: String) {
+        let currentUser = Auth.auth().currentUser
+        let changeRequest = currentUser?.createProfileChangeRequest()
+        changeRequest?.displayName = displayName
+        changeRequest?.commitChanges(completion: {(error) in
+            if error != nil {
+                print("Error setting display name")
+            } else {
+                print("Display name set")
             }
         })
     }

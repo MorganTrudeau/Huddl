@@ -13,12 +13,16 @@ class Constants {
     // DBProvider
     static let USERS = "Users"
     static let ROOMS = "Rooms"
+    static let USER_ROOMS = "User_Rooms"
+    static let LOCATION_ROOMS = "Location_Rooms"
     static let MESSAGES = "Messages"
     static let MEDIA_MESSAGES = "Media_Messages"
     static let IMAGE_STORAGE = "Image_Storage"
     static let VIDEO_STORAGE = "Video_Storage"
+    static let DISPLAY_NAMES = "Display_Names"
     
     static let EMAIL = "email"
+    static let DISPLAY_NAME = "display_name"
     static let PASSWORD = "password"
     static let DATA = "data"
     static let COLOR = "color"

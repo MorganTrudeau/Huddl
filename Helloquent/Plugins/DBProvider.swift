@@ -26,6 +26,8 @@ typealias ActiveUsersHandler = (_ activeUsers: Int, _ index: Int) -> Void
 
 typealias CreateRoomHandler = (_ room: Room, _ success: Bool) -> Void
 
+typealias GetRoomsHandler = (_ rooms: [Room]) -> Void
+
 typealias ColorFetchHandler = (_ color: String) -> Void
 
 class DBProvider {
@@ -51,8 +53,20 @@ class DBProvider {
         return dbRef.child(Constants.USERS)
     }
     
+    var displayNamesRef: DatabaseReference {
+        return dbRef.child(Constants.DISPLAY_NAMES)
+    }
+    
     var roomsRef: DatabaseReference {
         return dbRef.child(Constants.ROOMS)
+    }
+    
+    var userRoomsRef: DatabaseReference {
+        return dbRef.child(Constants.USER_ROOMS)
+    }
+    
+    var locationRoomsRef: DatabaseReference {
+        return dbRef.child(Constants.LOCATION_ROOMS)
     }
     
     var messagesRef: DatabaseReference {
@@ -80,8 +94,9 @@ class DBProvider {
     }
     
     func createUser(withID: String, email: String, displayName: String, password: String, color: String) {
-        let data: Dictionary<String, Any> = [Constants.EMAIL: email, Constants.PASSWORD: password, Constants.COLOR: color]
+        let data: Dictionary<String, Any> = [Constants.EMAIL: email, Constants.DISPLAY_NAME: displayName, Constants.PASSWORD: password, Constants.COLOR: color]
         usersRef.child(withID).setValue(data)
+        displayNamesRef.child(displayName).setValue("")
     }
     
     func currentUserColor(colorDataReceived: ColorFetchHandler?) {
@@ -100,14 +115,131 @@ class DBProvider {
         var success = false
         var newRoom: Room?
         let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.DESCRIPTION: description ?? "", Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0]
-        roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+        userRoomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             if !snapshot.hasChild(name) {
                 
+                self.userRoomsRef.child(name).setValue(data)
                 self.roomsRef.child(name).setValue(data)
                 newRoom = Room(id: "", name: name, description: description!, password: password!, activeUsers: 0)
                 success = true
             }
             roomCreated?(newRoom!, success)
+        })
+    }
+    
+    func getUserRooms(completion: GetRoomsHandler?) {
+        userRoomsRef.observeSingleEvent(of: DataEventType.value) {
+            (snapshot: DataSnapshot) in
+            
+            var rooms = [Room]()
+            
+            if let roomData = snapshot.value as? NSDictionary {
+                
+                for (key, value) in roomData {
+                    
+                    if let room = value as? NSDictionary {
+                        
+                        if let roomName = room[Constants.ROOM_NAME] as? String {
+                            
+                            if let description = room[Constants.DESCRIPTION] as? String {
+                                
+                                if let password = room[Constants.PASSWORD] as? String {
+                                    
+                                    if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
+                                        
+                                        let id = key as! String
+                                        let newRoom = Room(id: id, name: roomName, description: description, password: password, activeUsers: activeUsers)
+                                        rooms.append(newRoom)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            completion?(rooms)
+        }
+    }
+    
+    func createLocationRoom(id: String, name: String, description: String?, password: String?) {
+        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.DESCRIPTION: description ?? "", Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0]
+        roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+            if !snapshot.hasChild(id) {
+                self.roomsRef.child(id).setValue(data)
+            }
+        })
+        
+        var ref =
+    }
+    
+    func getActiveRooms(completion: GetRoomsHandler?) {
+        roomsRef.observeSingleEvent(of: DataEventType.value) {
+            (snapshot: DataSnapshot) in
+            
+            var rooms = [Room]()
+            
+            if let roomData = snapshot.value as? NSDictionary {
+                
+                for (key, value) in roomData {
+                    
+                    if let room = value as? NSDictionary {
+                        
+                        if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
+                            
+                            if activeUsers > 0 {
+                        
+                                if let roomName = room[Constants.ROOM_NAME] as? String {
+                                
+                                    if let description = room[Constants.DESCRIPTION] as? String {
+                                
+                                        if let password = room[Constants.PASSWORD] as? String {
+                                    
+                                            let id = key as! String
+                                            let newRoom = Room(id: id, name: roomName, description: description, password: password, activeUsers: activeUsers)
+                                            rooms.append(newRoom)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            completion?(rooms)
+        }
+    }
+    
+    func getSavedRooms(savedIDs: [String], completion: GetRoomsHandler?) {
+        
+        var rooms = [Room]()
+        
+        roomsRef.observeSingleEvent(of: .value, with: {(snapshot) in
+            
+            for id in savedIDs {
+                
+                if snapshot.hasChild(id) {
+                    
+                    if let room = snapshot.childSnapshot(forPath: id).value as? NSDictionary {
+                        
+                        if let roomName = room[Constants.ROOM_NAME] as? String {
+                            
+                            if let description = room[Constants.DESCRIPTION] as? String {
+                                
+                                if let password = room[Constants.PASSWORD] as? String {
+                                    
+                                    if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
+                                        
+                                        let id = id
+                                        let newRoom = Room(id: id, name: roomName, description: description, password: password, activeUsers: activeUsers)
+                                        rooms.append(newRoom)
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            completion?(rooms)
         })
     }
     
@@ -122,15 +254,8 @@ class DBProvider {
         
                     completion?(activeUsers, index)
                 }
-            }
-        })
-    }
-    
-    func createLocationRoom(id: String, name: String, description: String?, password: String?) {
-        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.DESCRIPTION: description ?? "", Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0]
-        roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
-            if !snapshot.hasChild(name) {
-                self.roomsRef.child(id).setValue(data)
+            } else {
+                completion?(0, index)
             }
         })
     }

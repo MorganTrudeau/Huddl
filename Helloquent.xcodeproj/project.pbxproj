@@ -10,6 +10,8 @@
 		4C97677652B24F944C9A1913 /* Pods_Helloquent.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 45133CF7D71936EB63E66199 /* Pods_Helloquent.framework */; };
 		8664EF09AA2959AEAD427E67 /* Pods_HelloquentTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C9903F0212B6980D79CB696E /* Pods_HelloquentTests.framework */; };
 		DF6EE0A8076409BDBC12C4DD /* Pods_HelloquentUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B01B6A9C2126C136662B5F3 /* Pods_HelloquentUITests.framework */; };
+		F90555F8201B0AF60053267A /* LocationRoomsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90555F7201B0AF60053267A /* LocationRoomsTableView.swift */; };
+		F90555FA201B0B210053267A /* UserRoomsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90555F9201B0B210053267A /* UserRoomsTableView.swift */; };
 		F90D10291FECDFB90012283B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D10281FECDFB90012283B /* AppDelegate.swift */; };
 		F90D102E1FECDFB90012283B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F90D102C1FECDFB90012283B /* Main.storyboard */; };
 		F90D10331FECDFB90012283B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F90D10311FECDFB90012283B /* LaunchScreen.storyboard */; };
@@ -22,6 +24,7 @@
 		F93364D81FEDE89D002A3718 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F93364D71FEDE89D002A3718 /* Assets.xcassets */; };
 		F93364DA1FEDE8BF002A3718 /* avatar.gif in Resources */ = {isa = PBXBuildFile; fileRef = F93364D91FEDE8BF002A3718 /* avatar.gif */; };
 		F947B3432016B83600E8CB41 /* SignUpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F947B3422016B83600E8CB41 /* SignUpVC.swift */; };
+		F947B345201ADFA900E8CB41 /* RoomsContainerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F947B344201ADFA800E8CB41 /* RoomsContainerVC.swift */; };
 		F966C9D62005300000E92A39 /* RoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F966C9D52005300000E92A39 /* RoomsVC.swift */; };
 		F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC381FED050700CC3C58 /* AuthProvider.swift */; };
 		F973BC3B1FEDA66800CC3C58 /* DBProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */; };
@@ -38,6 +41,8 @@
 		F9E264DA1FFDA35C00605CA7 /* Room.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D91FFDA35C00605CA7 /* Room.swift */; };
 		F9E69A7E20172CFB0014733D /* LoadingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E69A7D20172CFB0014733D /* LoadingOverlay.swift */; };
 		F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EA8BEC20008A6400A98421 /* ColorHandler.swift */; };
+		F9F7E394201E8F5A00ABD6B8 /* LocationRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E393201E8F5A00ABD6B8 /* LocationRoom.swift */; };
+		F9F7E396201FB67100ABD6B8 /* ImageDisplayVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -81,6 +86,8 @@
 		B61C84F6EE2F8B946612DE92 /* Pods-HelloquentUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HelloquentUITests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-HelloquentUITests/Pods-HelloquentUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		C447E1574BB164EAE91B1231 /* Pods-HelloquentUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-HelloquentUITests.release.xcconfig"; path = "Pods/Target Support Files/Pods-HelloquentUITests/Pods-HelloquentUITests.release.xcconfig"; sourceTree = "<group>"; };
 		C9903F0212B6980D79CB696E /* Pods_HelloquentTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HelloquentTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F90555F7201B0AF60053267A /* LocationRoomsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRoomsTableView.swift; sourceTree = "<group>"; };
+		F90555F9201B0B210053267A /* UserRoomsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRoomsTableView.swift; sourceTree = "<group>"; };
 		F90D10251FECDFB90012283B /* Helloquent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Helloquent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F90D10281FECDFB90012283B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F90D102D1FECDFB90012283B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -101,6 +108,7 @@
 		F93CA2A6200D38C200D9132C /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NMAKit.framework; path = "../../../Downloads/HERESDK-Premium 4/framework/NMAKit.framework"; sourceTree = "<group>"; };
 		F93CA2A9200D38C500D9132C /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NMAKit.framework; path = "../../../Downloads/HERESDK-Premium 4/framework/NMAKit.framework"; sourceTree = "<group>"; };
 		F947B3422016B83600E8CB41 /* SignUpVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpVC.swift; sourceTree = "<group>"; };
+		F947B344201ADFA800E8CB41 /* RoomsContainerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomsContainerVC.swift; sourceTree = "<group>"; };
 		F966C9D52005300000E92A39 /* RoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomsVC.swift; sourceTree = "<group>"; };
 		F973BC381FED050700CC3C58 /* AuthProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProvider.swift; sourceTree = "<group>"; };
 		F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBProvider.swift; sourceTree = "<group>"; };
@@ -116,6 +124,8 @@
 		F9E264D91FFDA35C00605CA7 /* Room.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Room.swift; sourceTree = "<group>"; };
 		F9E69A7D20172CFB0014733D /* LoadingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingOverlay.swift; sourceTree = "<group>"; };
 		F9EA8BEC20008A6400A98421 /* ColorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHandler.swift; sourceTree = "<group>"; };
+		F9F7E393201E8F5A00ABD6B8 /* LocationRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRoom.swift; sourceTree = "<group>"; };
+		F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDisplayVC.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -238,6 +248,7 @@
 				F973BC3E1FEDB47E00CC3C58 /* Contact.swift */,
 				F9E264D91FFDA35C00605CA7 /* Room.swift */,
 				F985FD4C200C294A00F1934B /* JSQMessage.swift */,
+				F9F7E393201E8F5A00ABD6B8 /* LocationRoom.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -248,10 +259,14 @@
 				F9179B76200EBDFC0057AAEF /* TabBarVC.swift */,
 				F90D105A1FECE33B0012283B /* SigninVC.swift */,
 				F947B3422016B83600E8CB41 /* SignUpVC.swift */,
-				F966C9D52005300000E92A39 /* RoomsVC.swift */,
 				F9179B78200FD9060057AAEF /* ActiveRoomsVC.swift */,
+				F966C9D52005300000E92A39 /* RoomsVC.swift */,
 				F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */,
 				F973BC401FEDDA8700CC3C58 /* ChatVC.swift */,
+				F947B344201ADFA800E8CB41 /* RoomsContainerVC.swift */,
+				F90555F7201B0AF60053267A /* LocationRoomsTableView.swift */,
+				F90555F9201B0B210053267A /* UserRoomsTableView.swift */,
+				F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -597,6 +612,7 @@
 				F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */,
 				F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */,
 				F9E264D41FFD4EED00605CA7 /* SavedRoomsVC.swift in Sources */,
+				F947B345201ADFA900E8CB41 /* RoomsContainerVC.swift in Sources */,
 				F973BC411FEDDA8700CC3C58 /* ChatVC.swift in Sources */,
 				F90D105B1FECE33B0012283B /* SigninVC.swift in Sources */,
 				F90D10291FECDFB90012283B /* AppDelegate.swift in Sources */,
@@ -608,9 +624,13 @@
 				F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */,
 				F9179B79200FD9060057AAEF /* ActiveRoomsVC.swift in Sources */,
 				F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */,
+				F9F7E396201FB67100ABD6B8 /* ImageDisplayVC.swift in Sources */,
 				F9179B77200EBDFC0057AAEF /* TabBarVC.swift in Sources */,
 				F985FD4D200C294A00F1934B /* JSQMessage.swift in Sources */,
 				F973BC3F1FEDB47E00CC3C58 /* Contact.swift in Sources */,
+				F90555F8201B0AF60053267A /* LocationRoomsTableView.swift in Sources */,
+				F9F7E394201E8F5A00ABD6B8 /* LocationRoom.swift in Sources */,
+				F90555FA201B0B210053267A /* UserRoomsTableView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -155,12 +155,23 @@ class MessagesHandler {
                                     photo?.appliesMediaViewMaskAsOutgoing = false
                                 }
                                 let message = JSQMessage(senderId: senderID, displayName: senderName, media: photo)
-                                self.delegateMessage?.mediaMessageReceived(message: message!, forIndex: index)
+                                DispatchQueue.main.async {
+                                    self.delegateMessage?.mediaMessageReceived(message: message!, forIndex: index)
+                                }
                             }
                         })
+                } else {
+                    let video = JSQVideoMediaItem(fileURL: mediaURL, isReadyToPlay: true)
+                    if senderID != AuthProvider.Instance.userID() {
+                        video?.appliesMediaViewMaskAsOutgoing = false
+                    }
+                    let message = JSQMessage(senderId: senderID, displayName: senderName, media: video)
+                    DispatchQueue.main.async {
+                        self.delegateMessage?.mediaMessageReceived(message: message!, forIndex: index)
+                    }
                 }
             } catch {
-                print("Error downloading Image")
+                print("Error downloading Data")
             }
         }
     }

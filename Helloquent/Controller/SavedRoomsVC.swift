@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, FetchRoomData {
+class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource {
     
     @IBOutlet weak var m_savedRoomsTableView: UITableView!
     
@@ -20,41 +20,38 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     var m_index: Int?
     
     let CHAT_SEGUE = "chat_room_segue"
-    let CELL_ID = "room_cell"
+    let CELL_ID = "cell"
     
     override func viewDidLoad() {
+        m_savedRoomsTableView.delegate = self
+        m_savedRoomsTableView.dataSource = self
         setUpUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
         CoreDataProvider.Instance.fetchRoomCoreData(coreRoomDataReceived: {(savedRoomIDs) in
-            self.m_savedRoomIDs = savedRoomIDs
-            self.m_savedRoomsTableView.reloadData()
+            if self.m_savedRoomIDs.count != savedRoomIDs.count {
+                self.m_savedRoomIDs = savedRoomIDs
+                self.m_dbProvider.getSavedRooms(savedIDs: self.m_savedRoomIDs, completion: {(rooms) in
+                    self.m_savedRooms = rooms
+                    self.m_savedRoomsTableView.reloadData()
+                })
+            }
         })
-        
-        m_savedRoomsTableView.delegate = self
-        m_savedRoomsTableView.dataSource = self
-        
-        m_dbProvider.delegateRooms = self
-        m_dbProvider.getRooms()
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        m_savedRooms.removeAll()
     }
     
     func setUpUI() {
-        m_savedRoomsTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
-        
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
     }
     
     func numberOfSections(in tableView: UITableView) -> Int {
         return 1
+    }
+    
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 90
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -65,26 +62,33 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
         let cell = UITableViewCell(style: UITableViewCellStyle.subtitle,
                                    reuseIdentifier: CELL_ID)
         
-        // Set cell text and text color
-        cell.textLabel?.text = m_savedRooms[indexPath.row].name
-        cell.textLabel?.textColor = UIColor.white
+        let nameTextLabel = UILabel.init(frame: CGRect(x: 10, y: 5, width: cell.frame.size.width, height: 30))
+        nameTextLabel.font = UIFont.systemFont(ofSize: 18)
         
-        // Set cell detail text and text color
-        cell.detailTextLabel?.text = String(m_savedRooms[indexPath.row].activeUsers) + " Active Users"
-        cell.detailTextLabel?.textColor = UIColor.white
+        let descriptionTextLabel = UILabel.init(frame: CGRect(x: 10, y: 28, width: cell.frame.size.width, height: 30))
+        descriptionTextLabel.font = UIFont.systemFont(ofSize: 13)
         
-        // Initiate new cell with color of tableview
-        cell.contentView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+        let activeUserImage = UIImage.init(named: "user")
+        let activeUserImageView = UIImageView.init(frame: CGRect(x: 10, y: 60, width: 20, height: 20))
+        activeUserImageView.image = activeUserImage
         
-        // Set color of cell when it is selected
-        let backgroundView = UIView()
-        backgroundView.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
-        cell.selectedBackgroundView = backgroundView
+        let activeUserTextView = UILabel.init(frame: CGRect(x: 35, y: 60, width: 80, height: 20))
+        activeUserTextView.text = String(m_savedRooms[indexPath.row].activeUsers)
+        activeUserTextView.font = UIFont.boldSystemFont(ofSize: 18)
+        
+        cell.contentView.addSubview(activeUserImageView)
+        cell.contentView.addSubview(activeUserTextView)
+        cell.contentView.addSubview(nameTextLabel)
+        cell.contentView.addSubview(descriptionTextLabel)
+        
+        nameTextLabel.text = m_savedRooms[indexPath.row].name
+        descriptionTextLabel.text = m_savedRooms[indexPath.row].description
         
         return cell
     }
 
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        m_savedRoomsTableView.deselectRow(at: indexPath, animated: true)
         m_index = indexPath.row
         let requiredPassword = m_savedRooms[m_index!].password
         if requiredPassword != "" {
@@ -135,34 +139,4 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
         })
         present(alert, animated: true, completion: nil)
     }
-    
-    // Delegation functions
-    
-    func userEnteredRoom() {
-        m_dbProvider.getRooms()
-    }
-    
-    func roomDataReceived(room: Room) {
-        
-    }
-    
-    func activeUserDataReceived(activeUsers: Int, index: Int) {
-        
-    }
-    
-    func allRoomDataReceived(rooms: [Room]) {
-        if m_savedRoomIDs.count > 0 {
-            for id in m_savedRoomIDs {
-                let index = rooms.index { $0.id == id }
-                m_savedRooms.append(rooms[index!])
-            }
-            m_savedRoomsTableView.reloadData()
-        }
-    }
-    
-    
-    
-    
-    
-
-}
+} // class

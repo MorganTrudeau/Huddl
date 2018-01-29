@@ -20,10 +20,9 @@ class SigninVC: UIViewController {
     @IBOutlet weak var m_FBLoginButton: UIButton!
     
     let authProvider = AuthProvider()
+    let m_loadingOverlay = LoadingOverlay()
     
     private let SIGN_IN_SEGUE: String = "sign_in_segue"
-    
-    let m_loadingOverlay = LoadingOverlay()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -96,12 +95,16 @@ class SigninVC: UIViewController {
     }
     
     @IBAction func FBLoginButonPressed(_ sender: Any) {
+        self.present(self.m_loadingOverlay, animated: false, completion: nil)
         let login: FBSDKLoginManager = FBSDKLoginManager.init()
         login.logIn(withReadPermissions: ["public_profile"], from: self, handler: {(result, error) in
             
             if error != nil {
-                self.alertUser(title: "Problem With Authentication", message: String(describing: error))
+                self.dismiss(animated: false, completion: {() in
+                    self.alertUser(title: "Problem With Authentication", message: String(describing: error))
+                })
             } else if (result?.isCancelled)! {
+                self.dismiss(animated: false, completion: nil)
                 print("FBLogin Cancelled")
             } else {
                 print("FBLogin Success")
@@ -109,10 +112,14 @@ class SigninVC: UIViewController {
                 AuthProvider.Instance.facebookAuth(credential: credential, loginHandler: {(message) in
                     
                     if message != nil {
-                        self.alertUser(title: "Problem With Authentication", message: message!)
+                        self.dismiss(animated: false, completion: {() in
+                            self.alertUser(title: "Problem With Authentication", message: message!)
+                        })
                     } else {
-                        print("Login Successful")
-                        self.performSegue(withIdentifier: self.SIGN_IN_SEGUE, sender: nil)
+                        self.dismiss(animated: false, completion: {() in
+                            print("Login Successful")
+                            self.performSegue(withIdentifier: self.SIGN_IN_SEGUE, sender: nil)
+                        })
                     }
                 })
             }

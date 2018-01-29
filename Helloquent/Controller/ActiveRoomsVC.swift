@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import NMAKit
 
-class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, FetchRoomData {
+class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
     
     @IBOutlet weak var m_roomsTableView: UITableView!
     @IBOutlet weak var m_roomsSearchBar: UISearchBar!
@@ -22,11 +22,28 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     var m_index: Int?
     var m_searchActive = false
     
+    lazy var m_refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action:
+            #selector(ActiveRoomsVC.handleRefresh(_:)),
+                                 for: UIControlEvents.valueChanged)
+        refreshControl.tintColor = UIColor.red
+        
+        return refreshControl
+    }()
+    
     let CHAT_SEGUE = "chat_room_segue"
-    let CELL_ID = "room_cell"
+    let CELL_ID = "cell"
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        m_dbProvider.getActiveRooms(completion: {(rooms) in
+            self.m_rooms = rooms
+            self.m_roomsTableView.reloadData()
+        })
+        
+        m_roomsTableView.addSubview(m_refreshControl)
         
         m_roomsTableView.delegate = self
         m_roomsTableView.dataSource = self
@@ -37,24 +54,13 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func setUpUI() {
-        m_roomsTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+//        m_roomsTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        m_dbProvider.delegateRooms = self
-        m_dbProvider.getRooms()
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-    }
-    
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
-        m_rooms.removeAll()
         m_roomsSearchBar.resignFirstResponder()
         m_roomsSearchBar.text = ""
     }
@@ -97,6 +103,10 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         return 1
     }
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 90
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if !m_searchActive {
             return m_rooms.count
@@ -108,35 +118,40 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCellStyle.subtitle,
                                    reuseIdentifier: CELL_ID)
-        cell.textLabel?.textColor = UIColor.white
-        cell.detailTextLabel?.textColor = UIColor.white
-        cell.contentView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
-        let backgroundView = UIView()
-        backgroundView.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
-        cell.selectedBackgroundView = backgroundView
+        
+//        cell.contentView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+//        let backgroundView = UIView()
+//        backgroundView.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
+//        cell.selectedBackgroundView = backgroundView
+        
+        let nameTextLabel = UILabel.init(frame: CGRect(x: 10, y: 5, width: cell.frame.size.width, height: 30))
+        nameTextLabel.font = UIFont.systemFont(ofSize: 18)
+//        nameTextLabel.textColor = UIColor.white
+        
+        let descriptionTextLabel = UILabel.init(frame: CGRect(x: 10, y: 28, width: cell.frame.size.width, height: 30))
+        descriptionTextLabel.font = UIFont.systemFont(ofSize: 13)
+//        descriptionTextLabel.textColor = UIColor.white
         
         let activeUserImage = UIImage.init(named: "user")
-        let activeUserImageView = UIImageView.init(frame: CGRect(x: self.view.frame.size.width*0.93, y: cell.contentView.bounds.height/5.2, width: 20, height: 20))
+        let activeUserImageView = UIImageView.init(frame: CGRect(x: 10, y: 60, width: 20, height: 20))
         activeUserImageView.image = activeUserImage
         
-        let activeUserTextView = UITextView.init(frame: CGRect(x: self.view.frame.size.width*0.71, y: cell.contentView.bounds.height/5.5, width: 80, height: 20))
-        activeUserTextView.textAlignment = NSTextAlignment.right
-        activeUserTextView.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        activeUserTextView.isEditable = false
-        activeUserTextView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+        let activeUserTextView = UILabel.init(frame: CGRect(x: 35, y: 60, width: 80, height: 20))
         activeUserTextView.text = String(m_rooms[indexPath.row].activeUsers)
-        activeUserTextView.textColor = UIColor.white
         activeUserTextView.font = UIFont.boldSystemFont(ofSize: 18)
+//        activeUserTextView.textColor = UIColor.white
         
         cell.contentView.addSubview(activeUserImageView)
         cell.contentView.addSubview(activeUserTextView)
+        cell.contentView.addSubview(nameTextLabel)
+        cell.contentView.addSubview(descriptionTextLabel)
         
         if !m_searchActive {
-            cell.textLabel?.text = m_rooms[indexPath.row].name
-            cell.detailTextLabel?.text = m_rooms[indexPath.row].description
+            nameTextLabel.text = m_rooms[indexPath.row].name
+            descriptionTextLabel.text = m_rooms[indexPath.row].description
         } else {
-            cell.textLabel?.text = m_filteredRooms[indexPath.row].name
-            cell.detailTextLabel?.text = m_filteredRooms[indexPath.row].description
+            nameTextLabel.text = m_filteredRooms[indexPath.row].name
+            descriptionTextLabel.text = m_filteredRooms[indexPath.row].description
         }
         return cell
     }
@@ -181,69 +196,6 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         }
     }
     
-    @IBAction func logout(_ sender: Any) {
-        if AuthProvider.Instance.logout() {
-            dismiss(animated: true, completion: nil)
-        }
-    }
-    
-    @IBAction func addRoomButton(_ sender: Any) {
-        
-        let alert: UIAlertController = UIAlertController.init(title: "Create A Room", message: "Enter room name", preferredStyle: .alert)
-        
-        let submit: UIAlertAction = UIAlertAction.init(title: "Submit", style: .default, handler: {(action: UIAlertAction) in
-            
-            if (alert.textFields!.count > 0 ) {
-                let nameTextField: UITextField = alert.textFields![0]
-                let descriptionTextField: UITextField = alert.textFields![1]
-                let passWordTextField: UITextField = alert.textFields![2]
-                if nameTextField.text != "" {
-                    
-                    if descriptionTextField.text != "" {
-                    
-                        if nameTextField.text!.size(withAttributes: [NSAttributedStringKey.font : UIFont.systemFont(ofSize: 17)]).width < CGFloat(self.view.frame.size.width*0.65) {
-                        
-                            if descriptionTextField.text!.size(withAttributes: [NSAttributedStringKey.font : UIFont.systemFont(ofSize: 12)]).width < CGFloat(self.view.frame.size.width*0.65) {
-                            
-                                DBProvider.Instance.createRoom(name: nameTextField.text!, description: descriptionTextField.text,   password: passWordTextField.text, roomCreated: {(newRoom, success) in
-                                    if !success {
-                                        self.alertUser(title: "Room Name Already Exists", message: "Enter another room name")
-                                    } else {
-                                        self.m_rooms.append(newRoom)
-                                        self.m_roomsTableView.reloadData()
-                                    }
-                                })
-                            } else {
-                                self.alertUser(title: "Invalid Format", message: "Room description too long")
-                            }
-                        } else {
-                            self.alertUser(title: "Invalid Format", message: "Room name too long")
-                        }
-                    } else {
-                        self.alertUser(title: "Invalid Format", message: "Enter a room description")
-                    }
-                } else {
-                    self.alertUser(title: "Invalid Format", message: "Enter a room name.")
-                }
-            }
-        })
-        
-        let cancel: UIAlertAction = UIAlertAction.init(title: "Cancel", style: .cancel, handler: nil)
-        
-        alert.addAction(submit)
-        alert.addAction(cancel)
-        alert.addTextField(configurationHandler: {(nameTextField: UITextField) in
-            nameTextField.placeholder = "Room Name"
-        })
-        alert.addTextField(configurationHandler: {(descriptionTextField: UITextField) in
-            descriptionTextField.placeholder = "Description"
-        })
-        alert.addTextField(configurationHandler: {(passwordTextField: UITextField) in
-            passwordTextField.placeholder = "Password"
-        })
-        present(alert, animated: true, completion: nil)
-    }
-    
     func alertUser(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
@@ -276,31 +228,13 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         present(alert, animated: true, completion: nil)
     }
     
-    // Delegation Functions
-    
-    func userEnteredRoom() {
-        if !m_searchActive {
-            m_dbProvider.getRooms()
-        }
+    @objc func handleRefresh(_ refreshControl: UIRefreshControl) {
+        m_dbProvider.getActiveRooms(completion: {(rooms) in
+            self.m_rooms = rooms
+            self.m_roomsTableView.reloadData()
+            self.m_refreshControl.endRefreshing()
+        })
     }
-    
-    func roomDataReceived(room: Room) {
-        if !m_searchActive {
-            m_rooms.append(room)
-            m_filteredRooms.append(room)
-            m_roomsTableView.reloadData()
-        }
-    }
-    
-    func allRoomDataReceived(rooms: [Room]) {
-        if !m_searchActive {
-            m_rooms = rooms
-            m_filteredRooms = m_rooms
-            m_roomsTableView.reloadData()
-        }
-    }
-    
-    
     
     
     

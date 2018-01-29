@@ -10,15 +10,22 @@ import Foundation
 import UIKit
 import NMAKit
 
-class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, FetchRoomData {
+class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate, FetchRoomData {
     
     @IBOutlet weak var m_roomsSearchBar: UISearchBar!
     @IBOutlet weak var m_roomsTableView: UITableView!
+    @IBOutlet weak var m_roomsSegControl: UISegmentedControl!
+    
+    var m_addRoomButton: UIBarButtonItem?
+    var m_roomTextImageView: UIImageView?
+    let m_roomTextImage = UIImage(named: "rooms_text")
     
     let m_dbProvider = DBProvider.Instance
     
     var m_index: IndexPath?
-    var m_rooms = [Room]()
+    var m_userRooms = [Room]()
+    var m_filteredUserRooms = [Room]()
+    var m_locationRooms = [Room]()
     
     let CELL_ID = "cell"
     let CHAT_SEGUE = "chat_room_segue"
@@ -38,18 +45,34 @@ class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISea
         super.viewWillAppear(animated)
         m_dbProvider.delegateRooms = self
         m_roomsSearchBar.text = ""
-        m_rooms.removeAll()
+        m_locationRooms.removeAll()
         m_roomsTableView.reloadData()
+        
+        m_roomTextImageView = UIImageView.init(frame: CGRect(x: 0, y: 0, width: 70, height: 30))
+        m_roomTextImageView?.image = m_roomTextImage
+        m_roomTextImageView?.center.x = (self.navigationController?.navigationBar.center.x)!
+        m_roomTextImageView?.center.y = (self.navigationController?.navigationBar.center.y)! - 19
+        m_roomTextImageView?.image = m_roomTextImageView?.image?.withRenderingMode(.alwaysTemplate)
+        m_roomTextImageView?.tintColor = UIColor.lightText
+        
+        self.navigationController?.navigationBar.addSubview(m_roomTextImageView!)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewDidAppear(animated)
         m_roomsSearchBar.resignFirstResponder()
+        m_roomTextImageView?.removeFromSuperview()
     }
     
     func setUpUI() {
+        self.view.tintColor = UIColor(red: 133/255, green: 51/255, blue: 1, alpha: 1)
+        
         m_roomsTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
         
+        m_addRoomButton = UIBarButtonItem(image: UIImage(named: "add"), style: .plain, target: self, action: #selector(RoomsVC.addRoomButtonClicked))
+        m_addRoomButton?.tintColor = UIColor(red: 133/255, green: 51/255, blue: 1, alpha: 1)
+        self.navigationItem.rightBarButtonItem = m_addRoomButton
+    
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
     }
@@ -76,7 +99,7 @@ class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISea
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText == "" {
-            m_rooms.removeAll()
+            m_locationRooms.removeAll()
             m_roomsTableView.reloadData()
         }
     }
@@ -89,43 +112,47 @@ class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISea
         return 1
     }
     
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 90
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return m_rooms.count
+        return m_locationRooms.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell.init(style: UITableViewCellStyle.subtitle, reuseIdentifier: CELL_ID)
         
-        // Define cell colors
-        cell.textLabel?.textColor = UIColor.white
-        cell.detailTextLabel?.textColor = UIColor.white
         cell.contentView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
         
-        // Define cell color when selected
         let backgroundView = UIView()
         backgroundView.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
         cell.selectedBackgroundView = backgroundView
         
-        // Create active user image view
+        let nameTextLabel = UILabel.init(frame: CGRect(x: 10, y: 5, width: cell.frame.size.width, height: 30))
+        nameTextLabel.font = UIFont.systemFont(ofSize: 18)
+        nameTextLabel.textColor = UIColor.white
+        
+        let descriptionTextLabel = UILabel.init(frame: CGRect(x: 10, y: 28, width: cell.frame.size.width, height: 30))
+        descriptionTextLabel.font = UIFont.systemFont(ofSize: 13)
+        descriptionTextLabel.textColor = UIColor.white
+        
         let activeUserImage = UIImage.init(named: "user")
-        let activeUserImageView = UIImageView.init(frame: CGRect(x: self.view.frame.size.width*0.93, y: cell.contentView.bounds.height/5.2, width: 20, height: 20))
+        let activeUserImageView = UIImageView.init(frame: CGRect(x: 10, y: 60, width: 20, height: 20))
         activeUserImageView.image = activeUserImage
         
-        // Create active user text view
-        let activeUserTextView = UITextView.init(frame: CGRect(x: self.view.frame.size.width*0.71, y: cell.contentView.bounds.height/5.5, width: 80, height: 20))
-        activeUserTextView.textAlignment = NSTextAlignment.right
-        activeUserTextView.textContainerInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
-        activeUserTextView.isEditable = false
-        activeUserTextView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
-        activeUserTextView.text = String(m_rooms[indexPath.row].activeUsers)
-        activeUserTextView.textColor = UIColor.white
+        let activeUserTextView = UILabel.init(frame: CGRect(x: 35, y: 60, width: 80, height: 20))
+        activeUserTextView.text = String(m_locationRooms[indexPath.row].activeUsers)
         activeUserTextView.font = UIFont.boldSystemFont(ofSize: 18)
+        activeUserTextView.textColor = UIColor.white
         
         cell.contentView.addSubview(activeUserImageView)
         cell.contentView.addSubview(activeUserTextView)
+        cell.contentView.addSubview(nameTextLabel)
+        cell.contentView.addSubview(descriptionTextLabel)
         
-        cell.textLabel?.text = m_rooms[indexPath.row].name
-        cell.detailTextLabel?.text = m_rooms[indexPath.row].description
+        nameTextLabel.text = m_locationRooms[indexPath.row].name
+        descriptionTextLabel.text = m_locationRooms[indexPath.row].description
         
         return cell;
     }
@@ -140,17 +167,31 @@ class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISea
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
-            if let vc = segue.destination as? ChatVC {let currentRoomName = m_rooms[m_index!.row].name
-                let description = m_rooms[m_index!.row].description
-                let currentRoomID = m_rooms[m_index!.row].id
-                vc.m_currentRoomName = currentRoomName
-                vc.m_currentRoomID = currentRoomID
+            if let vc = segue.destination as? ChatVC {
                 
-                // Pass selected room ID to dbProvider to use as child ID
-                m_dbProvider.m_currentRoomID = currentRoomID
-                
-                // Create location room in database
-                m_dbProvider.createLocationRoom(id: currentRoomID, name: currentRoomName, description: description, password: "")
+                if m_roomsSegControl.selectedSegmentIndex == 0 {
+                    let currentRoomName = m_locationRooms[m_index!.row].name
+                    let description = m_locationRooms[m_index!.row].description
+                    let currentRoomID = m_locationRooms[m_index!.row].id
+                    vc.m_currentRoomName = currentRoomName
+                    vc.m_currentRoomID = currentRoomID
+                    
+                    // Pass selected room ID to dbProvider to use as child ID
+                    m_dbProvider.m_currentRoomID = currentRoomID
+                    
+                    // Create location room in database
+                    m_dbProvider.createLocationRoom(id: currentRoomID, name: currentRoomName, description: description, password: "")
+                } else {
+                    let currentRoomName = m_userRooms[m_index!.row].name
+                    let description = m_userRooms[m_index!.row].description
+                    let currentRoomID = m_userRooms[m_index!.row].id
+                    
+                    // Pass selected room ID to dbProvider to use as child ID
+                    m_dbProvider.m_currentRoomID = currentRoomID
+                    
+                    // Create location room in database
+                    m_dbProvider.createLocationRoom(id: currentRoomID, name: currentRoomName, description: description, password: "")
+                }
             }
         }
     }
@@ -164,7 +205,7 @@ class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISea
         request.collectionSize = 10
         request.start({(request: NMARequest, data: Any?, error: Error?) in
             if error == nil {
-                self.m_rooms.removeAll()
+                self.m_locationRooms.removeAll()
                 for item in data as! [NMAAutoSuggest] {
                     if let place = item as? NMAAutoSuggestPlace {
                         
@@ -175,10 +216,10 @@ class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISea
                         do {
                             let name = try NSAttributedString.init(data: (htmlString?.data(using: String.Encoding.unicode))!, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
                             let newRoom = Room(id: id, name: String(describing: name.string), description: description!, password: "", activeUsers: 0)
-                            let index = self.m_rooms.count
-                            self.m_rooms.append(newRoom)
-                            self.m_dbProvider.hasRoom(roomID: self.m_rooms[index].id, index: index, completion: {(activeUsers, index) in
-                                self.m_rooms[index].activeUsers = activeUsers
+                            let index = self.m_locationRooms.count
+                            self.m_locationRooms.append(newRoom)
+                            self.m_dbProvider.hasRoom(roomID: self.m_locationRooms[index].id, index: index, completion: {(activeUsers, index) in
+                                self.m_locationRooms[index].activeUsers = activeUsers
                                 let indexPath = IndexPath(row: index, section: 0)
                                 self.m_roomsTableView.reloadRows(at: [indexPath], with: .none)
                             })
@@ -198,7 +239,7 @@ class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISea
         }
     }
     
-    @IBAction func addRoomButton(_ sender: Any) {
+    @objc func addRoomButtonClicked() {
         
         let alert: UIAlertController = UIAlertController.init(title: "Create A Room", message: "Enter room name", preferredStyle: .alert)
         
@@ -280,11 +321,29 @@ class Rooms: UIViewController, UITableViewDelegate, UITableViewDataSource, UISea
         present(alert, animated: true, completion: nil)
     }
     
+    @IBAction func segIndexChanged(_ sender: Any) {
+        
+        switch m_roomsSegControl.selectedSegmentIndex {
+            
+        case 0:
+            m_roomsTableView.reloadData()
+        case 1:
+            m_dbProvider.getRooms()
+        default:
+            break
+        }
+        
+    }
+    
+    
     // Delegate Function
     
     func roomDataReceived(room: Room) {}
     
-    func allRoomDataReceived(rooms: [Room]) {}
+    func allRoomDataReceived(rooms: [Room]) {
+        m_userRooms = rooms
+        m_roomsTableView.reloadData()
+    }
     
     
 }
