@@ -22,6 +22,8 @@ protocol UserEnteredRoom: class {
 
 typealias DefaultClosure = () -> Void
 
+typealias SaveHandler = (_ success: Bool) -> Void
+
 typealias ActiveUsersHandler = (_ activeUsers: Int, _ index: Int) -> Void
 
 typealias CreateRoomHandler = (_ room: Room, _ success: Bool) -> Void
@@ -29,6 +31,8 @@ typealias CreateRoomHandler = (_ room: Room, _ success: Bool) -> Void
 typealias GetRoomsHandler = (_ rooms: [Room]) -> Void
 
 typealias ColorFetchHandler = (_ color: String) -> Void
+
+typealias AvatarHandler = (_ avatar: UIImage) -> Void
 
 class DBProvider {
     
@@ -94,21 +98,9 @@ class DBProvider {
     }
     
     func createUser(withID: String, email: String, displayName: String, password: String, color: String) {
-        let data: Dictionary<String, Any> = [Constants.EMAIL: email, Constants.DISPLAY_NAME: displayName, Constants.PASSWORD: password, Constants.COLOR: color]
+        let data: Dictionary<String, Any> = [Constants.EMAIL: email, Constants.DISPLAY_NAME: displayName, Constants.PASSWORD: password, Constants.COLOR: color, Constants.AVATAR: "https://firebasestorage.googleapis.com/v0/b/helloquent-a4460.appspot.com/o/Image_Storage%2Favatar.gif?alt=media&token=5dc264a6-3a70-4511-9adf-957d897a1d56"]
         usersRef.child(withID).setValue(data)
         displayNamesRef.child(displayName).setValue("")
-    }
-    
-    func currentUserColor(colorDataReceived: ColorFetchHandler?) {
-        var currentUserColor = ""
-        usersRef.child(AuthProvider.Instance.userID()).observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
-            if let data = snapshot.value as? NSDictionary {
-                if let color = data[Constants.COLOR] as? String {
-                    currentUserColor = color
-                }
-            }
-            colorDataReceived?(currentUserColor)
-        })
     }
     
     func createRoom(name: String, description: String?, password: String?, roomCreated: CreateRoomHandler?){
@@ -120,7 +112,7 @@ class DBProvider {
                 
                 self.userRoomsRef.child(name).setValue(data)
                 self.roomsRef.child(name).setValue(data)
-                newRoom = Room(id: "", name: name, description: description!, password: password!, activeUsers: 0)
+                newRoom = Room(id: name, name: name, description: description!, password: password!, activeUsers: 0)
                 success = true
             }
             roomCreated?(newRoom!, success)
@@ -168,8 +160,6 @@ class DBProvider {
                 self.roomsRef.child(id).setValue(data)
             }
         })
-        
-        var ref =
     }
     
     func getActiveRooms(completion: GetRoomsHandler?) {
@@ -344,21 +334,6 @@ class DBProvider {
         })
     }
     
-    func decreaseActiveUsersWithCallback() {
-        roomsRef.child(m_currentRoomID!).runTransactionBlock({(data: MutableData) in
-            if var room = data.value as? [String: Any] {
-                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
-                activeUsers = activeUsers! - 1
-                room[Constants.ACTIVE_USERS] = activeUsers
-                data.value = room
-            }
-            return TransactionResult.success(withValue: data)}, andCompletionBlock:     {(error: Error?, success: Bool, snapshot: DataSnapshot?) in
-                    if success {
-                        
-                    }
-            })
-    }
-    
     func decreaseActiveUsers(completion: DefaultClosure?) {
         roomsRef.child(m_currentRoomID!).runTransactionBlock({(data: MutableData) in
             if var room = data.value as? [String: Any] {
@@ -373,6 +348,45 @@ class DBProvider {
                 }
         })
     }
+    
+    func saveProfile(newDisplayName: String?, newColor: String?, newAvatar: UIImage?) {
+        
+        let authProvider = AuthProvider.Instance
+        authProvider.currentUser?.color = newColor!
+        authProvider.currentUser?.name = newDisplayName!
+        
+        if newAvatar != authProvider.currentUser?.avatar {
+            
+            authProvider.currentUser?.avatar = newAvatar!
+            let path = "\(NSUUID().uuidString)"
+            let data = UIImageJPEGRepresentation(newAvatar!, 0.1)
+            imageStorageRef.child(path).putData(data!, metadata: nil) {(metadata, error) in
+                guard error == nil else {
+                    print("Error occured while saving data")
+                    return
+                }
+                let metadataURL = String(describing: metadata!.downloadURL()!)
+                self.usersRef.child(AuthProvider.Instance.userID()).runTransactionBlock({(data: MutableData) in
+                    if var user = data.value as? [String: Any] {
+                        user[Constants.AVATAR] = metadataURL
+                        user[Constants.DISPLAY_NAME] = newDisplayName
+                        user[Constants.COLOR] = newColor
+                        data.value = user
+                    }
+                    return TransactionResult.success(withValue: data)})
+            }
+        } else {
+            
+            self.usersRef.child(AuthProvider.Instance.userID()).runTransactionBlock({(data: MutableData) in
+                if var user = data.value as? [String: Any] {
+                    user[Constants.DISPLAY_NAME] = newDisplayName
+                    user[Constants.COLOR] = newColor
+                    data.value = user
+                }
+                return TransactionResult.success(withValue: data)})
+        }
+    }
+
     
     
 }

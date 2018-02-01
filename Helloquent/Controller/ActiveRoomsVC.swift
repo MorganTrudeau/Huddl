@@ -17,10 +17,11 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     let m_dbProvider = DBProvider.Instance
     
-    var m_rooms = [Room]()
+    var m_activeRooms = [Room]()
     var m_filteredRooms = [Room]()
     var m_index: Int?
     var m_searchActive = false
+    var m_queryCounter = 2
     
     lazy var m_refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -39,7 +40,8 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         super.viewDidLoad()
         
         m_dbProvider.getActiveRooms(completion: {(rooms) in
-            self.m_rooms = rooms
+            self.m_activeRooms = rooms
+            self.m_filteredRooms = rooms
             self.m_roomsTableView.reloadData()
         })
         
@@ -54,7 +56,6 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func setUpUI() {
-//        m_roomsTableView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
     }
@@ -63,6 +64,7 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         super.viewWillDisappear(true)
         m_roomsSearchBar.resignFirstResponder()
         m_roomsSearchBar.text = ""
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     // SearchBar Functions
@@ -72,14 +74,20 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchText != "" {
-            m_searchActive = true
-            m_filteredRooms = m_rooms.filter { $0.name.lowercased().contains(searchText.lowercased()) }
-            m_roomsTableView.reloadData()
-        } else {
-            m_searchActive = false
-            m_roomsTableView.reloadData()
+        let queryLength = searchText.count
+        
+        if queryLength == 0 {
+            m_filteredRooms = m_activeRooms
+            m_queryCounter = 2
         }
+        if queryLength < m_queryCounter {
+            m_filteredRooms = m_activeRooms.filter { $0.name.lowercased().contains(searchText.lowercased()) }
+            m_queryCounter = queryLength
+        } else {
+            m_filteredRooms = m_filteredRooms.filter { $0.name.lowercased().contains(searchText.lowercased()) }
+            m_queryCounter = queryLength
+        }
+        m_roomsTableView.reloadData()
     }
     
     func searchBarTextDidEndEditing(_ searchBar: UISearchBar) {
@@ -88,10 +96,11 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         m_roomsSearchBar.showsCancelButton = false
-        m_dbProvider.getRooms()
-        m_roomsSearchBar.text = ""
         m_roomsSearchBar.resignFirstResponder()
-        m_searchActive = false
+    }
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        m_roomsSearchBar.resignFirstResponder()
     }
     
     // TableView Functions
@@ -108,71 +117,46 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if !m_searchActive {
-            return m_rooms.count
-        } else {
-            return m_filteredRooms.count
-        }
+        return m_filteredRooms.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCellStyle.subtitle,
                                    reuseIdentifier: CELL_ID)
         
-//        cell.contentView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
-//        let backgroundView = UIView()
-//        backgroundView.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
-//        cell.selectedBackgroundView = backgroundView
-        
         let nameTextLabel = UILabel.init(frame: CGRect(x: 10, y: 5, width: cell.frame.size.width, height: 30))
         nameTextLabel.font = UIFont.systemFont(ofSize: 18)
-//        nameTextLabel.textColor = UIColor.white
         
         let descriptionTextLabel = UILabel.init(frame: CGRect(x: 10, y: 28, width: cell.frame.size.width, height: 30))
         descriptionTextLabel.font = UIFont.systemFont(ofSize: 13)
-//        descriptionTextLabel.textColor = UIColor.white
         
         let activeUserImage = UIImage.init(named: "user")
         let activeUserImageView = UIImageView.init(frame: CGRect(x: 10, y: 60, width: 20, height: 20))
         activeUserImageView.image = activeUserImage
         
         let activeUserTextView = UILabel.init(frame: CGRect(x: 35, y: 60, width: 80, height: 20))
-        activeUserTextView.text = String(m_rooms[indexPath.row].activeUsers)
+        activeUserTextView.text = String(m_filteredRooms[indexPath.row].activeUsers)
         activeUserTextView.font = UIFont.boldSystemFont(ofSize: 18)
-//        activeUserTextView.textColor = UIColor.white
         
         cell.contentView.addSubview(activeUserImageView)
         cell.contentView.addSubview(activeUserTextView)
         cell.contentView.addSubview(nameTextLabel)
         cell.contentView.addSubview(descriptionTextLabel)
         
-        if !m_searchActive {
-            nameTextLabel.text = m_rooms[indexPath.row].name
-            descriptionTextLabel.text = m_rooms[indexPath.row].description
-        } else {
-            nameTextLabel.text = m_filteredRooms[indexPath.row].name
-            descriptionTextLabel.text = m_filteredRooms[indexPath.row].description
-        }
+        nameTextLabel.text = m_filteredRooms[indexPath.row].name
+        descriptionTextLabel.text = m_filteredRooms[indexPath.row].description
+        
         return cell
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         m_index = indexPath.row
         m_roomsTableView.deselectRow(at: indexPath, animated: false)
-        if !m_searchActive {
-            let requiredPassword = m_rooms[indexPath.row].password
-            if requiredPassword != "" {
-                askPassword(requiredPassword: requiredPassword)
-            } else {
-                performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
-            }
+        let requiredPassword = m_filteredRooms[indexPath.row].password
+        if requiredPassword != "" {
+            askPassword(requiredPassword: requiredPassword)
         } else {
-            let requiredPassword = m_filteredRooms[indexPath.row].password
-            if requiredPassword != "" {
-                askPassword(requiredPassword: requiredPassword)
-            } else {
-                performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
-            }
+            performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
         }
     }
     
@@ -183,15 +167,9 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                if !m_searchActive {
-                    vc.m_currentRoomID = m_rooms[m_index!].id
-                    vc.m_currentRoomName = m_rooms[m_index!].name
-                    m_dbProvider.m_currentRoomID = m_rooms[m_index!].id
-                } else {
-                    vc.m_currentRoomID = m_filteredRooms[m_index!].id
-                    vc.m_currentRoomName = m_filteredRooms[m_index!].name
-                    m_dbProvider.m_currentRoomID = m_filteredRooms[m_index!].id
-                }
+                vc.m_currentRoomID = m_filteredRooms[m_index!].id
+                vc.m_currentRoomName = m_filteredRooms[m_index!].name
+                m_dbProvider.m_currentRoomID = m_filteredRooms[m_index!].id
             }
         }
     }
@@ -213,7 +191,6 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
                     self.performSegue(withIdentifier: self.CHAT_SEGUE, sender: nil)
                 } else {
                     self.alertUser(title: "Incorrect Password", message: "Please try again")
-                    self.m_roomsTableView.reloadData()
                 }
             }
         })
@@ -230,7 +207,12 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     
     @objc func handleRefresh(_ refreshControl: UIRefreshControl) {
         m_dbProvider.getActiveRooms(completion: {(rooms) in
-            self.m_rooms = rooms
+            self.m_activeRooms = rooms
+            if self.m_roomsSearchBar.text != "" {
+                self.m_filteredRooms = self.m_activeRooms.filter { $0.name.lowercased().contains(self.m_roomsSearchBar.text!.lowercased()) }
+            } else {
+                self.m_filteredRooms = rooms
+            }
             self.m_roomsTableView.reloadData()
             self.m_refreshControl.endRefreshing()
         })

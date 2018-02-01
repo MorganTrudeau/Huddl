@@ -18,6 +18,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     let m_coreDataProvider = CoreDataProvider.Instance
     let m_messagesHandler = MessagesHandler.Instance
     let m_dbProvider = DBProvider.Instance
+    let m_authProvider = AuthProvider.Instance
     
     var m_messages = [JSQMessage]()
     var m_messageColors = [String]()
@@ -26,7 +27,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     var m_currentRoomID: String?
     var m_currentRoomName: String?
     var m_currentUserColor: String?
-    var m_goingBack = false
+    var m_currentUserAvatar: UIImage?
     
     let m_picker = UIImagePickerController()
 
@@ -39,12 +40,11 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleResignActive), name: NSNotification.Name(rawValue: "ResignActiveNotification"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleBecomeActive), name: NSNotification.Name(rawValue: "BecomeActiveNotification"), object: nil)
         
-        m_dbProvider.currentUserColor(colorDataReceived: {(color: String) in
-            self.m_currentUserColor = color
-        })
+        m_currentUserColor = m_authProvider.currentUser?.color
+        m_currentUserAvatar = m_authProvider.currentUser?.avatar
         
-        self.senderId = AuthProvider.Instance.userID()
-        self.senderDisplayName = AuthProvider.Instance.currentUserName()
+        self.senderId = m_authProvider.userID()
+        self.senderDisplayName = m_authProvider.currentUserName()
         
         m_picker.delegate = self
         
@@ -58,14 +58,9 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     func setUpUI() {
         self.collectionView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
         
-        // Create custom back button to extend functionality
-        let newBackButton = UIBarButtonItem(title: "Back", style: UIBarButtonItemStyle.plain, target: self, action: #selector(ChatVC.back(sender:)))
-        
         // Create Heart button to save room
         m_saveRoomButton = UIBarButtonItem(image: UIImage(named: "heart"), style: .plain, target: self, action: #selector(ChatVC.saveRoomButtonClicked))
         
-        self.navigationItem.hidesBackButton = true
-        self.navigationItem.leftBarButtonItem = newBackButton
         self.navigationItem.rightBarButtonItem  = m_saveRoomButton
         self.navigationItem.title = m_currentRoomName;
         
@@ -102,11 +97,9 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
-        if !m_goingBack {
-            m_dbProvider.decreaseActiveUsers(completion: nil)
-        }
         m_messagesHandler.removeRoomObservers()
         self.tabBarController?.tabBar.isHidden = false
+        m_messagesHandler.delegateMessage = nil
     }
     
     @objc func handleResignActive() {
@@ -133,14 +126,14 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     **/
 
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
-        return JSQMessagesAvatarImageFactory.avatarImage(with: UIImage(named: "avatar.gif"), diameter: 30)
+        return JSQMessagesAvatarImageFactory.avatarImage(with: m_currentUserAvatar, diameter: 30)
     }
 
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
         let bubbleFactory = JSQMessagesBubbleImageFactory()
         let message = m_messages[indexPath.item]
         let messageColor = ColorHandler.Instance.convertToUIColor(colorString: m_messageColors[indexPath.row])
-        if message.senderId == AuthProvider.Instance.userID() {
+        if message.senderId == m_authProvider.currentUser?.id {
             return bubbleFactory?.outgoingMessagesBubbleImage(with: messageColor)
         } else {
             return bubbleFactory?.incomingMessagesBubbleImage(with: messageColor)
@@ -197,11 +190,13 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
                 
             } else if let media = m_messages[indexPath.row].media as? JSQPhotoMediaItem {
                 
-                let image: UIImage = media.image
-                let imageDisplay = ImageDisplayVC.Instance
-                imageDisplay.setImage(image: image)
-                imageDisplay.setView(frame: self.view.frame)
-                present(imageDisplay, animated: true, completion: nil)
+                let image: UIImage? = media.image
+                if image != nil {
+                    let imageDisplay = ImageDisplayVC.Instance
+                    imageDisplay.setImage(image: image!)
+                    imageDisplay.setView(frame: self.view.frame)
+                    present(imageDisplay, animated: true, completion: nil)
+                }
             }
         }
     }
@@ -307,18 +302,11 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     }
     
     func mediaMessageReceived(message: JSQMessage, forIndex: Int) {
-        m_messages[forIndex] = message
-        let indexPath = IndexPath(row: forIndex, section: 0)
-        self.collectionView.reloadItems(at: [indexPath])
+        if forIndex <= m_messages.count {
+            m_messages[forIndex] = message
+            let indexPath = IndexPath(row: forIndex, section: 0)
+            self.collectionView.reloadItems(at: [indexPath])
+        }
     }
-    
-    @objc func back(sender: UIBarButtonItem) {
-        m_goingBack = true
-        m_dbProvider.decreaseActiveUsers(completion: {() in
-            _ = self.navigationController?.popViewController(animated: true)
-        })
-    }
-    
-    
     
 }

@@ -21,6 +21,7 @@
 		F90D105F1FECFAFD0012283B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */; };
 		F9179B77200EBDFC0057AAEF /* TabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B76200EBDFC0057AAEF /* TabBarVC.swift */; };
 		F9179B79200FD9060057AAEF /* ActiveRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B78200FD9060057AAEF /* ActiveRoomsVC.swift */; };
+		F9282ED22022A18000E009A5 /* SplashScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9282ED12022A18000E009A5 /* SplashScreenVC.swift */; };
 		F93364D81FEDE89D002A3718 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F93364D71FEDE89D002A3718 /* Assets.xcassets */; };
 		F93364DA1FEDE8BF002A3718 /* avatar.gif in Resources */ = {isa = PBXBuildFile; fileRef = F93364D91FEDE8BF002A3718 /* avatar.gif */; };
 		F947B3432016B83600E8CB41 /* SignUpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F947B3422016B83600E8CB41 /* SignUpVC.swift */; };
@@ -43,6 +44,8 @@
 		F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EA8BEC20008A6400A98421 /* ColorHandler.swift */; };
 		F9F7E394201E8F5A00ABD6B8 /* LocationRoom.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E393201E8F5A00ABD6B8 /* LocationRoom.swift */; };
 		F9F7E396201FB67100ABD6B8 /* ImageDisplayVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */; };
+		F9F7E398201FE51D00ABD6B8 /* ProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E397201FE51D00ABD6B8 /* ProfileVC.swift */; };
+		F9F7E39A202002D000ABD6B8 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E399202002D000ABD6B8 /* Helper.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -103,6 +106,7 @@
 		F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F9179B76200EBDFC0057AAEF /* TabBarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarVC.swift; sourceTree = "<group>"; };
 		F9179B78200FD9060057AAEF /* ActiveRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRoomsVC.swift; sourceTree = "<group>"; };
+		F9282ED12022A18000E009A5 /* SplashScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenVC.swift; sourceTree = "<group>"; };
 		F93364D71FEDE89D002A3718 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F93364D91FEDE8BF002A3718 /* avatar.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = avatar.gif; path = Assets.xcassets/avatar.gif; sourceTree = "<group>"; };
 		F93CA2A6200D38C200D9132C /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NMAKit.framework; path = "../../../Downloads/HERESDK-Premium 4/framework/NMAKit.framework"; sourceTree = "<group>"; };
@@ -126,6 +130,8 @@
 		F9EA8BEC20008A6400A98421 /* ColorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHandler.swift; sourceTree = "<group>"; };
 		F9F7E393201E8F5A00ABD6B8 /* LocationRoom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRoom.swift; sourceTree = "<group>"; };
 		F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDisplayVC.swift; sourceTree = "<group>"; };
+		F9F7E397201FE51D00ABD6B8 /* ProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileVC.swift; sourceTree = "<group>"; };
+		F9F7E399202002D000ABD6B8 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -249,6 +255,7 @@
 				F9E264D91FFDA35C00605CA7 /* Room.swift */,
 				F985FD4C200C294A00F1934B /* JSQMessage.swift */,
 				F9F7E393201E8F5A00ABD6B8 /* LocationRoom.swift */,
+				F9F7E399202002D000ABD6B8 /* Helper.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -267,6 +274,8 @@
 				F90555F7201B0AF60053267A /* LocationRoomsTableView.swift */,
 				F90555F9201B0B210053267A /* UserRoomsTableView.swift */,
 				F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */,
+				F9F7E397201FE51D00ABD6B8 /* ProfileVC.swift */,
+				F9282ED12022A18000E009A5 /* SplashScreenVC.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -435,6 +444,7 @@
 			inputPaths = (
 				"${SRCROOT}/Pods/Target Support Files/Pods-Helloquent/Pods-Helloquent-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Bolts/Bolts.framework",
+				"${BUILT_PRODUCTS_DIR}/CropViewController/CropViewController.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKCoreKit/FBSDKCoreKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKLoginKit/FBSDKLoginKit.framework",
 				"${BUILT_PRODUCTS_DIR}/FBSDKShareKit/FBSDKShareKit.framework",
@@ -452,6 +462,7 @@
 			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bolts.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CropViewController.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKCoreKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKLoginKit.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/FBSDKShareKit.framework",
@@ -610,8 +621,10 @@
 				F9C747D92010914C00F311D8 /* CoreDataProvider.swift in Sources */,
 				F9C747D720108FBA00F311D8 /* SavedRooms.xcdatamodeld in Sources */,
 				F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */,
+				F9282ED22022A18000E009A5 /* SplashScreenVC.swift in Sources */,
 				F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */,
 				F9E264D41FFD4EED00605CA7 /* SavedRoomsVC.swift in Sources */,
+				F9F7E398201FE51D00ABD6B8 /* ProfileVC.swift in Sources */,
 				F947B345201ADFA900E8CB41 /* RoomsContainerVC.swift in Sources */,
 				F973BC411FEDDA8700CC3C58 /* ChatVC.swift in Sources */,
 				F90D105B1FECE33B0012283B /* SigninVC.swift in Sources */,
@@ -629,6 +642,7 @@
 				F985FD4D200C294A00F1934B /* JSQMessage.swift in Sources */,
 				F973BC3F1FEDB47E00CC3C58 /* Contact.swift in Sources */,
 				F90555F8201B0AF60053267A /* LocationRoomsTableView.swift in Sources */,
+				F9F7E39A202002D000ABD6B8 /* Helper.swift in Sources */,
 				F9F7E394201E8F5A00ABD6B8 /* LocationRoom.swift in Sources */,
 				F90555FA201B0B210053267A /* UserRoomsTableView.swift in Sources */,
 			);
@@ -813,6 +827,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_PRECOMPILE_BRIDGING_HEADER = NO;
 				SWIFT_VERSION = 4.0;
@@ -841,6 +856,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_PRECOMPILE_BRIDGING_HEADER = NO;
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

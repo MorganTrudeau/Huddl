@@ -56,7 +56,6 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         
         NMAPositioningManager.sharedInstance().startPositioning()
         
-        
         setUpUI()
     }
     
@@ -70,17 +69,17 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         m_roomTextImageView?.image = m_roomTextImageView?.image?.withRenderingMode(.alwaysTemplate)
         m_roomTextImageView?.tintColor = UIColor.lightText
         
-        self.navigationController?.navigationBar.addSubview(m_roomTextImageView!)
-        
-        self.addChildViewController(m_locationRoomsTableView)
         m_locationRoomsTableView.didMove(toParentViewController: self)
         delegate = m_locationRoomsTableView.self
+        
+        self.navigationController?.navigationBar.addSubview(m_roomTextImageView!)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewDidAppear(animated)
         m_roomsSearchBar.resignFirstResponder()
         m_roomTextImageView?.removeFromSuperview()
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     func setUpUI() {
@@ -108,6 +107,7 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
                 self.delegate = self.m_locationRoomsTableView.self
                 self.m_roomsSearchBar.placeholder = "Search Place"
                 self.navigationItem.rightBarButtonItem = nil
+                self.delegate?.textChanged(query: self.m_roomsSearchBar.text!)
             })
         case 1:
             m_locationRoomsTableView.willMove(toParentViewController: nil)
@@ -118,6 +118,7 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
                 self.delegate = self.m_userRoomsTableView.self
                 self.m_roomsSearchBar.placeholder = "Filter"
                 self.navigationItem.rightBarButtonItem = self.m_addRoomButton
+                self.delegate?.textChanged(query: self.m_roomsSearchBar.text!)
             })
         default:
             break
@@ -145,7 +146,6 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
         m_roomsSearchBar.showsCancelButton = false
         m_roomsSearchBar.resignFirstResponder()
-        m_roomsSearchBar.text = ""
     }
     
     @objc func addRoomButtonClicked() {
@@ -209,12 +209,6 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
         alert.addAction(ok)
         present(alert, animated: true, completion: nil)
-    }
-    
-    @IBAction func logout(_ sender: Any) {
-        if AuthProvider.Instance.logout() {
-            dismiss(animated: true, completion: nil)
-        }
     }
     
 }

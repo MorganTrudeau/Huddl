@@ -26,6 +26,7 @@ class Constants {
     static let PASSWORD = "password"
     static let DATA = "data"
     static let COLOR = "color"
+    static let AVATAR = "avatar"
     
     // Messages
     static let TEXT = "text"

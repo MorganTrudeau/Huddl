@@ -30,6 +30,7 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        m_savedRoomsTableView.reloadData()
         CoreDataProvider.Instance.fetchRoomCoreData(coreRoomDataReceived: {(savedRoomIDs) in
             if self.m_savedRoomIDs.count != savedRoomIDs.count {
                 self.m_savedRoomIDs = savedRoomIDs
@@ -39,6 +40,11 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
                 })
             }
         })
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     func setUpUI() {

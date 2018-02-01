@@ -12,7 +12,7 @@ import FBSDKCoreKit
 import FBSDKLoginKit
 import FirebaseAuth
 
-class SigninVC: UIViewController {
+class SigninVC: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var m_emailTextField: UITextField!
     @IBOutlet weak var m_passwordTextField: UITextField!
@@ -26,8 +26,12 @@ class SigninVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(SigninVC.dismissKeyboard))
         view.addGestureRecognizer(tap)
+        
+        m_emailTextField.delegate = self
+        m_passwordTextField.delegate = self
         
         m_loadingOverlay.modalPresentationStyle = .overFullScreen
         
@@ -51,10 +55,12 @@ class SigninVC: UIViewController {
         m_emailTextField.frame = CGRect(x: 0, y: 0, width: 275, height: 40)
         m_emailTextField.center.y = self.view.frame.size.height*0.4
         m_emailTextField.center.x = self.view.center.x
+        m_emailTextField.tag = 1
         
         m_passwordTextField.frame = CGRect(x: 0, y: 0, width: 275, height: 40)
         m_passwordTextField.center.y = self.view.frame.size.height*0.49
         m_passwordTextField.center.x = self.view.center.x
+        m_passwordTextField.tag = 2
         
         m_loginButton.frame = CGRect(x: 0, y: 0, width: 275, height: 45)
         m_loginButton.layer.borderWidth = 2.0
@@ -92,6 +98,18 @@ class SigninVC: UIViewController {
         if AuthProvider.Instance.isLoggedIn() {
             self.performSegue(withIdentifier: self.SIGN_IN_SEGUE, sender: nil)
         }
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        
+        let nextTag = textField.tag + 1
+        let nextResponder = textField.superview?.viewWithTag(nextTag) as UIResponder!
+        if nextResponder != nil {
+            nextResponder?.becomeFirstResponder()
+        } else {
+            m_loginButton.sendActions(for: .touchUpInside)
+        }
+        return false
     }
     
     @IBAction func FBLoginButonPressed(_ sender: Any) {

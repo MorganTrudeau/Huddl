@@ -18,6 +18,8 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
     var m_userRooms = [Room]()
     var m_filteredRooms = [Room]()
     var m_index: Int?
+    var m_query = ""
+    var m_queryCounter = 2
     
     lazy var m_refreshControl: UIRefreshControl = {
         let refreshControl = UIRefreshControl()
@@ -40,6 +42,7 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
         
         m_dbProvider.getUserRooms(completion: {(rooms) in
             self.m_userRooms = rooms
+            self.m_filteredRooms = rooms
             self.m_userRoomsTableView.reloadData()
         })
         
@@ -49,14 +52,6 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
     }
     
     func setUpUI() {
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
     }
     
     // TableView Functions
@@ -70,15 +65,15 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-            return m_userRooms.count
+            return m_filteredRooms.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCellStyle.subtitle,
                                    reuseIdentifier: CELL_ID)
         
-        cell.textLabel?.text = m_userRooms[indexPath.row].name
-        cell.detailTextLabel?.text = m_userRooms[indexPath.row].description
+        cell.textLabel?.text = m_filteredRooms[indexPath.row].name
+        cell.detailTextLabel?.text = m_filteredRooms[indexPath.row].description
         
         return cell
     }
@@ -86,7 +81,7 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         m_index = indexPath.row
         m_userRoomsTableView.deselectRow(at: indexPath, animated: false)
-            let requiredPassword = m_userRooms[indexPath.row].password
+            let requiredPassword = m_filteredRooms[indexPath.row].password
             if requiredPassword != "" {
                 askPassword(requiredPassword: requiredPassword)
             } else {
@@ -97,9 +92,9 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                vc.m_currentRoomID = m_userRooms[m_index!].id
-                vc.m_currentRoomName = m_userRooms[m_index!].name
-                m_dbProvider.m_currentRoomID = m_userRooms[m_index!].id
+                vc.m_currentRoomID = m_filteredRooms[m_index!].id
+                vc.m_currentRoomName = m_filteredRooms[m_index!].name
+                m_dbProvider.m_currentRoomID = m_filteredRooms[m_index!].id
             }
         }
     }
@@ -138,6 +133,9 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
     @objc func handleRefresh(_ refreshControl: UIRefreshControl) {
         m_dbProvider.getUserRooms(completion: {(rooms) in
             self.m_userRooms = rooms
+            if self.m_query != "" {
+                self.m_filteredRooms = self.m_userRooms.filter { $0.name.lowercased().contains(self.m_query.lowercased()) }
+            }
             self.m_userRoomsTableView.reloadData()
             self.m_refreshControl.endRefreshing()
         })
@@ -146,11 +144,29 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
     // Delegate Functions
     
     func textChanged(query: String) {
+        let queryLength = query.count
+        m_query = query
         
+        if queryLength == 0 {
+            m_filteredRooms = m_userRooms
+            m_queryCounter = 2
+        } else if queryLength < m_queryCounter {
+            m_filteredRooms = m_userRooms.filter { $0.name.lowercased().contains(query.lowercased()) }
+            m_queryCounter = queryLength
+        } else {
+            m_filteredRooms = m_filteredRooms.filter { $0.name.lowercased().contains(query.lowercased()) }
+            m_queryCounter = queryLength
+        }
+        m_userRoomsTableView.reloadData()
     }
     
     func roomCreated(room: Room) {
         m_userRooms.append(room)
+        if m_query != "" {
+            if room.name.lowercased().contains(m_query.lowercased()) {
+                m_filteredRooms.append(room)
+            }
+        }
         m_userRoomsTableView.reloadData()
     }
 } // class

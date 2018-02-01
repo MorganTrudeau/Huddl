@@ -8,7 +8,7 @@
 
 import UIKit
 
-class SignUpVC: UIViewController {
+class SignUpVC: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var m_displayNameTextField: UITextField!
     @IBOutlet weak var m_emailTextField: UITextField!
@@ -23,8 +23,14 @@ class SignUpVC: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(SigninVC.dismissKeyboard))
         view.addGestureRecognizer(tap)
+        
+        m_displayNameTextField.delegate = self
+        m_emailTextField.delegate = self
+        m_passwordTextField.delegate = self
+        m_confirmPassTextField.delegate = self
         
         m_loadingOverlay.modalPresentationStyle = .overFullScreen
         
@@ -42,18 +48,22 @@ class SignUpVC: UIViewController {
         m_displayNameTextField.frame = CGRect(x: 0, y: 0, width: 275, height: 40)
         m_displayNameTextField.center.y = self.view.frame.size.height*0.4
         m_displayNameTextField.center.x = self.view.center.x
+        m_displayNameTextField.tag = 1
         
         m_emailTextField.frame = CGRect(x: 0, y: 0, width: 275, height: 40)
         m_emailTextField.center.y = self.view.frame.size.height*0.49
         m_emailTextField.center.x = self.view.center.x
+        m_emailTextField.tag = 2
         
         m_passwordTextField.frame = CGRect(x: 0, y: 0, width: 275, height: 40)
         m_passwordTextField.center.y = self.view.frame.size.height*0.58
         m_passwordTextField.center.x = self.view.center.x
+        m_passwordTextField.tag = 3
         
         m_confirmPassTextField.frame = CGRect(x: 0, y: 0, width: 275, height: 40)
         m_confirmPassTextField.center.y = self.view.frame.size.height*0.67
         m_confirmPassTextField.center.x = self.view.center.x
+        m_confirmPassTextField.tag = 4
         
         m_signUpButton.frame = CGRect(x: 0, y: 0, width: 275, height: 45)
         m_signUpButton.center.y = self.view.frame.size.height*0.76
@@ -68,7 +78,18 @@ class SignUpVC: UIViewController {
         m_cancelButton.layer.borderWidth = 2
         m_cancelButton.layer.borderColor = UIColor.white.cgColor
         m_cancelButton.layer.cornerRadius = 5
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
+        let nextTag = textField.tag + 1
+        let nextResponder = textField.superview?.viewWithTag(nextTag) as UIResponder!
+        if nextResponder != nil {
+            nextResponder?.becomeFirstResponder()
+        } else {
+            m_signUpButton.sendActions(for: .touchUpInside)
+        }
+        return false
     }
 
     @IBAction func signUp(_ sender: Any) {
@@ -104,22 +125,6 @@ class SignUpVC: UIViewController {
         let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
         alert.addAction(ok)
         present(alert, animated: true, completion: nil)
-    }
-    
-    func presentLoadingIndicator() {
-//        let alert = UIAlertController.(title: "", message: "", preferredStyle: .alert)
-//        alert.view.backgroundColor = UIColor(white: 0.3, alpha: 0.7)
-//        alert.view.frame = CGRect(x: self.view.center.x, y: self.view.center.y, width: 80, height: 80)
-//
-//
-//
-//        let loadingIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 40, height: 40))
-//        loadingIndicator.center = overlay.center
-//
-//        overlay.addSubview(loadingIndicator)
-//
-//        present(overlay, animated: true, completion: nil)
-//        loadingIndicator.startAnimating()
     }
     
     @objc func dismissKeyboard() {

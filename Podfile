@@ -2,7 +2,7 @@
 # platform :ios, '9.0'
 
 target 'Helloquent' do
-  # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
+
   use_frameworks!
 
   # Pods for Helloquent
@@ -16,6 +16,7 @@ pod 'FacebookCore'
 pod 'FacebookLogin'
 pod 'FacebookShare'
 pod ‘SDWebImage’
+pod 'CropViewController'
 
 
   target 'HelloquentTests' do
