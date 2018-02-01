@@ -79,8 +79,9 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         if queryLength == 0 {
             m_filteredRooms = m_activeRooms
             m_queryCounter = 2
-        }
-        if queryLength < m_queryCounter {
+            print(m_activeRooms)
+            print(m_filteredRooms)
+        } else if queryLength < m_queryCounter {
             m_filteredRooms = m_activeRooms.filter { $0.name.lowercased().contains(searchText.lowercased()) }
             m_queryCounter = queryLength
         } else {

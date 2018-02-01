@@ -69,10 +69,19 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         m_roomTextImageView?.image = m_roomTextImageView?.image?.withRenderingMode(.alwaysTemplate)
         m_roomTextImageView?.tintColor = UIColor.lightText
         
-        m_locationRoomsTableView.didMove(toParentViewController: self)
-        delegate = m_locationRoomsTableView.self
+        if m_roomsSegControl.selectedSegmentIndex == 0 {
+            m_locationRoomsTableView.didMove(toParentViewController: self)
+            delegate = m_locationRoomsTableView.self
+        } else {
+            m_userRoomsTableView.didMove(toParentViewController: self)
+            delegate = m_userRoomsTableView.self
+        }
         
         self.navigationController?.navigationBar.addSubview(m_roomTextImageView!)
+        
+        
+        
+//        CacheStorage.Instance.cacheUser()
     }
     
     override func viewWillDisappear(_ animated: Bool) {

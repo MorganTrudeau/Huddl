@@ -17,6 +17,7 @@ pod 'FacebookLogin'
 pod 'FacebookShare'
 pod ‘SDWebImage’
 pod 'CropViewController'
+pod 'Cache'
 
 
   target 'HelloquentTests' do

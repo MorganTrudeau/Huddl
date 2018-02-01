@@ -46,34 +46,34 @@ class SignUpVC: UIViewController, UITextFieldDelegate {
         self.view.addSubview(roomTextImageView)
         
         m_displayNameTextField.frame = CGRect(x: 0, y: 0, width: 275, height: 40)
-        m_displayNameTextField.center.y = self.view.frame.size.height*0.4
+        m_displayNameTextField.center.y = self.view.frame.size.height*0.35
         m_displayNameTextField.center.x = self.view.center.x
         m_displayNameTextField.tag = 1
         
         m_emailTextField.frame = CGRect(x: 0, y: 0, width: 275, height: 40)
-        m_emailTextField.center.y = self.view.frame.size.height*0.49
+        m_emailTextField.center.y = self.view.frame.size.height*0.44
         m_emailTextField.center.x = self.view.center.x
         m_emailTextField.tag = 2
         
         m_passwordTextField.frame = CGRect(x: 0, y: 0, width: 275, height: 40)
-        m_passwordTextField.center.y = self.view.frame.size.height*0.58
+        m_passwordTextField.center.y = self.view.frame.size.height*0.53
         m_passwordTextField.center.x = self.view.center.x
         m_passwordTextField.tag = 3
         
         m_confirmPassTextField.frame = CGRect(x: 0, y: 0, width: 275, height: 40)
-        m_confirmPassTextField.center.y = self.view.frame.size.height*0.67
+        m_confirmPassTextField.center.y = self.view.frame.size.height*0.62
         m_confirmPassTextField.center.x = self.view.center.x
         m_confirmPassTextField.tag = 4
         
         m_signUpButton.frame = CGRect(x: 0, y: 0, width: 275, height: 45)
-        m_signUpButton.center.y = self.view.frame.size.height*0.76
+        m_signUpButton.center.y = self.view.frame.size.height*0.71
         m_signUpButton.center.x = self.view.center.x
         m_signUpButton.layer.borderWidth = 2
         m_signUpButton.layer.borderColor = UIColor.white.cgColor
         m_signUpButton.layer.cornerRadius = 5
         
         m_cancelButton.frame = CGRect(x: 0, y: 0, width: 275, height: 45)
-        m_cancelButton.center.y = self.view.frame.height*0.85
+        m_cancelButton.center.y = self.view.frame.height*0.80
         m_cancelButton.center.x = self.view.center.x
         m_cancelButton.layer.borderWidth = 2
         m_cancelButton.layer.borderColor = UIColor.white.cgColor
@@ -105,6 +105,7 @@ class SignUpVC: UIViewController, UITextFieldDelegate {
                         })
                     } else {
                         print("Successfully created user")
+                        print("Login Successful")
                         self.dismiss(animated: false, completion: {() in
                             self.dismiss(animated: true, completion: {() in
                                 self.performSegue(withIdentifier: self.SIGN_UP_SEGUE, sender: nil)

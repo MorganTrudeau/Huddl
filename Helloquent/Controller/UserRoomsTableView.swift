@@ -166,6 +166,8 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
             if room.name.lowercased().contains(m_query.lowercased()) {
                 m_filteredRooms.append(room)
             }
+        } else {
+            m_filteredRooms.append(room)
         }
         m_userRoomsTableView.reloadData()
     }

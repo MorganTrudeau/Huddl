@@ -40,11 +40,13 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleResignActive), name: NSNotification.Name(rawValue: "ResignActiveNotification"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleBecomeActive), name: NSNotification.Name(rawValue: "BecomeActiveNotification"), object: nil)
         
-        m_currentUserColor = m_authProvider.currentUser?.color
-        m_currentUserAvatar = m_authProvider.currentUser?.avatar
+        CacheStorage.Instance.fetchUserData(id: AuthProvider.Instance.userID(), completion: {(user) in
+            self.m_currentUserColor = user.color
+            self.m_currentUserAvatar = user.avatar.image
+        })
         
         self.senderId = m_authProvider.userID()
-        self.senderDisplayName = m_authProvider.currentUserName()
+        self.senderDisplayName = m_authProvider.currentUser?.name
         
         m_picker.delegate = self
         
@@ -100,6 +102,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         m_messagesHandler.removeRoomObservers()
         self.tabBarController?.tabBar.isHidden = false
         m_messagesHandler.delegateMessage = nil
+        m_dbProvider.decreaseActiveUsers(completion: nil)
     }
     
     @objc func handleResignActive() {

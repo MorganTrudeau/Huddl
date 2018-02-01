@@ -19,14 +19,22 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     let m_uiColors = ColorHandler.Instance.uiColors
     let m_stringColors = ColorHandler.Instance.colors
     var m_selectedCellIndexPath: IndexPath? = nil
+    var m_currentUserColor: String?
     
     let m_picker = UIImagePickerController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ProfileVC.dismissKeyboard))
-        view.addGestureRecognizer(tap)
+        // Tap screen to dismiss keyboard
+        let screenTap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ProfileVC.dismissKeyboard))
+        screenTap.cancelsTouchesInView = false
+        view.addGestureRecognizer(screenTap)
+        
+        // Tap profile image to change
+        let imageTap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ProfileVC.choosePicture(_:)))
+        m_profileImageView.isUserInteractionEnabled = true
+        m_profileImageView.addGestureRecognizer(imageTap)
         
         m_colorColletionView.delegate = self
         m_colorColletionView.dataSource = self
@@ -61,10 +69,15 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         logoutButton.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         logoutButton.addTarget(self, action: #selector(ProfileVC.logout), for: .touchUpInside)
         
-        m_displayNameTextField.text = AuthProvider.Instance.currentUser?.name
+        CacheStorage.Instance.fetchUserData(id: AuthProvider.Instance.userID(), completion: {(user) in
+            DispatchQueue.main.async {
+                self.m_profileImageView.image = user.avatar.image
+                self.m_displayNameTextField.text = user.name
+                self.m_currentUserColor = user.color
+            }
+        })
         
-        m_profileImageView.image = AuthProvider.Instance.currentUser?.avatar
-        m_profileImageView.layer.borderWidth=1.0
+        m_profileImageView.layer.borderWidth = 1.0
         m_profileImageView.layer.masksToBounds = false
         m_profileImageView.layer.borderColor = UIColor.black.cgColor
         m_profileImageView.layer.cornerRadius = (m_profileImageView?.frame.size.height)!/2
@@ -76,9 +89,7 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         topBar.addSubview(logoutButton)
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-    }
+    // Color picker collectionView Functions
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return m_uiColors.count
@@ -107,8 +118,7 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         cell.layer.borderColor = UIColor.black.cgColor
     }
     
-    // Image Set Functions
-    
+    // Change Profile Picture Functions
     
     @IBAction func choosePicture(_ sender: Any) {
         present(m_picker, animated: true, completion: nil)
@@ -134,18 +144,20 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         dismiss(animated: true, completion: nil)
     }
     
+    
+    // Save Profile Settings
     @objc func save(sender: UIButton) {
-        let newDisplayName: String = m_displayNameTextField.text!
-        var newColor: String? = AuthProvider.Instance.currentUser?.color
-        let newAvatar: UIImage = m_profileImageView.image!
+        let displayName: String = m_displayNameTextField.text!
+        var color: String? = m_currentUserColor
+        let avatar: UIImage = m_profileImageView.image!
         
         if m_selectedCellIndexPath != nil {
-            newColor = m_stringColors[(m_selectedCellIndexPath?.row)!]
+            color = m_stringColors[(m_selectedCellIndexPath?.row)!]
         }
         if m_displayNameTextField.text == "" {
             alertUser(title: "Invalid Display Name", message: "Display name cannot be blank")
         } else {
-            DBProvider.Instance.saveProfile(newDisplayName: newDisplayName, newColor: newColor, newAvatar: newAvatar)
+            DBProvider.Instance.saveProfile(displayName: displayName, color: color!, avatar: avatar)
             alertUser(title: "Success", message: "Profile saved")
         }
     }
