@@ -9,7 +9,8 @@
 import Foundation
 import Cache
 
-typealias UserHandler = (_ users: [String:User]) -> Void
+typealias AllUsersHandler = (_ users: [String:User]) -> Void
+typealias UserHandler = (_ user: User) -> Void
 typealias ImageHandler = (_ image: UIImage) -> Void
 
 class CacheStorage {
@@ -37,12 +38,32 @@ class CacheStorage {
         }
     }
     
-    func fetchUserData(id: String, completion: UserHandler?) {
-        m_userStorage.async.object(ofType: [String:User].self, forKey: id, completion: {(result) in
+    func cacheUser(user: User) {
+        do{
+            try m_userStorage.setObject(user, forKey: user.id)
+        } catch {
+            print(error)
+        }
+    }
+    
+    func fetchAllUsers(completion: AllUsersHandler?) {
+        m_userStorage.async.object(ofType: [String:User].self, forKey: "users", completion: {(result) in
             switch result {
             case .value(let users):
                 print(users)
                 completion?(users)
+            case .error(let error):
+                print(error)
+            }
+        })
+    }
+    
+    func fetchUser(id: String, completion: UserHandler?) {
+        m_userStorage.async.object(ofType: User.self, forKey: id, completion: {(result) in
+            switch result {
+            case .value(let user):
+                print(user)
+                completion?(user)
             case .error(let error):
                 print(error)
             }
@@ -63,24 +84,25 @@ class CacheStorage {
         return wrappedImage
     }
     
-    func cacheImage(url: String, image: UIImage) {
+    func cacheImage(id: String, image: UIImage) {
         let wrappedImage = wrapImage(image: image)
         do{
-            try m_imageStorage.setObject(wrappedImage, forKey: url)
+            try m_imageStorage.setObject(wrappedImage, forKey: id)
+            print("Cached image with key: \(id)")
         } catch {
-            print(error)
+            print("Image cache error: \(error)")
         }
     }
     
     func fetchImageData(id: String, completion: ImageHandler?) {
-        m_userStorage.async.object(ofType: ImageWrapper.self, forKey: id, completion: {(result) in
+        m_imageStorage.async.object(ofType: ImageWrapper.self, forKey: id, completion: {(result) in
+            print("Fetching Image with key: \(id)")
             switch result {
             case .value(let wrappedImage):
-                print(wrappedImage)
-                let image = wrappedImage.image
+                let image = wrappedImage.image as UIImage
                 completion?(image)
             case .error(let error):
-                print(error)
+                print("Image fetch error: \(error)")
             }
         })
     }

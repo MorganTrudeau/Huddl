@@ -27,7 +27,7 @@ class SplashScreenVC: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         if AuthProvider.Instance.isLoggedIn() {
-            self.performSegue(withIdentifier: self.MAIN_SEGUE, sender: nil)
+            self.performSegue(withIdentifier: MAIN_SEGUE, sender: nil)
         } else {
             self.performSegue(withIdentifier: SIGN_IN_SEGUE, sender: nil)
         }

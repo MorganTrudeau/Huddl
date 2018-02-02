@@ -16,16 +16,50 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     @IBOutlet weak var m_displayNameTextField: UITextField!
     @IBOutlet weak var m_profileImageView: UIImageView!
     
+    let m_picker = UIImagePickerController()
     let m_authProvider = AuthProvider.Instance
+    let m_cacheStorage = CacheStorage.Instance
+    let m_dbProvider = DBProvider.Instance
+    
     let m_uiColors = ColorHandler.Instance.uiColors
     let m_stringColors = ColorHandler.Instance.colors
     var m_selectedCellIndexPath: IndexPath? = nil
-    let m_currentUserID = AuthProvider.Instance.userID()
-    
-    let m_picker = UIImagePickerController()
+    var m_currentUser: User?
+    var m_currentUserImage: UIImage?
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Get current user information from cache
+        m_cacheStorage.fetchUser(id: m_authProvider.userID(), completion: {(user) in
+            self.m_currentUser = user
+        
+           self.m_cacheStorage.fetchImageData(id: user.id, completion: {(image) in
+                DispatchQueue.main.async {
+                    self.m_profileImageView.image = image
+                    self.m_currentUserImage = image
+                    self.m_displayNameTextField.text = user.name
+                }
+            })
+        })
+        
+        m_dbProvider.getUser(id: m_authProvider.userID(), completion: {(user) in
+                if user.name != self.m_currentUser?.name {
+                    DispatchQueue.main.async {
+                        self.m_displayNameTextField.text = user.name
+                    }
+                }
+                if user.avatar != self.m_currentUser?.avatar {
+                    self.m_dbProvider.loadMedia(id: user.id, url: user.avatar, completion: {(image) in
+                        DispatchQueue.main.async {
+                            self.m_profileImageView.image = image
+                            self.m_currentUserImage = image
+                        }
+                    })
+                }
+                self.m_currentUser = user
+            }
+        )
         
         // Tap screen to dismiss keyboard
         let screenTap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ProfileVC.dismissKeyboard))
@@ -69,10 +103,8 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         logoutButton.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         logoutButton.addTarget(self, action: #selector(ProfileVC.logout), for: .touchUpInside)
     
-        m_displayNameTextField.text = m_authProvider.users![m_currentUserID]?.name
         m_displayNameTextField.underlined()
         
-//        m_profileImageView.image = m_authProvider.users![currentUserID]?.avatar
         m_profileImageView.layer.borderWidth = 1.0
         m_profileImageView.layer.masksToBounds = false
         m_profileImageView.layer.borderColor = UIColor.black.cgColor
@@ -144,16 +176,20 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     // Save Profile Settings
     @objc func save(sender: UIButton) {
         let displayName: String = m_displayNameTextField.text!
-        var color: String? = m_authProvider.users![m_authProvider.userID()]?.color
-        let avatar: UIImage = m_profileImageView.image!
+        var color: String = m_currentUser!.color
+        var avatar: UIImage? = nil
         
-        if m_selectedCellIndexPath != nil {
-            color = m_stringColors[(m_selectedCellIndexPath?.row)!]
-        }
         if m_displayNameTextField.text == "" {
             alertUser(title: "Invalid Display Name", message: "Display name cannot be blank")
         } else {
-            DBProvider.Instance.saveProfile(displayName: displayName, color: color!, avatar: avatar)
+            if m_selectedCellIndexPath != nil {
+                color = m_stringColors[(m_selectedCellIndexPath?.row)!]
+            }
+            if m_profileImageView.image != m_currentUserImage {
+                avatar = m_profileImageView.image
+            }
+            // Update Firebase child
+            DBProvider.Instance.saveProfile(displayName: displayName, color: color, avatar: avatar, avatarURL: m_currentUser!.avatar)
             alertUser(title: "Success", message: "Profile saved")
         }
     }

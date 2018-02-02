@@ -10,6 +10,7 @@ import Foundation
 import FirebaseDatabase
 import FirebaseCore
 import FirebaseStorage
+import SDWebImage
 
 protocol FetchRoomData: class {
     func roomDataReceived(room: Room)
@@ -33,6 +34,8 @@ typealias GetRoomsHandler = (_ rooms: [Room]) -> Void
 typealias ColorFetchHandler = (_ color: String) -> Void
 
 typealias AvatarHandler = (_ avatar: UIImage) -> Void
+
+typealias RoomUserHandler = (_ roomUsers: NSDictionary) -> Void
 
 class DBProvider {
     
@@ -96,10 +99,16 @@ class DBProvider {
         return storageRef.child(Constants.VIDEO_STORAGE)
     }
     
+    // User Functions
+    
     func createUser(withID: String, email: String, displayName: String, password: String, color: String) {
         let defaultAvatar = "https://firebasestorage.googleapis.com/v0/b/helloquent-a4460.appspot.com/o/Image_Storage%2Favatar.gif?alt=media&token=5dc264a6-3a70-4511-9adf-957d897a1d56"
         let data: Dictionary<String, Any> = [Constants.EMAIL: email, Constants.DISPLAY_NAME: displayName, Constants.PASSWORD: password, Constants.COLOR: color, Constants.AVATAR: defaultAvatar]
+        // Store new user in Firebase
         usersRef.child(withID).setValue(data)
+        // Store new user in cache
+        m_cacheStorage.cacheUser(user: User(id: withID, name: displayName, color: color, avatar: defaultAvatar))
+        m_cacheStorage.cacheImage(id: withID, image: UIImage(named: "avatar.gif")!)
     }
     
     func getUsers() {
@@ -124,6 +133,76 @@ class DBProvider {
             }
         })
     }
+    
+    func getUser(id: String, completion: UserHandler?) {
+        usersRef.observeSingleEvent(of: .value, with: {(snapshot) in
+            if let userData = snapshot.childSnapshot(forPath: id).value as? NSDictionary {
+                if let name = userData[Constants.DISPLAY_NAME] as? String {
+                    if let color = userData[Constants.COLOR] as? String {
+                        if let avatar = userData[Constants.AVATAR] as? String {
+                            let user = User(id: id, name: name, color: color, avatar: avatar)
+                            self.m_cacheStorage.cacheUser(user: user)
+                            completion?(user)
+                        }
+                    }
+                }
+            }
+        })
+    }
+    
+    func saveProfile(displayName: String, color: String, avatar: UIImage?, avatarURL: String) {
+        
+        // Update current user profile
+        if avatar != nil {
+            let path = "\(NSUUID().uuidString)"
+            let data = UIImageJPEGRepresentation(avatar!, 0.1)
+            self.imageStorageRef.child(path).putData(data!, metadata: nil) {(metadata, error) in
+                guard error == nil else {
+                    print("Error occured while saving data")
+                    return
+                }
+                let metadataURL = String(describing: metadata!.downloadURL()!)
+                
+                // Store updated user in cache
+                let updatedUser = User(id: AuthProvider.Instance.userID(), name: displayName, color: color, avatar: metadataURL)
+                self.m_cacheStorage.cacheUser(user: updatedUser)
+                
+                // Store image in cache
+                self.m_cacheStorage.cacheImage(id: AuthProvider.Instance.userID(), image: avatar!)
+                
+//                // Add updated user to AuthProvider user dictionary
+//                self.m_authProvider.users![self.m_authProvider.userID()]! = updatedUser
+//
+//                // Store updated user dictionary in cache
+//                self.m_cacheStorage.cacheUsers(users: self.m_authProvider.users!)
+                
+                // Update user in Firebase
+                self.usersRef.child(AuthProvider.Instance.userID()).runTransactionBlock({(data: MutableData) in
+                    if var user = data.value as? [String: Any] {
+                        user[Constants.AVATAR] = metadataURL
+                        user[Constants.DISPLAY_NAME] = displayName
+                        user[Constants.COLOR] = color
+                        data.value = user
+                    }
+                    return TransactionResult.success(withValue: data)})
+            }
+        } else {
+            // Store updated user in cache
+            let updatedUser = User(id: AuthProvider.Instance.userID(), name: displayName, color: color, avatar: avatarURL)
+            self.m_cacheStorage.cacheUser(user: updatedUser)
+            
+            // Update user in Firebase
+            self.usersRef.child(AuthProvider.Instance.userID()).runTransactionBlock({(data: MutableData) in
+                if var user = data.value as? [String: Any] {
+                    user[Constants.DISPLAY_NAME] = displayName
+                    user[Constants.COLOR] = color
+                    data.value = user
+                }
+                return TransactionResult.success(withValue: data)})
+            }
+    }
+    
+    // Room Functions
     
     func createRoom(name: String, description: String?, password: String?, roomCreated: CreateRoomHandler?){
         var success = false
@@ -180,6 +259,20 @@ class DBProvider {
         roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             if !snapshot.hasChild(id) {
                 self.roomsRef.child(id).setValue(data)
+            }
+        })
+    }
+    
+    func addRoomUser(userID: String) {
+        roomsRef.child(m_currentRoomID!).child(Constants.ROOM_USERS).setValue([userID:true])
+    }
+    
+    func getRoomUsers(completion: RoomUserHandler?) {
+        roomsRef.child(m_currentRoomID!).observeSingleEvent(of: .value, with: {(snapshot) in
+            if let room = snapshot.value as? NSDictionary {
+                if let roomUsers = room[Constants.ROOM_USERS] as? NSDictionary {
+                    completion?(roomUsers)
+                }
             }
         })
     }
@@ -371,45 +464,27 @@ class DBProvider {
         })
     }
     
-    func saveProfile(displayName: String, color: String, avatar: UIImage) {
-            
-            // Write to Firebase
-//        if avatar != m_authProvider.users![m_authProvider.userID()]?.avatar {
-                let path = "\(NSUUID().uuidString)"
-                let data = UIImageJPEGRepresentation(avatar, 0.1)
-                self.imageStorageRef.child(path).putData(data!, metadata: nil) {(metadata, error) in
-                    guard error == nil else {
-                        print("Error occured while saving data")
-                        return
-                    }
-                    let metadataURL = String(describing: metadata!.downloadURL()!)
-                    
-                    // Add updated user to AuthProvider user dictionary
-                    let updatedUser = User(id: AuthProvider.Instance.userID(), name: displayName, color: color, avatar: metadataURL)
-                    self.m_authProvider.users![self.m_authProvider.userID()]! = updatedUser
-                    
-                    // Store updated user dictionary in cache
-                    self.m_cacheStorage.cacheUsers(users: self.m_authProvider.users!)
-                    
-                    // Update user in Firebase
-                    self.usersRef.child(AuthProvider.Instance.userID()).runTransactionBlock({(data: MutableData) in
-                        if var user = data.value as? [String: Any] {
-                            user[Constants.AVATAR] = metadataURL
-                            user[Constants.DISPLAY_NAME] = displayName
-                            user[Constants.COLOR] = color
-                            data.value = user
+    func loadMedia(id: String, url: String, completion: ImageHandler?) {
+        if let mediaURL = URL(string: url) {
+            do {
+                let data = try Data(contentsOf: mediaURL)
+                if let _ = UIImage(data: data) {
+                    let _ = SDWebImageDownloader.shared().downloadImage(with: mediaURL, options: [], progress: nil, completed: {(image, data, error, finished) in
+                        
+                        if error != nil {
+                            print("Image download error: \(String(describing: error!))")
+                        } else {
+                            completion?(image!)
+                            self.m_cacheStorage.cacheImage(id: id, image: image!)
                         }
-                        return TransactionResult.success(withValue: data)})
+                    })
+                } else {
+                    // video is mediaURL
                 }
-//            } else {
-//                self.usersRef.child(AuthProvider.Instance.userID()).runTransactionBlock({(data: MutableData) in
-//                    if var user = data.value as? [String: Any] {
-//                        user[Constants.DISPLAY_NAME] = displayName
-//                        user[Constants.COLOR] = color
-//                        data.value = user
-//                    }
-//                    return TransactionResult.success(withValue: data)})
-//            }
+            } catch {
+                print("Error downloading Data")
+            }
+        }
     }
 
     

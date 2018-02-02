@@ -30,6 +30,7 @@ class MessagesHandler {
     }
     
     let m_dbProvider = DBProvider.Instance
+    let m_cacheStorage = CacheStorage.Instance
     
     func sendRoomMessage(senderID: String, senderName: String, text: String?, url: String?, roomID: String, color: String) {
         let data: Dictionary<String, Any> = [Constants.SENDER_ID: senderID, Constants.SENDER_NAME: senderName, Constants.TEXT: text ?? "", Constants.URL: url ?? "" , Constants.COLOR: color]
@@ -126,7 +127,7 @@ class MessagesHandler {
                                             messageColors.append(color)
                                             let index = messages.count - 1
                                             DispatchQueue.global().async {
-                                                self.loadMedia(senderID: senderID, senderName: senderName, url: url, index: index)
+                                                self.loadMessageMedia(senderID: senderID, senderName: senderName, url: url, index: index)
                                             }
                                         }
                                     }
@@ -140,7 +141,7 @@ class MessagesHandler {
         })
     }
     
-    func loadMedia(senderID: String, senderName: String, url: String, index: Int) {
+    func loadMessageMedia(senderID: String, senderName: String, url: String, index: Int) {
         if let mediaURL = URL(string: url) {
             do {
                 let data = try Data(contentsOf: mediaURL)

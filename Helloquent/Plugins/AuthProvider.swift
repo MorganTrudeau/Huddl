@@ -32,55 +32,12 @@ class AuthProvider {
     
     var users: [String:User]?
     
-//    func getCurrentUser(completion: DefaultClosure?) {
-//        let id = userID()
-//        DBProvider.Instance.usersRef.child(id).observeSingleEvent(of: .value, with: {(snapshot) in
-//            if let user = snapshot.value as? NSDictionary {
-//                
-//                if let name = user[Constants.DISPLAY_NAME] as? String  {
-//                
-//                    if let color = user[Constants.COLOR] as? String {
-//                    
-//                        if let avatar =  user[Constants.AVATAR] as? String {
-//                            
-//                            if let mediaURL = URL(string: avatar) {
-//                                
-//                                    do {
-//                                        let data = try Data(contentsOf: mediaURL)
-//                                        if let _ = UIImage(data: data) {
-//                                            let _ = SDWebImageDownloader.shared().downloadImage(with: mediaURL, options: [], progress: nil, completed: {(image, data, error, finished) in
-//                                                
-//                                                if error != nil {
-//                                                    print("Image download error: \(String(describing: error!))")
-//                                                } else {
-//                                                    self.currentUser = CurrentUser(id: id, name: name, color: color, avatar: image!)
-//                                                    completion?()
-//                                                }
-//                                            })
-//                                        }
-//                                    } catch {
-//                                        print("Error downloading Data")
-//                                    }
-//                                
-//                            }
-//                        } else {
-//                            self.currentUser = CurrentUser(id: id, name: name, color: color, avatar: UIImage(named: "avatar.gif")!)
-//                        }
-//                    }
-//                }
-//            }
-//        })
-//    }
-    
     func login(email: String, password: String, loginHandler: LoginHandler?) {
         Auth.auth().signIn(withEmail: email, password: password, completion: {(user, error) in
             
             if error != nil {
                 self.handleErrors(error: error! as NSError, loginHandler: loginHandler)
             } else {
-                // Download current user data from firebase and store to cache
-                DBProvider.Instance.getUsers()
-                
                 loginHandler?(nil)
             }
         })
@@ -88,18 +45,18 @@ class AuthProvider {
     
     func facebookAuth(credential: AuthCredential, loginHandler: LoginHandler?) {
         Auth.auth().signIn(with: credential, completion: {(user, error) in
+            
             if error != nil {
                 self.handleErrors(error: error! as NSError, loginHandler: loginHandler)
             } else {
                 loginHandler?(nil)
                 
+                // Check Firebase for user exists, if not save in DB
                 DBProvider.Instance.usersRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
                     if !snapshot.hasChild(user!.uid) {
                         // Store new user in Firebase
                         let userColor = ColorHandler.Instance.userColor()
                         DBProvider.Instance.createUser(withID: user!.uid, email: "", displayName: (user!.displayName)!, password: "", color: userColor)
-                        // Download current user data from Firebase and store to cache
-                        DBProvider.Instance.getUsers()
                     }
                 })
             }

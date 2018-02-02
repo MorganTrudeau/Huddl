@@ -19,35 +19,49 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     let m_messagesHandler = MessagesHandler.Instance
     let m_dbProvider = DBProvider.Instance
     let m_authProvider = AuthProvider.Instance
+    let m_cacheStorage = CacheStorage.Instance
+    let m_picker = UIImagePickerController()
     
     var m_messages = [JSQMessage]()
     var m_messageColors = [String]()
     
+    var m_roomUsers = [String:User]()
     var m_isRoomSaved = false
     var m_currentRoomID: String?
     var m_currentRoomName: String?
     var m_currentUserColor: String?
     var m_currentUserAvatar: UIImage?
-    
-    let m_picker = UIImagePickerController()
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         m_messagesHandler.delegateMessage = self
-        m_messagesHandler.getRoomMessages()
+        
+        m_dbProvider.getUser(id: m_authProvider.userID(), completion: {(user) in
+            self.m_roomUsers[user.id] = user
+        })
+        m_dbProvider.getRoomUsers(completion: {(roomUsers) in
+            for (userID,_) in roomUsers {
+                self.m_dbProvider.getUser(id: userID as! String, completion: {(user) in
+                    self.m_roomUsers[userID as! String] = user as User!
+                    DispatchQueue.global().async {
+                        self.m_dbProvider.loadMedia(id: user.id, url: user.avatar, completion: nil)
+                    }
+                })
+            }
+            self.m_messagesHandler.getRoomMessages()
+        })
+        
+        m_picker.delegate = self
         
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleResignActive), name: NSNotification.Name(rawValue: "ResignActiveNotification"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleBecomeActive), name: NSNotification.Name(rawValue: "BecomeActiveNotification"), object: nil)
         
-        self.senderId = m_authProvider.userID()
-        self.senderDisplayName = m_authProvider.users![senderId]?.name
-        
-        m_picker.delegate = self
-        
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        
+        self.senderId = m_authProvider.userID()
+        self.senderDisplayName = m_authProvider.currentUserName()
         
         setUpUI()
     }
@@ -125,17 +139,17 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
 
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
         let message = m_messages[indexPath.item]
-        let avatarURL = m_authProvider.users![message.senderId]?.avatar
+//        let avatarURL = m_authProvider.users![message.senderId]?.avatar
         
         /** Search for image in cache or download from Firebase **/
         
-        return JSQMessagesAvatarImageFactory.avatarImage(with: m_currentUserAvatar, diameter: 30)
+        return JSQMessagesAvatarImageFactory.avatarImage(with: UIImage(named: "avatar.gif"), diameter: 30)
     }
 
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
         let bubbleFactory = JSQMessagesBubbleImageFactory()
         let message = m_messages[indexPath.item]
-        let messageColor = ColorHandler.Instance.convertToUIColor(colorString: (m_authProvider.users![message.senderId]?.color)!)
+        let messageColor = ColorHandler.Instance.convertToUIColor(colorString: (m_roomUsers[message.senderId]?.color)!)
         if message.senderId == m_authProvider.userID() {
             return bubbleFactory?.outgoingMessagesBubbleImage(with: messageColor)
         } else {
@@ -209,7 +223,8 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     **/
     
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        m_messagesHandler.sendRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, url: nil, roomID: m_currentRoomID!, color: m_currentUserColor!)
+        m_messagesHandler.sendRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, url: nil, roomID: m_currentRoomID!, color: (m_roomUsers[senderId]?.color)!)
+        m_dbProvider.addRoomUser(userID: senderId)
         
         finishSendingMessage()
     }
