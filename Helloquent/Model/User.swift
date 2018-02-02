@@ -13,5 +13,5 @@ struct User: Codable {
     let id: String
     var name: String
     var color: String
-    var avatar: ImageWrapper
+    var avatar: String
 }

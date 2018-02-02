@@ -16,10 +16,11 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     @IBOutlet weak var m_displayNameTextField: UITextField!
     @IBOutlet weak var m_profileImageView: UIImageView!
     
+    let m_authProvider = AuthProvider.Instance
     let m_uiColors = ColorHandler.Instance.uiColors
     let m_stringColors = ColorHandler.Instance.colors
     var m_selectedCellIndexPath: IndexPath? = nil
-    var m_currentUserColor: String?
+    let m_currentUserID = AuthProvider.Instance.userID()
     
     let m_picker = UIImagePickerController()
     
@@ -45,7 +46,6 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     }
     
     func setUpUI() {
-        m_displayNameTextField.underlined()
         
         let topBar = UIView(frame: CGRect(x: 0, y: 0, width: self.view.frame.size.width, height: 64))
         topBar.backgroundColor = UIColor.init(white: 0.23, alpha: 1)
@@ -68,15 +68,11 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         logoutButton.setTitleColor(UIColor(red: 133/255, green: 51/255, blue: 1, alpha: 1), for: .normal)
         logoutButton.titleLabel?.font = UIFont.systemFont(ofSize: 17)
         logoutButton.addTarget(self, action: #selector(ProfileVC.logout), for: .touchUpInside)
+    
+        m_displayNameTextField.text = m_authProvider.users![m_currentUserID]?.name
+        m_displayNameTextField.underlined()
         
-        CacheStorage.Instance.fetchUserData(id: AuthProvider.Instance.userID(), completion: {(user) in
-            DispatchQueue.main.async {
-                self.m_profileImageView.image = user.avatar.image
-                self.m_displayNameTextField.text = user.name
-                self.m_currentUserColor = user.color
-            }
-        })
-        
+//        m_profileImageView.image = m_authProvider.users![currentUserID]?.avatar
         m_profileImageView.layer.borderWidth = 1.0
         m_profileImageView.layer.masksToBounds = false
         m_profileImageView.layer.borderColor = UIColor.black.cgColor
@@ -148,7 +144,7 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     // Save Profile Settings
     @objc func save(sender: UIButton) {
         let displayName: String = m_displayNameTextField.text!
-        var color: String? = m_currentUserColor
+        var color: String? = m_authProvider.users![m_authProvider.userID()]?.color
         let avatar: UIImage = m_profileImageView.image!
         
         if m_selectedCellIndexPath != nil {

@@ -30,7 +30,7 @@ class AuthProvider {
         return _instance
     }
     
-    var currentUser: User?
+    var users: [String:User]?
     
 //    func getCurrentUser(completion: DefaultClosure?) {
 //        let id = userID()
@@ -78,9 +78,9 @@ class AuthProvider {
             if error != nil {
                 self.handleErrors(error: error! as NSError, loginHandler: loginHandler)
             } else {
-                CacheStorage.Instance.fetchUserData(id: self.userID(), completion: {(user) in
-                    self.currentUser = user
-                })
+                // Download current user data from firebase and store to cache
+                DBProvider.Instance.getUsers()
+                
                 loginHandler?(nil)
             }
         })
@@ -95,9 +95,11 @@ class AuthProvider {
                 
                 DBProvider.Instance.usersRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
                     if !snapshot.hasChild(user!.uid) {
-                        //Store in db
+                        // Store new user in Firebase
                         let userColor = ColorHandler.Instance.userColor()
                         DBProvider.Instance.createUser(withID: user!.uid, email: "", displayName: (user!.displayName)!, password: "", color: userColor)
+                        // Download current user data from Firebase and store to cache
+                        DBProvider.Instance.getUsers()
                     }
                 })
             }

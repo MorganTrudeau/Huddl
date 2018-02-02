@@ -40,13 +40,8 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleResignActive), name: NSNotification.Name(rawValue: "ResignActiveNotification"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleBecomeActive), name: NSNotification.Name(rawValue: "BecomeActiveNotification"), object: nil)
         
-        CacheStorage.Instance.fetchUserData(id: AuthProvider.Instance.userID(), completion: {(user) in
-            self.m_currentUserColor = user.color
-            self.m_currentUserAvatar = user.avatar.image
-        })
-        
         self.senderId = m_authProvider.userID()
-        self.senderDisplayName = m_authProvider.currentUser?.name
+        self.senderDisplayName = m_authProvider.users![senderId]?.name
         
         m_picker.delegate = self
         
@@ -129,14 +124,19 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     **/
 
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
+        let message = m_messages[indexPath.item]
+        let avatarURL = m_authProvider.users![message.senderId]?.avatar
+        
+        /** Search for image in cache or download from Firebase **/
+        
         return JSQMessagesAvatarImageFactory.avatarImage(with: m_currentUserAvatar, diameter: 30)
     }
 
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
         let bubbleFactory = JSQMessagesBubbleImageFactory()
         let message = m_messages[indexPath.item]
-        let messageColor = ColorHandler.Instance.convertToUIColor(colorString: m_messageColors[indexPath.row])
-        if message.senderId == m_authProvider.currentUser?.id {
+        let messageColor = ColorHandler.Instance.convertToUIColor(colorString: (m_authProvider.users![message.senderId]?.color)!)
+        if message.senderId == m_authProvider.userID() {
             return bubbleFactory?.outgoingMessagesBubbleImage(with: messageColor)
         } else {
             return bubbleFactory?.incomingMessagesBubbleImage(with: messageColor)
