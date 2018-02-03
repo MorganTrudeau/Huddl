@@ -35,9 +35,21 @@ class MessagesProvider {
     let m_cacheStorage = CacheStorage.Instance
     
     func sendRoomMessage(senderID: String, senderName: String, text: String?, url: String?, roomID: String) {
+        // Construct message data to be written to Firebase
         let data: Dictionary<String, Any> = [Constants.SENDER_ID: senderID, Constants.SENDER_NAME: senderName, Constants.TEXT: text ?? "", Constants.URL: url ?? ""]
-        m_dbProvider.m_currentRoomID = roomID
+        
+        // Write message to Firebase
         m_dbProvider.roomMessagesRef.childByAutoId().setValue(data)
+        
+        // Fetch cached messages from room to update
+        var cachedMessages = try? m_cacheStorage.m_messagesStorage.object(ofType: [Message].self, forKey: roomID)
+        
+        // Contruct codable message to cache
+        let message = Message(senderID: senderID, senderName: senderName, text: text ?? "", url: url ?? "")
+        cachedMessages?.append(message)
+        
+        // Cache messages
+        m_cacheStorage.cacheMessages(roomID: roomID, messages: cachedMessages!)
     }
     
     func saveMedia(image: Data?, video: URL?, senderID: String, senderName: String, roomID: String) {
