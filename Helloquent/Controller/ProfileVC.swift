@@ -189,8 +189,11 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
                 avatar = m_profileImageView.image
             }
             // Update Firebase child
-            DBProvider.Instance.saveProfile(displayName: displayName, color: color, avatar: avatar, avatarURL: m_currentUser!.avatar)
-            alertUser(title: "Success", message: "Profile saved")
+            DispatchQueue.global().async {
+                DBProvider.Instance.saveProfile(displayName: displayName, color: color, avatar: avatar, avatarURL: self.m_currentUser!.avatar, completion: {() in
+                    self.alertUser(title: "Success", message: "Profile saved")
+                })
+            }
         }
     }
     

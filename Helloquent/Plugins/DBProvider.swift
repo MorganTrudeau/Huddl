@@ -21,6 +21,10 @@ protocol UserEnteredRoom: class {
     func userEnteredRoom()
 }
 
+protocol MediaLoaded: class {
+    func mediaLoaded(id: String, image: UIImage)
+}
+
 typealias DefaultClosure = () -> Void
 
 typealias SaveHandler = (_ success: Bool) -> Void
@@ -46,6 +50,7 @@ class DBProvider {
     
     weak var delegateRooms: FetchRoomData?
     weak var delegateUserEnteredRoom: UserEnteredRoom?
+    weak var delegateMedia: MediaLoaded?
     
     var m_currentRoomID: String?
     var m_selectedContactID: String?
@@ -150,7 +155,7 @@ class DBProvider {
         })
     }
     
-    func saveProfile(displayName: String, color: String, avatar: UIImage?, avatarURL: String) {
+    func saveProfile(displayName: String, color: String, avatar: UIImage?, avatarURL: String, completion: DefaultClosure?) {
         
         // Update current user profile
         if avatar != nil {
@@ -183,6 +188,7 @@ class DBProvider {
                         user[Constants.DISPLAY_NAME] = displayName
                         user[Constants.COLOR] = color
                         data.value = user
+                        completion?()
                     }
                     return TransactionResult.success(withValue: data)})
             }
@@ -197,6 +203,7 @@ class DBProvider {
                     user[Constants.DISPLAY_NAME] = displayName
                     user[Constants.COLOR] = color
                     data.value = user
+                    completion?()
                 }
                 return TransactionResult.success(withValue: data)})
             }
@@ -476,6 +483,7 @@ class DBProvider {
                         } else {
                             completion?(image!)
                             self.m_cacheStorage.cacheImage(id: id, image: image!)
+                            self.delegateMedia?.mediaLoaded(id: id, image: image!)
                         }
                     })
                 } else {
