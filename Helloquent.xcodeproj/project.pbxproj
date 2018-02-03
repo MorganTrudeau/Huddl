@@ -33,7 +33,6 @@
 		F973BC3F1FEDB47E00CC3C58 /* Contact.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3E1FEDB47E00CC3C58 /* Contact.swift */; };
 		F973BC411FEDDA8700CC3C58 /* ChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC401FEDDA8700CC3C58 /* ChatVC.swift */; };
 		F983B84C20230FFB00080AB5 /* CacheStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F983B84B20230FFB00080AB5 /* CacheStorage.swift */; };
-		F985FD4D200C294A00F1934B /* JSQMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F985FD4C200C294A00F1934B /* JSQMessage.swift */; };
 		F9C747D220107F4E00F311D8 /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9C747D120107F4E00F311D8 /* NMAKit.framework */; };
 		F9C747D320107F4E00F311D8 /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F9C747D120107F4E00F311D8 /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F9C747D720108FBA00F311D8 /* SavedRooms.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F9C747D520108FBA00F311D8 /* SavedRooms.xcdatamodeld */; };
@@ -122,7 +121,6 @@
 		F973BC3E1FEDB47E00CC3C58 /* Contact.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Contact.swift; sourceTree = "<group>"; };
 		F973BC401FEDDA8700CC3C58 /* ChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatVC.swift; sourceTree = "<group>"; };
 		F983B84B20230FFB00080AB5 /* CacheStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheStorage.swift; sourceTree = "<group>"; };
-		F985FD4C200C294A00F1934B /* JSQMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSQMessage.swift; sourceTree = "<group>"; };
 		F9C747D120107F4E00F311D8 /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NMAKit.framework; sourceTree = "<group>"; };
 		F9C747D620108FBA00F311D8 /* SavedRooms.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SavedRooms.xcdatamodel; sourceTree = "<group>"; };
 		F9C747D82010914C00F311D8 /* CoreDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProvider.swift; sourceTree = "<group>"; };
@@ -257,7 +255,6 @@
 				F973BC3C1FEDA7B000CC3C58 /* Constants.swift */,
 				F973BC3E1FEDB47E00CC3C58 /* Contact.swift */,
 				F9E264D91FFDA35C00605CA7 /* Room.swift */,
-				F985FD4C200C294A00F1934B /* JSQMessage.swift */,
 				F9F7E393201E8F5A00ABD6B8 /* LocationRoom.swift */,
 				F9F7E399202002D000ABD6B8 /* Helper.swift */,
 				F9ECA254202337A400289D7C /* User.swift */,
@@ -648,7 +645,6 @@
 				F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */,
 				F9F7E396201FB67100ABD6B8 /* ImageDisplayVC.swift in Sources */,
 				F9179B77200EBDFC0057AAEF /* TabBarVC.swift in Sources */,
-				F985FD4D200C294A00F1934B /* JSQMessage.swift in Sources */,
 				F973BC3F1FEDB47E00CC3C58 /* Contact.swift in Sources */,
 				F90555F8201B0AF60053267A /* LocationRoomsTableView.swift in Sources */,
 				F9F7E39A202002D000ABD6B8 /* Helper.swift in Sources */,

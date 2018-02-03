@@ -9,8 +9,9 @@
 import Foundation
 import UIKit
 import CropViewController
+import Cache
 
-class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, CropViewControllerDelegate {
+class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, CropViewControllerDelegate, CacheDelegate {
     
     @IBOutlet weak var m_colorColletionView: UICollectionView!
     @IBOutlet weak var m_displayNameTextField: UITextField!
@@ -29,37 +30,21 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     
     override func viewDidLoad() {
         super.viewDidLoad()
+    
+        m_colorColletionView.delegate = self
+        m_colorColletionView.dataSource = self
         
-        // Get current user information from cache
-        m_cacheStorage.fetchUser(id: m_authProvider.userID(), completion: {(user) in
-            self.m_currentUser = user
+        m_picker.delegate = self
         
-           self.m_cacheStorage.fetchImageData(id: user.id, completion: {(image) in
-                DispatchQueue.main.async {
-                    self.m_profileImageView.image = image
-                    self.m_currentUserImage = image
-                    self.m_displayNameTextField.text = user.name
-                }
-            })
-        })
+        m_cacheStorage.delegate = self
         
-        m_dbProvider.getUser(id: m_authProvider.userID(), completion: {(user) in
-                if user.name != self.m_currentUser?.name {
-                    DispatchQueue.main.async {
-                        self.m_displayNameTextField.text = user.name
-                    }
-                }
-                if user.avatar != self.m_currentUser?.avatar {
-                    self.m_dbProvider.loadMedia(id: user.id, url: user.avatar, completion: {(image) in
-                        DispatchQueue.main.async {
-                            self.m_profileImageView.image = image
-                            self.m_currentUserImage = image
-                        }
-                    })
-                }
-                self.m_currentUser = user
-            }
-        )
+        setUpUI()
+        loadUIWithCache()
+        DispatchQueue.global().async {
+            self.updateCache()
+        }
+        
+        
         
         // Tap screen to dismiss keyboard
         let screenTap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ProfileVC.dismissKeyboard))
@@ -70,13 +55,20 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         let imageTap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ProfileVC.choosePicture(_:)))
         m_profileImageView.isUserInteractionEnabled = true
         m_profileImageView.addGestureRecognizer(imageTap)
+    }
+    
+    func loadUIWithCache() {
         
-        m_colorColletionView.delegate = self
-        m_colorColletionView.dataSource = self
-        
-        m_picker.delegate = self
-        
-        setUpUI()
+        if let displayName = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: m_authProvider.userID()).name {
+            m_displayNameTextField.text = displayName
+        }
+        if let image = try? m_cacheStorage.m_imageStorage.object(ofType: ImageWrapper.self, forKey: m_authProvider.userID()).image {
+            m_profileImageView.image = image
+        }
+    }
+    
+    func updateCache() {
+        m_dbProvider.getUser(id: m_authProvider.userID())
     }
     
     func setUpUI() {
@@ -176,8 +168,9 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     // Save Profile Settings
     @objc func save(sender: UIButton) {
         let displayName: String = m_displayNameTextField.text!
-        var color: String = m_currentUser!.color
-        var avatar: UIImage? = nil
+        var color = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: m_authProvider.userID()).color
+        let currentAvatar = try? m_cacheStorage.m_imageStorage.object(ofType: ImageWrapper.self, forKey: m_authProvider.userID()).image
+        var newAvatar: UIImage? = nil
         
         if m_displayNameTextField.text == "" {
             alertUser(title: "Invalid Display Name", message: "Display name cannot be blank")
@@ -185,12 +178,18 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
             if m_selectedCellIndexPath != nil {
                 color = m_stringColors[(m_selectedCellIndexPath?.row)!]
             }
-            if m_profileImageView.image != m_currentUserImage {
-                avatar = m_profileImageView.image
+            if m_profileImageView.image != currentAvatar {
+                let loadingOverlay = LoadingOverlay()
+                loadingOverlay.modalPresentationStyle = .overFullScreen
+                present(loadingOverlay, animated: false, completion: nil)
+                newAvatar = m_profileImageView.image
             }
             // Update Firebase child
             DispatchQueue.global().async {
-                DBProvider.Instance.saveProfile(displayName: displayName, color: color, avatar: avatar, avatarURL: self.m_currentUser!.avatar, completion: {() in
+                DBProvider.Instance.saveProfile(displayName: displayName, color: color!, avatar: newAvatar, completion: {(savedImage) in
+                    if savedImage {
+                        self.dismiss(animated: false, completion: nil)
+                    }
                     self.alertUser(title: "Success", message: "Profile saved")
                 })
             }
@@ -213,5 +212,9 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         if AuthProvider.Instance.logout() {
             dismiss(animated: true, completion: nil)
         }
+    }
+    
+    func cacheUpdated() {
+        loadUIWithCache()
     }
 }

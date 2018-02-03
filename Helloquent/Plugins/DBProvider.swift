@@ -39,8 +39,6 @@ typealias ColorFetchHandler = (_ color: String) -> Void
 
 typealias AvatarHandler = (_ avatar: UIImage) -> Void
 
-typealias RoomUserHandler = (_ roomUsers: NSDictionary) -> Void
-
 class DBProvider {
     
     private static let _instance = DBProvider()
@@ -139,7 +137,7 @@ class DBProvider {
         })
     }
     
-    func getUser(id: String, completion: UserHandler?) {
+    func getUser(id: String) {
         usersRef.observeSingleEvent(of: .value, with: {(snapshot) in
             if let userData = snapshot.childSnapshot(forPath: id).value as? NSDictionary {
                 if let name = userData[Constants.DISPLAY_NAME] as? String {
@@ -147,7 +145,7 @@ class DBProvider {
                         if let avatar = userData[Constants.AVATAR] as? String {
                             let user = User(id: id, name: name, color: color, avatar: avatar)
                             self.m_cacheStorage.cacheUser(user: user)
-                            completion?(user)
+                            self.loadMedia(id: user.id, url: user.avatar)
                         }
                     }
                 }
@@ -155,7 +153,7 @@ class DBProvider {
         })
     }
     
-    func saveProfile(displayName: String, color: String, avatar: UIImage?, avatarURL: String, completion: DefaultClosure?) {
+    func saveProfile(displayName: String, color: String, avatar: UIImage?, completion: SaveHandler?) {
         
         // Update current user profile
         if avatar != nil {
@@ -168,18 +166,8 @@ class DBProvider {
                 }
                 let metadataURL = String(describing: metadata!.downloadURL()!)
                 
-                // Store updated user in cache
-                let updatedUser = User(id: AuthProvider.Instance.userID(), name: displayName, color: color, avatar: metadataURL)
-                self.m_cacheStorage.cacheUser(user: updatedUser)
-                
                 // Store image in cache
                 self.m_cacheStorage.cacheImage(id: AuthProvider.Instance.userID(), image: avatar!)
-                
-//                // Add updated user to AuthProvider user dictionary
-//                self.m_authProvider.users![self.m_authProvider.userID()]! = updatedUser
-//
-//                // Store updated user dictionary in cache
-//                self.m_cacheStorage.cacheUsers(users: self.m_authProvider.users!)
                 
                 // Update user in Firebase
                 self.usersRef.child(AuthProvider.Instance.userID()).runTransactionBlock({(data: MutableData) in
@@ -188,22 +176,18 @@ class DBProvider {
                         user[Constants.DISPLAY_NAME] = displayName
                         user[Constants.COLOR] = color
                         data.value = user
-                        completion?()
+                        completion?(true)
                     }
                     return TransactionResult.success(withValue: data)})
             }
         } else {
-            // Store updated user in cache
-            let updatedUser = User(id: AuthProvider.Instance.userID(), name: displayName, color: color, avatar: avatarURL)
-            self.m_cacheStorage.cacheUser(user: updatedUser)
-            
             // Update user in Firebase
             self.usersRef.child(AuthProvider.Instance.userID()).runTransactionBlock({(data: MutableData) in
                 if var user = data.value as? [String: Any] {
                     user[Constants.DISPLAY_NAME] = displayName
                     user[Constants.COLOR] = color
                     data.value = user
-                    completion?()
+                    completion?(false)
                 }
                 return TransactionResult.success(withValue: data)})
             }
@@ -220,7 +204,7 @@ class DBProvider {
                 
                 self.userRoomsRef.child(name).setValue(data)
                 self.roomsRef.child(name).setValue(data)
-                newRoom = Room(id: name, name: name, description: description!, password: password!, activeUsers: 0)
+                newRoom = Room(name: name, description: description!, id: name, password: password!, activeUsers: 0)
                 success = true
             }
             roomCreated?(newRoom!, success)
@@ -248,7 +232,7 @@ class DBProvider {
                                     if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
                                         
                                         let id = key as! String
-                                        let newRoom = Room(id: id, name: roomName, description: description, password: password, activeUsers: activeUsers)
+                                        let newRoom = Room(name: roomName, description: description, id: id, password: password, activeUsers: activeUsers)
                                         rooms.append(newRoom)
                                     }
                                 }
@@ -266,20 +250,6 @@ class DBProvider {
         roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             if !snapshot.hasChild(id) {
                 self.roomsRef.child(id).setValue(data)
-            }
-        })
-    }
-    
-    func addRoomUser(userID: String) {
-        roomsRef.child(m_currentRoomID!).child(Constants.ROOM_USERS).setValue([userID:true])
-    }
-    
-    func getRoomUsers(completion: RoomUserHandler?) {
-        roomsRef.child(m_currentRoomID!).observeSingleEvent(of: .value, with: {(snapshot) in
-            if let room = snapshot.value as? NSDictionary {
-                if let roomUsers = room[Constants.ROOM_USERS] as? NSDictionary {
-                    completion?(roomUsers)
-                }
             }
         })
     }
@@ -307,7 +277,7 @@ class DBProvider {
                                         if let password = room[Constants.PASSWORD] as? String {
                                     
                                             let id = key as! String
-                                            let newRoom = Room(id: id, name: roomName, description: description, password: password, activeUsers: activeUsers)
+                                            let newRoom = Room(name: roomName, description: description, id: id, password: password, activeUsers: activeUsers)
                                             rooms.append(newRoom)
                                         }
                                     }
@@ -342,7 +312,7 @@ class DBProvider {
                                     if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
                                         
                                         let id = id
-                                        let newRoom = Room(id: id, name: roomName, description: description, password: password, activeUsers: activeUsers)
+                                        let newRoom = Room(name: roomName, description: description, id: id, password: password, activeUsers: activeUsers)
                                         rooms.append(newRoom)
                                     }
                                 }
@@ -392,7 +362,7 @@ class DBProvider {
                             if let activeUsers = data[Constants.ACTIVE_USERS] as? Int {
                                 
                                 let id = snapshot.key as String
-                                let newRoom = Room(id: id, name: roomName, description: description, password: password, activeUsers: activeUsers)
+                                let newRoom = Room(name: id, description: roomName, id: description, password: password, activeUsers: activeUsers)
                                 self.delegateRooms?.roomDataReceived(room: newRoom)
                             }
                         }
@@ -423,7 +393,7 @@ class DBProvider {
                                     if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
                                         
                                         let id = key as! String
-                                        let newRoom = Room(id: id, name: roomName, description: description, password: password, activeUsers: activeUsers)
+                                        let newRoom = Room(name: roomName, description: description, id: id, password: password, activeUsers: activeUsers)
                                         rooms.append(newRoom)
                                     }
                                 }
@@ -471,7 +441,7 @@ class DBProvider {
         })
     }
     
-    func loadMedia(id: String, url: String, completion: ImageHandler?) {
+    func loadMedia(id: String, url: String) {
         if let mediaURL = URL(string: url) {
             do {
                 let data = try Data(contentsOf: mediaURL)
@@ -481,7 +451,6 @@ class DBProvider {
                         if error != nil {
                             print("Image download error: \(String(describing: error!))")
                         } else {
-                            completion?(image!)
                             self.m_cacheStorage.cacheImage(id: id, image: image!)
                             self.delegateMedia?.mediaLoaded(id: id, image: image!)
                         }

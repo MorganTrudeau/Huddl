@@ -10,13 +10,14 @@ import UIKit
 import JSQMessagesViewController
 import MobileCoreServices
 import AVKit
+import Cache
 
-class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, MediaLoaded {
+class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, MediaLoaded, CacheDelegate {
     
     var m_saveRoomButton: UIBarButtonItem?
     
     let m_coreDataProvider = CoreDataProvider.Instance
-    let m_messagesHandler = MessagesHandler.Instance
+    let m_messagesProvider = MessagesProvider.Instance
     let m_dbProvider = DBProvider.Instance
     let m_authProvider = AuthProvider.Instance
     let m_cacheStorage = CacheStorage.Instance
@@ -24,8 +25,6 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     var m_messages = [JSQMessage]()
     
-    var m_roomUsers = [String:User]()
-    var m_userAvatars = [String:UIImage]()
     var m_isRoomSaved = false
     var m_currentRoomID: String?
     var m_currentRoomName: String?
@@ -33,28 +32,10 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        m_messagesHandler.delegateMessage = self
-        
-//        DispatchQueue.main.async {
-//            self.m_messagesHandler.getRoomMessages()
-//        }
-        
-        m_dbProvider.getRoomUsers(completion: {(roomUsers) in
-            // Ensure current user is roomUsers
-            roomUsers.setValue(true, forKey: self.m_authProvider.userID())
-            for (userID,_) in roomUsers {
-                self.m_dbProvider.getUser(id: userID as! String, completion: {(user) in
-                    self.m_roomUsers[userID as! String] = user as User!
-                    DispatchQueue.global().async {
-                        self.m_dbProvider.loadMedia(id: user.id, url: user.avatar, completion: nil)
-                    }
-                })
-            }
-            self.m_messagesHandler.getRoomMessages()
-        })
-        
-        m_picker.delegate = self
+        m_messagesProvider.delegateMessage = self
         m_dbProvider.delegateMedia = self
+        m_cacheStorage.delegate = self
+        m_picker.delegate = self
         
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleResignActive), name: NSNotification.Name(rawValue: "ResignActiveNotification"), object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleBecomeActive), name: NSNotification.Name(rawValue: "BecomeActiveNotification"), object: nil)
@@ -66,6 +47,10 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         self.senderDisplayName = m_authProvider.currentUserName()
         
         setUpUI()
+        loadUIWithCache()
+        DispatchQueue.global().async {
+            self.updateCache()
+        }
     }
     
     func setUpUI() {
@@ -84,11 +69,31 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         }
     }
     
+    func loadUIWithCache() {
+        m_cacheStorage.fetchMessages(roomID: m_currentRoomID!, completion: {(messages) in
+            DispatchQueue.main.async {
+                self.m_messages = messages
+                self.collectionView.reloadData()
+                self.collectionView.layoutIfNeeded()
+                self.scrollToBottom(animated: false)
+            }
+        })
+    }
+    
+    func updateCache() {
+        // Update cache with current rooms messages and return users who have posted in room
+        self.m_messagesProvider.getRoomMessages(roomID: self.m_currentRoomID!, completion: {(userIDs) in
+            for (userID,_) in userIDs {
+                self.m_dbProvider.getUser(id: userID)
+            }
+        })
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         // Receives new messages add to database
-        m_messagesHandler.observeRoomMessages()
+        m_messagesProvider.observeRoomMessages()
         
         // Fetch core data to check if current room is saved
         m_coreDataProvider.fetchRoomCoreData(coreRoomDataReceived: {(_) in
@@ -110,9 +115,9 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(true)
-        m_messagesHandler.removeRoomObservers()
+        m_messagesProvider.removeRoomObservers()
         self.tabBarController?.tabBar.isHidden = false
-        m_messagesHandler.delegateMessage = nil
+        m_messagesProvider.delegateMessage = nil
         m_dbProvider.decreaseActiveUsers(completion: nil)
     }
     
@@ -141,18 +146,24 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
 
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
         let message = m_messages[indexPath.item]
+        let avatar = try? m_cacheStorage.m_imageStorage.object(ofType: ImageWrapper.self, forKey: message.senderId).image
         
-        if m_userAvatars.count == 0 {
+        if avatar == nil {
             return JSQMessagesAvatarImageFactory.avatarImage(with: UIImage(named: "avatar.gif"), diameter: 30)
         } else {
-            return JSQMessagesAvatarImageFactory.avatarImage(with: m_userAvatars[message.senderId], diameter: 30)
+            return JSQMessagesAvatarImageFactory.avatarImage(with: avatar, diameter: 30)
         }
     }
 
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, messageBubbleImageDataForItemAt indexPath: IndexPath!) -> JSQMessageBubbleImageDataSource! {
         let bubbleFactory = JSQMessagesBubbleImageFactory()
         let message = m_messages[indexPath.item]
-        let messageColor = ColorHandler.Instance.convertToUIColor(colorString: (m_roomUsers[message.senderId]?.color)!)
+        let messageColor: UIColor
+        if let userColor = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: message.senderId).color {
+            messageColor = ColorHandler.Instance.convertToUIColor(colorString: userColor)
+        } else {
+            messageColor = ColorHandler.Instance.convertToUIColor(colorString: "blue")
+        }
         if message.senderId == m_authProvider.userID() {
             return bubbleFactory?.outgoingMessagesBubbleImage(with: messageColor)
         } else {
@@ -175,14 +186,14 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
         
     }
     
-    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString!
-    {
+    override func collectionView(_ collectionView: JSQMessagesCollectionView!, attributedTextForMessageBubbleTopLabelAt indexPath: IndexPath!) -> NSAttributedString! {
+        
         let message = m_messages[indexPath.item]
         
         if message.senderId == senderId {
             return nil
         } else {
-            guard let senderDisplayName = message.senderDisplayName else {
+            guard let senderDisplayName = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: message.senderId).name else {
                 assertionFailure()
                 return nil
             }
@@ -196,11 +207,9 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     }
     
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, didTapMessageBubbleAt indexPath: IndexPath!) {
-        
         if m_messages[indexPath.row].isMediaMessage {
             
             if let media = m_messages[indexPath.row].media as? JSQVideoMediaItem {
-                
                 let videoURL = media.fileURL
                 
                 let player = AVPlayer.init(url: videoURL!)
@@ -227,8 +236,7 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     **/
     
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
-        m_messagesHandler.sendRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, url: nil, roomID: m_currentRoomID!)
-        m_dbProvider.addRoomUser(userID: senderId)
+        m_messagesProvider.sendRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, url: nil, roomID: m_currentRoomID!)
         
         finishSendingMessage()
     }
@@ -289,14 +297,14 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
             m_messages.append(JSQMessage(senderId: self.senderId, displayName: self.senderDisplayName, media: image))
             self.collectionView.reloadData()
             let data = UIImageJPEGRepresentation(mediaPick, 0.5)
-            m_messagesHandler.saveMedia(image: data!, video: nil, senderID: self.senderId, senderName: self.senderDisplayName, roomID: m_currentRoomID!)
+            m_messagesProvider.saveMedia(image: data!, video: nil, senderID: self.senderId, senderName: self.senderDisplayName, roomID: m_currentRoomID!)
             dismiss(animated: true, completion: nil)
             
         } else if let mediaPick = info[UIImagePickerControllerMediaURL] as? URL {
             let video = JSQVideoMediaItem.init(fileURL: mediaPick, isReadyToPlay: true)
             m_messages.append(JSQMessage(senderId: self.senderId, displayName: self.senderDisplayName, media: video))
             self.collectionView.reloadData()
-            m_messagesHandler.saveMedia(image: nil, video: mediaPick, senderID: self.senderId, senderName: self.senderDisplayName, roomID: m_currentRoomID!)
+            m_messagesProvider.saveMedia(image: nil, video: mediaPick, senderID: self.senderId, senderName: self.senderDisplayName, roomID: m_currentRoomID!)
             dismiss(animated: true, completion: nil)
         }
     }
@@ -328,7 +336,10 @@ class ChatVC: JSQMessagesViewController, MessageReceivedDelegate, UIImagePickerC
     }
     
     func mediaLoaded(id: String, image: UIImage) {
-        m_userAvatars[id] = image
         self.collectionView.reloadData()
+    }
+    
+    func cacheUpdated() {
+        loadUIWithCache()
     }
 }

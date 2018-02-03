@@ -1,5 +1,5 @@
 //
-//  MessagesHandler.swift
+//  MessagesProvider.swift
 //  Helloquent
 //
 //  Created by Morgan Trudeau on 2017-12-29.
@@ -19,13 +19,15 @@ protocol MessageReceivedDelegate: class {
     func mediaMessageReceived(message: JSQMessage, forIndex: Int)
 }
 
-class MessagesHandler {
-    private static let _instance = MessagesHandler()
+typealias AllMessagesHandler = (_ userIDs: [String:Bool]) -> Void
+
+class MessagesProvider {
+    private static let _instance = MessagesProvider()
     private init() {}
     
     weak var delegateMessage: MessageReceivedDelegate?
     
-    static var Instance: MessagesHandler {
+    static var Instance: MessagesProvider {
         return _instance
     }
     
@@ -100,8 +102,9 @@ class MessagesHandler {
         m_dbProvider.roomMessagesRef.removeAllObservers()
     }
     
-    func getRoomMessages() {
-        var messages = [JSQMessage]()
+    func getRoomMessages(roomID: String, completion: AllMessagesHandler?) {
+        var jsqMessages = [JSQMessage]()
+        var messages = [Message]()
         var userIDs = [String:Bool]()
         
         m_dbProvider.roomMessagesRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
@@ -113,16 +116,18 @@ class MessagesHandler {
                             if let text = messageData[Constants.TEXT] as? String {
                                 if let url = messageData[Constants.URL] as? String {
                                     if text != "" {
-                                        messages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
+                                        jsqMessages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
+                                        messages.append(Message(senderID: senderID, senderName: senderName, text: text, url: url))
                                         userIDs[senderID] = true
                                     } else {
                                         let placeHolderImage = JSQPhotoMediaItem.init(image: nil)
                                         if senderID != AuthProvider.Instance.userID() {
                                             placeHolderImage?.appliesMediaViewMaskAsOutgoing = false
                                         }
-                                        messages.append(JSQMessage(senderId: senderID, displayName: senderName, media: placeHolderImage))
+                                        jsqMessages.append(JSQMessage(senderId: senderID, displayName: senderName, media: placeHolderImage))
+                                        messages.append(Message(senderID: senderID, senderName: senderName, text: text, url: url))
                                         userIDs[senderID] = true
-                                        let index = messages.count - 1
+                                        let index = jsqMessages.count - 1
                                         DispatchQueue.global().async {
                                             self.loadMessageMedia(senderID: senderID, senderName: senderName, url: url, index: index)
                                         }
@@ -133,7 +138,8 @@ class MessagesHandler {
                     }
                 }
             }
-            self.delegateMessage?.allMessagesReceived(messages: messages, userIDs: userIDs)
+            self.m_cacheStorage.cacheMessages(roomID: roomID, messages: messages)
+            completion?(userIDs)
         })
     }
     
@@ -147,6 +153,7 @@ class MessagesHandler {
                             if error != nil {
                                 print("Image download error: \(String(describing: error!))")
                             } else {
+                                self.m_cacheStorage.cacheImage(id: url, image: image!)
                                 let photo = JSQPhotoMediaItem(image: image)
                                 if senderID != AuthProvider.Instance.userID() {
                                     photo?.appliesMediaViewMaskAsOutgoing = false

@@ -215,7 +215,7 @@ class RoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UIS
                         let description: String? = place.vicinityDescription?.replacingOccurrences(of: "<br/>", with: ", ")
                         do {
                             let name = try NSAttributedString.init(data: (htmlString?.data(using: String.Encoding.unicode))!, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
-                            let newRoom = Room(id: id, name: String(describing: name.string), description: description!, password: "", activeUsers: 0)
+                            let newRoom = Room(name: String(describing: name.string), description: description!, id: id, password: "", activeUsers: 0)
                             let index = self.m_locationRooms.count
                             self.m_locationRooms.append(newRoom)
                             self.m_dbProvider.hasRoom(roomID: self.m_locationRooms[index].id, index: index, completion: {(activeUsers, index) in

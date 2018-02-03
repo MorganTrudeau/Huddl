@@ -56,10 +56,6 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         
         NMAPositioningManager.sharedInstance().startPositioning()
         
-        DBProvider.Instance.getUser(id: AuthProvider.Instance.userID(), completion: {(user) in
-            
-        })
-        
         setUpUI()
     }
     
