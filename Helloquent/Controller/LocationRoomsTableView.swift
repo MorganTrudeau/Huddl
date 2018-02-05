@@ -45,7 +45,7 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
         
         let place = m_locationRooms[indexPath.row]
         let htmlString: String? = place.highlightedTitle
-        let description: String? = place.vicinityDescription?.replacingOccurrences(of: "<br/>", with: ", ")
+        let description: String? = place.vicinityDescription?.replacingOccurrences(of: "<br/>", with: ", ").replacingOccurrences(of: "<B>", with: "").replacingOccurrences(of: "</B>", with: "")
         cell.detailTextLabel?.text = description
         do {
             let name = try NSAttributedString.init(data: (htmlString?.data(using: String.Encoding.unicode))!, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
@@ -73,19 +73,19 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
                 let cell = m_locationRoomsTableView.cellForRow(at: m_index!)
                 let place = m_locationRooms[(m_index?.row)!]
                 
-                let currentRoomName = cell!.textLabel!.text
-                let description = cell!.detailTextLabel!.text
-                var currentRoomID = "\(place.position?.latitude ?? 1)\(place.position?.longitude ?? 1)"
-                currentRoomID = currentRoomID.replacingOccurrences(of: ".", with: "")
+                let selectedRoomName = cell!.textLabel!.text
+                let selectedRoomdescription = cell!.detailTextLabel!.text
+                var selectedRoomID = "\(place.position?.latitude ?? 1)\(place.position?.longitude ?? 1)"
+                selectedRoomID = selectedRoomID.replacingOccurrences(of: ".", with: "")
+                let selectedRoom = Room(name: selectedRoomName!, description: selectedRoomdescription!, id: selectedRoomID, password: "", activeUsers: 0)
                 
-                vc.m_currentRoomName = currentRoomName
-                vc.m_currentRoomID = currentRoomID
+                vc.m_currentRoom = selectedRoom
                     
                 // Pass selected room ID to dbProvider to use as child ID
-                m_dbProvider.m_currentRoomID = currentRoomID
+                m_dbProvider.m_currentRoomID = selectedRoom.id
                     
                 // Create location room in database
-                m_dbProvider.createLocationRoom(id: currentRoomID, name: currentRoomName!, description: description, password: "")
+                m_dbProvider.createLocationRoom(id: selectedRoomID, name: selectedRoomName!, description: selectedRoomdescription, password: "")
             }
         }
     }

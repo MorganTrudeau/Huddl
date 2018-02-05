@@ -40,6 +40,12 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
         m_userRoomsTableView.delegate = self
         m_userRoomsTableView.dataSource = self
         
+        if let userRooms = try? CacheStorage.Instance.m_roomStorage.object(ofType: [Room].self, forKey: "user") {
+            self.m_userRooms = userRooms
+            self.m_filteredRooms = userRooms
+            self.m_userRoomsTableView.reloadData()
+        }
+        
         m_dbProvider.getUserRooms(completion: {(rooms) in
             self.m_userRooms = rooms
             self.m_filteredRooms = rooms
@@ -92,9 +98,14 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                vc.m_currentRoomID = m_filteredRooms[m_index!].id
-                vc.m_currentRoomName = m_filteredRooms[m_index!].name
-                m_dbProvider.m_currentRoomID = m_filteredRooms[m_index!].id
+                let selectedRoom = m_filteredRooms[m_index!]
+                
+                let room = Room(name: selectedRoom.name, description: selectedRoom.description, id: selectedRoom.id, password: selectedRoom.password, activeUsers: selectedRoom.activeUsers)
+                
+                vc.m_currentRoom = room
+                
+                // Pass selected Room to DBProvider so it knows where to save
+                m_dbProvider.m_currentRoomID = room.id
             }
         }
     }

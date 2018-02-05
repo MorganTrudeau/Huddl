@@ -39,12 +39,6 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        m_dbProvider.getActiveRooms(completion: {(rooms) in
-            self.m_activeRooms = rooms
-            self.m_filteredRooms = rooms
-            self.m_roomsTableView.reloadData()
-        })
-        
         m_roomsTableView.addSubview(m_refreshControl)
         
         m_roomsTableView.delegate = self
@@ -52,12 +46,23 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
         
         m_roomsSearchBar.delegate = self
         
+        m_dbProvider.getActiveRooms(completion: {(rooms) in
+            self.m_activeRooms = rooms
+            self.m_filteredRooms = rooms
+            self.m_roomsTableView.reloadData()
+        })
+        
         setUpUI()
     }
     
     func setUpUI() {
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -168,9 +173,14 @@ class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSourc
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                vc.m_currentRoomID = m_filteredRooms[m_index!].id
-                vc.m_currentRoomName = m_filteredRooms[m_index!].name
-                m_dbProvider.m_currentRoomID = m_filteredRooms[m_index!].id
+                let selectedRoom = m_filteredRooms[m_index!]
+                
+                let room = Room(name: selectedRoom.name, description: selectedRoom.description, id: selectedRoom.id, password: selectedRoom.password, activeUsers: selectedRoom.activeUsers)
+                
+                vc.m_currentRoom = room
+                
+                // Pass selected Room to DBProvider so it knows where to save
+                m_dbProvider.m_currentRoomID = room.id
             }
         }
     }

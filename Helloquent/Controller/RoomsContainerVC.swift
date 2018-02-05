@@ -56,6 +56,8 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         
         NMAPositioningManager.sharedInstance().startPositioning()
         
+        DBProvider.Instance.getUser(id: AuthProvider.Instance.userID(), completion: nil)
+        
         setUpUI()
     }
     
@@ -78,10 +80,6 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         }
         
         self.navigationController?.navigationBar.addSubview(m_roomTextImageView!)
-        
-        
-        
-//        CacheStorage.Instance.cacheUser()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -96,7 +94,7 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         
         self.m_roomsSearchBar.placeholder = "Search Place"
         
-        m_addRoomButton = UIBarButtonItem(image: UIImage(named: "add"), style: .plain, target: self, action: #selector(RoomsVC.addRoomButtonClicked))
+        m_addRoomButton = UIBarButtonItem(image: UIImage(named: "add"), style: .plain, target: self, action: #selector(RoomsContainerVC.addRoomButtonClicked))
         m_addRoomButton?.tintColor = UIColor(red: 133/255, green: 51/255, blue: 1, alpha: 1)
         
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
@@ -141,7 +139,7 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
     }
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        self.delegate?.textChanged(query: m_roomsSearchBar.text!)
+        m_roomsSearchBar.resignFirstResponder()
     }
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {

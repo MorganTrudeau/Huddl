@@ -25,8 +25,7 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     let m_uiColors = ColorHandler.Instance.uiColors
     let m_stringColors = ColorHandler.Instance.colors
     var m_selectedCellIndexPath: IndexPath? = nil
-    var m_currentUser: User?
-    var m_currentUserImage: UIImage?
+    var m_profileImageChanged = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,9 +39,8 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         
         setUpUI()
         loadUIWithCache()
-        DispatchQueue.global().async {
-            self.updateCache()
-        }
+        self.updateCache()
+        
         
         
         
@@ -59,16 +57,16 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     
     func loadUIWithCache() {
         
-        if let displayName = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: m_authProvider.userID()).name {
-            m_displayNameTextField.text = displayName
-        }
-        if let image = try? m_cacheStorage.m_imageStorage.object(ofType: ImageWrapper.self, forKey: m_authProvider.userID()).image {
-            m_profileImageView.image = image
+        if let user = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: m_authProvider.userID()) {
+            self.m_displayNameTextField.text = user.name
+            if let image = try? m_cacheStorage.m_mediaStorage.object(ofType: ImageWrapper.self, forKey: user.avatar).image {
+                self.m_profileImageView.image = image
+            }
         }
     }
     
     func updateCache() {
-        m_dbProvider.getUser(id: m_authProvider.userID())
+        m_dbProvider.getUser(id: m_authProvider.userID(), completion: nil)
     }
     
     func setUpUI() {
@@ -161,38 +159,41 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     
     func cropViewController(_ cropViewController: CropViewController, didCropToImage image: UIImage, withRect cropRect: CGRect, angle: Int) {
         m_profileImageView.image = image
+        m_profileImageChanged = true
         dismiss(animated: true, completion: nil)
     }
     
     
     // Save Profile Settings
     @objc func save(sender: UIButton) {
-        let displayName: String = m_displayNameTextField.text!
-        var color = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: m_authProvider.userID()).color
-        let currentAvatar = try? m_cacheStorage.m_imageStorage.object(ofType: ImageWrapper.self, forKey: m_authProvider.userID()).image
-        var newAvatar: UIImage? = nil
-        
-        if m_displayNameTextField.text == "" {
-            alertUser(title: "Invalid Display Name", message: "Display name cannot be blank")
-        } else {
-            if m_selectedCellIndexPath != nil {
-                color = m_stringColors[(m_selectedCellIndexPath?.row)!]
-            }
-            if m_profileImageView.image != currentAvatar {
-                let loadingOverlay = LoadingOverlay()
-                loadingOverlay.modalPresentationStyle = .overFullScreen
-                present(loadingOverlay, animated: false, completion: nil)
-                newAvatar = m_profileImageView.image
-            }
-            // Update Firebase child
-            DispatchQueue.global().async {
-                DBProvider.Instance.saveProfile(displayName: displayName, color: color!, avatar: newAvatar, completion: {(savedImage) in
+        if Reachability.isConnectedToNetwork() {
+            let displayName: String = m_displayNameTextField.text!
+            var color = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: m_authProvider.userID()).color
+            var newAvatar: UIImage? = nil
+            
+            if m_displayNameTextField.text == "" {
+                alertUser(title: "Invalid Display Name", message: "Display name cannot be blank")
+            } else {
+                if m_selectedCellIndexPath != nil {
+                    color = m_stringColors[(m_selectedCellIndexPath?.row)!]
+                }
+                if m_profileImageChanged {
+                    let loadingOverlay = LoadingOverlay()
+                    loadingOverlay.modalPresentationStyle = .overFullScreen
+                    present(loadingOverlay, animated: false, completion: nil)
+                    newAvatar = m_profileImageView.image
+                }
+                // Update Firebase child
+                DBProvider.Instance.saveProfile(displayName: displayName, color: color!, avatar: newAvatar, completion:{(savedImage) in
                     if savedImage {
                         self.dismiss(animated: false, completion: nil)
                     }
+                    self.m_profileImageChanged = false
                     self.alertUser(title: "Success", message: "Profile saved")
                 })
             }
+        } else {
+            self.alertUser(title: "Network Connection Not Available", message: "Connect to update profile")
         }
     }
     

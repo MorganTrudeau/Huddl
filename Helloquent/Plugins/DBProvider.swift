@@ -11,6 +11,7 @@ import FirebaseDatabase
 import FirebaseCore
 import FirebaseStorage
 import SDWebImage
+import Cache
 
 protocol FetchRoomData: class {
     func roomDataReceived(room: Room)
@@ -19,10 +20,6 @@ protocol FetchRoomData: class {
 
 protocol UserEnteredRoom: class {
     func userEnteredRoom()
-}
-
-protocol MediaLoaded: class {
-    func mediaLoaded(id: String, image: UIImage)
 }
 
 typealias DefaultClosure = () -> Void
@@ -39,6 +36,8 @@ typealias ColorFetchHandler = (_ color: String) -> Void
 
 typealias AvatarHandler = (_ avatar: UIImage) -> Void
 
+typealias RoomUserHandler = (_ roomUsers: [String]) ->  Void
+
 class DBProvider {
     
     private static let _instance = DBProvider()
@@ -48,10 +47,8 @@ class DBProvider {
     
     weak var delegateRooms: FetchRoomData?
     weak var delegateUserEnteredRoom: UserEnteredRoom?
-    weak var delegateMedia: MediaLoaded?
     
     var m_currentRoomID: String?
-    var m_selectedContactID: String?
     var m_roomAddedHandle: UInt?
     var m_roomChangedHandle: UInt?
     
@@ -105,48 +102,43 @@ class DBProvider {
     // User Functions
     
     func createUser(withID: String, email: String, displayName: String, password: String, color: String) {
-        let defaultAvatar = "https://firebasestorage.googleapis.com/v0/b/helloquent-a4460.appspot.com/o/Image_Storage%2Favatar.gif?alt=media&token=5dc264a6-3a70-4511-9adf-957d897a1d56"
+        let defaultAvatar = "https://firebasestorage.googleapis.com/v0/b/helloquent-a4460.appspot.com/o/Image_Storage%2F59D84132-6661-4CD6-8DC7-E27E14A530B4?alt=media&token=93865466-8228-433b-938e-1cf10fd7c829"
         let data: Dictionary<String, Any> = [Constants.EMAIL: email, Constants.DISPLAY_NAME: displayName, Constants.PASSWORD: password, Constants.COLOR: color, Constants.AVATAR: defaultAvatar]
         // Store new user in Firebase
         usersRef.child(withID).setValue(data)
-        // Store new user in cache
-        m_cacheStorage.cacheUser(user: User(id: withID, name: displayName, color: color, avatar: defaultAvatar))
-        m_cacheStorage.cacheImage(id: withID, image: UIImage(named: "avatar.gif")!)
     }
     
-    func getUsers() {
-        var userDictionary = [String:User]()
-        usersRef.observeSingleEvent(of: .value, with: {(snapshot) in
-            if let users = snapshot.value as? NSDictionary {
-                for (key,value) in users {
-                    if let user = value as? NSDictionary {
-                        if let id = key as? String {
-                            if let name = user[Constants.DISPLAY_NAME] as? String {
-                                if let color = user[Constants.COLOR] as? String {
-                                    if let avatar = user[Constants.ACTIVE_USERS] as? String {
-                                        let newUser = User(id: id, name: name, color: color, avatar: avatar)
-                                        userDictionary[id] = newUser
-                                    }
-                                }
+    func getUser(id: String, completion: DefaultClosure?) {
+        self.usersRef.observeSingleEvent(of: .value, with: {(snapshot) in
+            DispatchQueue.global().async {
+                if let userData = snapshot.childSnapshot(forPath: id).value as? NSDictionary {
+                    if let name = userData[Constants.DISPLAY_NAME] as? String {
+                        if let color = userData[Constants.COLOR] as? String {
+                            if let avatar = userData[Constants.AVATAR] as? String {
+                                let user = User(id: id, name: name, color: color, avatar: avatar)
+                                self.m_cacheStorage.cacheUser(user: user)
+                                self.loadMedia(url: user.avatar, completion: {() in
+                                    completion?()
+                                })
                             }
                         }
                     }
                 }
-                self.m_cacheStorage.cacheUsers(users: userDictionary)
             }
         })
     }
     
-    func getUser(id: String) {
-        usersRef.observeSingleEvent(of: .value, with: {(snapshot) in
-            if let userData = snapshot.childSnapshot(forPath: id).value as? NSDictionary {
-                if let name = userData[Constants.DISPLAY_NAME] as? String {
-                    if let color = userData[Constants.COLOR] as? String {
-                        if let avatar = userData[Constants.AVATAR] as? String {
-                            let user = User(id: id, name: name, color: color, avatar: avatar)
-                            self.m_cacheStorage.cacheUser(user: user)
-                            self.loadMedia(id: user.id, url: user.avatar)
-                        }
+    func updateRoomUsers(roomUsers: [String]) {
+        roomsRef.child("\(m_currentRoomID!)/\(Constants.ROOM_USERS)").setValue(roomUsers)
+    }
+    
+    func getRoomUsers(completion: RoomUserHandler?) {
+        self.roomsRef.child(self.m_currentRoomID!).observeSingleEvent(of: .value, with: {(snapshot) in
+            if let room = snapshot.value as? NSDictionary {
+                if let roomUsers = room[Constants.ROOM_USERS] as? [String] {
+                    completion?(roomUsers)
+                    for userID in roomUsers {
+                        self.getUser(id: userID, completion: nil)
                     }
                 }
             }
@@ -167,7 +159,10 @@ class DBProvider {
                 let metadataURL = String(describing: metadata!.downloadURL()!)
                 
                 // Store image in cache
-                self.m_cacheStorage.cacheImage(id: AuthProvider.Instance.userID(), image: avatar!)
+                self.m_cacheStorage.cacheImage(id: metadataURL, image: avatar!)
+                
+                // Store updated user in cache
+                self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: metadataURL))
                 
                 // Update user in Firebase
                 self.usersRef.child(AuthProvider.Instance.userID()).runTransactionBlock({(data: MutableData) in
@@ -176,7 +171,9 @@ class DBProvider {
                         user[Constants.DISPLAY_NAME] = displayName
                         user[Constants.COLOR] = color
                         data.value = user
-                        completion?(true)
+                        DispatchQueue.main.sync {
+                            completion?(true)
+                        }
                     }
                     return TransactionResult.success(withValue: data)})
             }
@@ -187,7 +184,11 @@ class DBProvider {
                     user[Constants.DISPLAY_NAME] = displayName
                     user[Constants.COLOR] = color
                     data.value = user
-                    completion?(false)
+                    DispatchQueue.main.sync {
+                        completion?(false)
+                    }
+                    // Store updated user in cache
+                    self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: user[Constants.AVATAR] as! String))
                 }
                 return TransactionResult.success(withValue: data)})
             }
@@ -242,6 +243,7 @@ class DBProvider {
                 }
             }
             completion?(rooms)
+            self.m_cacheStorage.cacheRooms(type: "user", rooms: rooms)
         }
     }
     
@@ -430,7 +432,9 @@ class DBProvider {
         roomsRef.child(m_currentRoomID!).runTransactionBlock({(data: MutableData) in
             if var room = data.value as? [String: Any] {
                 var activeUsers = room[Constants.ACTIVE_USERS] as? Int
-                activeUsers = activeUsers! - 1
+                if activeUsers! > 0 {
+                    activeUsers = activeUsers! - 1
+                }
                 room[Constants.ACTIVE_USERS] = activeUsers
                 data.value = room
             }
@@ -441,26 +445,30 @@ class DBProvider {
         })
     }
     
-    func loadMedia(id: String, url: String) {
-        if let mediaURL = URL(string: url) {
-            do {
-                let data = try Data(contentsOf: mediaURL)
-                if let _ = UIImage(data: data) {
-                    let _ = SDWebImageDownloader.shared().downloadImage(with: mediaURL, options: [], progress: nil, completed: {(image, data, error, finished) in
-                        
-                        if error != nil {
-                            print("Image download error: \(String(describing: error!))")
-                        } else {
-                            self.m_cacheStorage.cacheImage(id: id, image: image!)
-                            self.delegateMedia?.mediaLoaded(id: id, image: image!)
-                        }
-                    })
-                } else {
-                    // video is mediaURL
+    func loadMedia(url: String, completion: DefaultClosure?) {
+        if !(try! m_cacheStorage.m_mediaStorage.existsObject(ofType: ImageWrapper.self, forKey: url)) {
+            if let mediaURL = URL(string: url) {
+                do {
+                    let data = try Data(contentsOf: mediaURL)
+                    if let _ = UIImage(data: data) {
+                        let _ = SDWebImageDownloader.shared().downloadImage(with: mediaURL, options: [], progress: nil, completed: {(image, data, error, finished) in
+                            
+                            if error != nil {
+                                print("Image download error: \(String(describing: error!))")
+                            } else {
+                                self.m_cacheStorage.cacheImage(id: url, image: image!)
+                                completion?()
+                            }
+                        })
+                    } else {
+                        // video is mediaURL
+                    }
+                } catch {
+                    print("Error downloading Media Data")
                 }
-            } catch {
-                print("Error downloading Data")
             }
+        } else {
+            completion?()
         }
     }
 

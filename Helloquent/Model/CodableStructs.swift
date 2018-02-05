@@ -1,5 +1,5 @@
 //
-//  File.swift
+//  CodableStructs.swift
 //  Helloquent
 //
 //  Created by Morgan Trudeau on 2018-02-01.

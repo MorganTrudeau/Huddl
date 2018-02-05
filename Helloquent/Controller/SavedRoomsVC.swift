@@ -14,8 +14,8 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     @IBOutlet weak var m_savedRoomsTableView: UITableView!
     
     let m_dbProvider = DBProvider.Instance
+    let m_cacheStorage = CacheStorage.Instance
     
-    var m_savedRoomIDs = [String]()
     var m_savedRooms = [Room]()
     var m_index: Int?
     
@@ -30,16 +30,10 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        m_savedRoomsTableView.reloadData()
-        CoreDataProvider.Instance.fetchRoomCoreData(coreRoomDataReceived: {(savedRoomIDs) in
-            if self.m_savedRoomIDs.count != savedRoomIDs.count {
-                self.m_savedRoomIDs = savedRoomIDs
-                self.m_dbProvider.getSavedRooms(savedIDs: self.m_savedRoomIDs, completion: {(rooms) in
-                    self.m_savedRooms = rooms
-                    self.m_savedRoomsTableView.reloadData()
-                })
-            }
-        })
+        if let savedRooms = try? m_cacheStorage.m_roomStorage.object(ofType: [Room].self, forKey: "saved") {
+            m_savedRooms = savedRooms
+            m_savedRoomsTableView.reloadData()
+        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -107,9 +101,14 @@ class SavedRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == CHAT_SEGUE {
             if let vc = segue.destination as? ChatVC {
-                vc.m_currentRoomID = m_savedRooms[m_index!].id
-                vc.m_currentRoomName = m_savedRooms[m_index!].name
-                m_dbProvider.m_currentRoomID = m_savedRooms[m_index!].id
+                let selectedRoom = m_savedRooms[m_index!]
+                
+                let room = Room(name: selectedRoom.name, description: selectedRoom.description, id: selectedRoom.id, password: selectedRoom.password, activeUsers: selectedRoom.activeUsers)
+                
+                vc.m_currentRoom = room
+                
+                // Pass selected Room to DBProvider so it knows where to save
+                m_dbProvider.m_currentRoomID = room.id
             }
         }
     }

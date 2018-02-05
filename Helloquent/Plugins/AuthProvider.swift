@@ -74,10 +74,6 @@ class AuthProvider {
         return Auth.auth().currentUser!.uid
     }
     
-    func currentUserName() -> String {
-        return (Auth.auth().currentUser?.displayName)!
-    }
-    
     func signUp(email: String, displayName: String, password: String, loginHandler: LoginHandler?) {
         Auth.auth().createUser(withEmail: email, password: password, completion: {(user, error) in
             

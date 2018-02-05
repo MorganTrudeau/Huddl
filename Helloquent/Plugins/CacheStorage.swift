@@ -29,7 +29,9 @@ class CacheStorage {
     
     weak var delegate: CacheDelegate?
     
-    // User Storage
+    /**
+     User Storage
+    **/
 
     lazy var m_userStorage: Storage = {
         let diskConfig = DiskConfig(name: "UserCache")
@@ -38,52 +40,21 @@ class CacheStorage {
         return storage
     }()
     
-    func cacheUsers(users: [String:User]) {
-        do{
-            try m_userStorage.setObject(users, forKey: "users")
-        } catch {
-            print(error)
-        }
-    }
-    
     func cacheUser(user: User) {
         do{
             try m_userStorage.setObject(user, forKey: user.id)
             print("Cached user: \(user.id), \(user.name)")
-            delegate?.cacheUpdated()
         } catch {
             print("User cache error: \(error)")
         }
     }
     
-    func fetchAllUsers(completion: AllUsersHandler?) {
-        m_userStorage.async.object(ofType: [String:User].self, forKey: "users", completion: {(result) in
-            switch result {
-            case .value(let users):
-                print(users)
-                completion?(users)
-            case .error(let error):
-                print(error)
-            }
-        })
-    }
+    /**
+     Image Storage
+    **/
     
-    func fetchUser(id: String, completion: UserHandler?) {
-        m_userStorage.async.object(ofType: User.self, forKey: id, completion: {(result) in
-            switch result {
-            case .value(let user):
-                print(user)
-                completion?(user)
-            case .error(let error):
-                print(error)
-            }
-        })
-    }
-    
-    // Image Storage
-    
-    lazy var m_imageStorage: Storage = {
-        let diskConfig = DiskConfig(name: "ImageCache")
+    lazy var m_mediaStorage: Storage = {
+        let diskConfig = DiskConfig(name: "MediaCache")
         let memoryConfig = MemoryConfig(expiry: .never, countLimit: 10, totalCostLimit: 10)
         let storage = try! Storage(diskConfig: diskConfig, memoryConfig: memoryConfig)
         return storage
@@ -97,7 +68,7 @@ class CacheStorage {
     func cacheImage(id: String, image: UIImage) {
         let wrappedImage = wrapImage(image: image)
         do{
-            try m_imageStorage.setObject(wrappedImage, forKey: id)
+            try m_mediaStorage.setObject(wrappedImage, forKey: id)
             delegate?.cacheUpdated()
             print("Cached image with key: \(id)")
         } catch {
@@ -105,20 +76,18 @@ class CacheStorage {
         }
     }
     
-    func fetchImageData(id: String, completion: ImageHandler?) {
-        m_imageStorage.async.object(ofType: ImageWrapper.self, forKey: id, completion: {(result) in
-            print("Fetching Image with key: \(id)")
-            switch result {
-            case .value(let wrappedImage):
-                let image = wrappedImage.image as UIImage
-                completion?(image)
-            case .error(let error):
-                print("Image fetch error: \(error)")
-            }
-        })
+    func cacheVideo(id: String, url: String) {
+        do {
+            try m_mediaStorage.setObject(url, forKey: url)
+            print("Cache video with key: \(url)")
+        } catch {
+            print("Video cache error: \(error)")
+        }
     }
     
-    // Room Storage
+    /**
+     Room Storage
+    **/
     
     lazy var m_roomStorage: Storage = {
         let diskConfig = DiskConfig(name: "RoomCache")
@@ -127,15 +96,20 @@ class CacheStorage {
         return storage
     }()
     
-    func cacheRoom(roomID: String, room: Room) {
+    func cacheRooms(type: String, rooms: [Room]) {
         do {
-            try m_roomStorage.setObject(room, forKey: roomID)
+            try m_roomStorage.setObject(rooms, forKey: type)
+            print("Cache rooms with type: \(type)")
         } catch {
             print("Room cache error: \(error)")
         }
     }
     
-    // Message Storage
+    
+    
+    /**
+     Message Storage
+    **/
     
     lazy var m_messagesStorage: Storage = {
         let diskConfig = DiskConfig(name: "MessageCache")
@@ -163,10 +137,23 @@ class CacheStorage {
                         let jsqMessage = JSQMessage(senderId: message.senderID, displayName: message.senderName, text: message.text)
                         jsqMessages.append(jsqMessage!)
                     } else {
-                        let image = try? self.m_imageStorage.object(ofType: ImageWrapper.self, forKey: message.url).image
-                        let messageImage = JSQPhotoMediaItem(image: image)
-                        let jsqMessage = JSQMessage(senderId: message.senderName, displayName: message.senderName, media: messageImage)
-                        jsqMessages.append(jsqMessage!)
+                        if let image = try? self.m_mediaStorage.object(ofType: ImageWrapper.self, forKey: message.url).image {
+                            let messageMedia = JSQPhotoMediaItem(image: image)
+                            if message.senderID != AuthProvider.Instance.userID() {
+                                messageMedia?.appliesMediaViewMaskAsOutgoing = false
+                            }
+                            let jsqMessage = JSQMessage(senderId: message.senderID, displayName: message.senderName, media: messageMedia)
+                            jsqMessages.append(jsqMessage!)
+                        } else {
+                            let url = try? self.m_mediaStorage.object(ofType: String.self, forKey: message.url)
+                            let video = URL(string: url!)
+                            let messageMedia = JSQVideoMediaItem(fileURL: video, isReadyToPlay: true)
+                            if message.senderID != AuthProvider.Instance.userID() {
+                                messageMedia?.appliesMediaViewMaskAsOutgoing = false
+                            }
+                            let jsqMessage = JSQMessage(senderId: message.senderID, displayName: message.senderName, media: messageMedia)
+                            jsqMessages.append(jsqMessage!)
+                        }
                     }
                 }
                 completion?(jsqMessages)
@@ -175,6 +162,5 @@ class CacheStorage {
             }
         })
     }
-
 }
 
