@@ -43,7 +43,6 @@ class MapVC : UIViewController {
         tap.cancelsTouchesInView = false
         
         mapView.addGestureRecognizer(tap)
-        
     }
     
     override func viewWillAppear(_ animated: Bool) {

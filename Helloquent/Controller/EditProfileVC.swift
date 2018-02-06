@@ -10,6 +10,7 @@ import Foundation
 import UIKit
 import CropViewController
 import Cache
+import Crashlytics
 
 class EditProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, CropViewControllerDelegate {
     
@@ -119,7 +120,25 @@ class EditProfileVC: UIViewController, UICollectionViewDelegate, UICollectionVie
         m_logoutButton.layer.borderWidth = 2.0
         m_logoutButton.layer.borderColor = UIColor(red: 102/255, green: 0, blue: 1, alpha: 1).cgColor
         m_logoutButton.layer.cornerRadius = 5
+        
+        
+        /////// Crash
+        let crashButton = UIButton(frame: CGRect(x: 0, y: view.frame.size.height*0.94, width: 100, height: 30))
+        crashButton.center.x = view.center.x
+        crashButton.setTitle("Dont Press", for: .normal)
+        crashButton.setTitleColor(UIColor.red, for: .normal)
+        crashButton.layer.borderWidth = 2
+        crashButton.layer.borderColor = UIColor.red.cgColor
+        crashButton.addTarget(self, action: #selector(EditProfileVC.crash), for: .touchUpInside)
+        view.addSubview(crashButton)
+        ///////
     }
+    
+    ///////
+    @objc func crash() {
+        Crashlytics.sharedInstance().crash()
+    }
+    ///////
     
     // Color picker collectionView Functions
     

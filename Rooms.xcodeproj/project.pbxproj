@@ -383,7 +383,7 @@
 					};
 				};
 			};
-			buildConfigurationList = F90D10201FECDFB90012283B /* Build configuration list for PBXProject "Helloquent" */;
+			buildConfigurationList = F90D10201FECDFB90012283B /* Build configuration list for PBXProject "Rooms" */;
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -949,7 +949,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		F90D10201FECDFB90012283B /* Build configuration list for PBXProject "Helloquent" */ = {
+		F90D10201FECDFB90012283B /* Build configuration list for PBXProject "Rooms" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				F90D104B1FECDFB90012283B /* Debug */,

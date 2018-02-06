@@ -568,7 +568,7 @@
                         <subviews>
                             <containerView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3DX-NE-E9C">
                                 <rect key="frame" x="0.0" y="149" width="375" height="469"/>
-                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             </containerView>
                             <searchBar contentMode="redraw" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="IbE-aU-rTJ">
                                 <rect key="frame" x="0.0" y="64" width="375" height="56"/>
@@ -757,7 +757,7 @@
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="8uE-RO-32W"/>
-        <segue reference="8nX-vv-koI"/>
+        <segue reference="c8E-JZ-ZGQ"/>
         <segue reference="7h9-SF-dMR"/>
     </inferredMetricsTieBreakers>
 </document>
