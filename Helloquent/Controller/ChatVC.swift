@@ -88,12 +88,11 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
     func loadUIWithCache() {
         if try! m_cacheStorage.m_messagesStorage.existsObject(ofType: [Message].self, forKey: m_currentRoom!.id) {
             m_cacheStorage.fetchMessages(roomID: m_currentRoom!.id, completion: {(messages) in
-                DispatchQueue.main.async {
-                    self.m_messages = messages
-                    self.collectionView.reloadData()
-                    self.collectionView.layoutIfNeeded()
-                    self.scrollToBottom(animated: false)
-                }
+                self.m_messages = messages
+                self.collectionView.reloadData()
+                self.collectionView.layoutIfNeeded()
+                self.scrollToBottom(animated: false)
+                
             })
         }
     }
@@ -311,8 +310,7 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
         self.scrollToBottom(animated: false)
         
         if !m_roomUsers.contains(senderId) {
-            m_roomUsers.append(senderId)
-            m_dbProvider.updateRoomUsers(roomUsers: m_roomUsers)
+            m_dbProvider.updateRoomUsers(roomUser: senderId)
         }
         
         // Clear message input field
@@ -422,10 +420,12 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
     }
     
     func messageReceived(message: JSQMessage) {
-        m_messages.append(message)
-        collectionView.reloadData()
-        self.collectionView.layoutIfNeeded()
-        self.scrollToBottom(animated: true)
+        DispatchQueue.main.sync {
+            m_messages.append(message)
+            collectionView.reloadData()
+            self.collectionView.layoutIfNeeded()
+            self.scrollToBottom(animated: true)
+        }
     }
     
     func cacheUpdated() {

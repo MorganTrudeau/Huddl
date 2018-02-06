@@ -54,7 +54,7 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         
         m_roomsSearchBar.delegate = self
         
-        NMAPositioningManager.sharedInstance().startPositioning()
+        NMAPositioningManager.shared().startPositioning()
         
         DBProvider.Instance.getUser(id: AuthProvider.Instance.userID(), completion: nil)
         
@@ -67,7 +67,7 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         m_roomTextImageView = UIImageView.init(frame: CGRect(x: 0, y: 0, width: 70, height: 30))
         m_roomTextImageView?.image = m_roomTextImage
         m_roomTextImageView?.center.x = (self.navigationController?.navigationBar.center.x)!
-        m_roomTextImageView?.center.y = (self.navigationController?.navigationBar.center.y)! - 19
+        m_roomTextImageView?.center.y = (self.navigationController?.navigationBar.center.y)! - 22
         m_roomTextImageView?.image = m_roomTextImageView?.image?.withRenderingMode(.alwaysTemplate)
         m_roomTextImageView?.tintColor = UIColor.lightText
         

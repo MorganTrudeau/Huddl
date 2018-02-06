@@ -23,6 +23,16 @@ struct Room: Codable {
     var activeUsers: Int
 }
 
+struct LocationRoom: Codable {
+    var name: String
+    var description: String
+    let id: String
+    var password: String
+    var activeUsers: Int
+    var latitude: String
+    var longitude: String
+}
+
 struct Message: Codable {
     let senderID: String
     let senderName: String

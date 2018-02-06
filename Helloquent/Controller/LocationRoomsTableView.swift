@@ -75,7 +75,7 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
                 
                 let selectedRoomName = cell!.textLabel!.text
                 let selectedRoomdescription = cell!.detailTextLabel!.text
-                var selectedRoomID = "\(place.position?.latitude ?? 1)\(place.position?.longitude ?? 1)"
+                var selectedRoomID = "\(place.position.latitude ?? 1)\(place.position.longitude ?? 1)"
                 selectedRoomID = selectedRoomID.replacingOccurrences(of: ".", with: "")
                 let selectedRoom = Room(name: selectedRoomName!, description: selectedRoomdescription!, id: selectedRoomID, password: "", activeUsers: 0)
                 
@@ -85,7 +85,7 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
                 m_dbProvider.m_currentRoomID = selectedRoom.id
                     
                 // Create location room in database
-                m_dbProvider.createLocationRoom(id: selectedRoomID, name: selectedRoomName!, description: selectedRoomdescription, password: "")
+                m_dbProvider.createLocationRoom(id: selectedRoomID, name: selectedRoomName!, description: selectedRoomdescription, password: "", lat: String(place.position.latitude), long: String(place.position.longitude))
             }
         }
     }
@@ -94,13 +94,13 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
         // Cancel any pending requests
         m_placeRequest?.cancel()
         
-        let currentPosition = NMAPositioningManager.sharedInstance().currentPosition?.coordinates
+        let currentPosition = NMAPositioningManager.shared().currentPosition?.coordinates
         let bounding = NMAGeoBoundingBox.init(center: currentPosition!, width: 45, height: 45)
         
-        m_placeRequest = (NMAPlaces.sharedInstance()?.createAutoSuggestionRequest(location: currentPosition, partialTerm: query))!
-        m_placeRequest?.viewport = bounding!
+        m_placeRequest = NMAPlaces.shared().makeAutoSuggestionRequest(location: currentPosition!, partialTerm: query)
+            m_placeRequest?.viewport = bounding
         m_placeRequest?.collectionSize = 10
-        m_placeRequest?.start({(request: NMARequest, data: Any?, error: Error?) in
+        m_placeRequest?.start(block: {(request: NMARequest, data: Any?, error: Error?) in
             if error == nil {
                 
                 let requestData = data as! [NMAAutoSuggest]

@@ -40,6 +40,8 @@ class Constants {
     static let ROOM_ID = "room_id"
     static let ACTIVE_USERS = "active_users"
     static let ROOM_USERS = "room_users"
+    static let LATITUDE = "latitude"
+    static let LONGITUDE = "longitude"
     
     // DB Handles
     static let CHILD_ADDED_HANDLE = "child_added_handle"

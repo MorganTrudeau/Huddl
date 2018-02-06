@@ -11,7 +11,7 @@ import UIKit
 import CropViewController
 import Cache
 
-class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, CropViewControllerDelegate, CacheDelegate {
+class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDataSource, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, CropViewControllerDelegate {
     
     @IBOutlet weak var m_colorColletionView: UICollectionView!
     @IBOutlet weak var m_displayNameTextField: UITextField!
@@ -35,14 +35,9 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         
         m_picker.delegate = self
         
-        m_cacheStorage.delegate = self
-        
         setUpUI()
         loadUIWithCache()
         self.updateCache()
-        
-        
-        
         
         // Tap screen to dismiss keyboard
         let screenTap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(ProfileVC.dismissKeyboard))
@@ -213,9 +208,5 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         if AuthProvider.Instance.logout() {
             dismiss(animated: true, completion: nil)
         }
-    }
-    
-    func cacheUpdated() {
-        loadUIWithCache()
     }
 }

@@ -156,7 +156,9 @@ class CacheStorage {
                         }
                     }
                 }
-                completion?(jsqMessages)
+                DispatchQueue.main.async {
+                    completion?(jsqMessages)
+                }
             case .error(let error):
                 print("Fetch messages error: \(error)")
             }

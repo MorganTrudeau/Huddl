@@ -32,6 +32,8 @@ typealias CreateRoomHandler = (_ room: Room, _ success: Bool) -> Void
 
 typealias GetRoomsHandler = (_ rooms: [Room]) -> Void
 
+typealias GetLocationRoomsHandler = (_ rooms: [LocationRoom]) -> Void
+
 typealias ColorFetchHandler = (_ color: String) -> Void
 
 typealias AvatarHandler = (_ avatar: UIImage) -> Void
@@ -128,8 +130,16 @@ class DBProvider {
         })
     }
     
-    func updateRoomUsers(roomUsers: [String]) {
-        roomsRef.child("\(m_currentRoomID!)/\(Constants.ROOM_USERS)").setValue(roomUsers)
+    func updateRoomUsers(roomUser: String) {
+        self.roomsRef.child(self.m_currentRoomID!).observeSingleEvent(of: .value, with: {(snapshot) in
+            if let room = snapshot.value as? NSDictionary {
+                if var roomUsers = room[Constants.ROOM_USERS] as? [String] {
+                    roomUsers.append(roomUser)
+                    print("Updated room users: \(roomUsers)")
+                    self.roomsRef.child("\(self.m_currentRoomID!)/\(Constants.ROOM_USERS)").setValue(roomUsers)
+                }
+            }
+        })
     }
     
     func getRoomUsers(completion: RoomUserHandler?) {
@@ -137,6 +147,7 @@ class DBProvider {
             if let room = snapshot.value as? NSDictionary {
                 if let roomUsers = room[Constants.ROOM_USERS] as? [String] {
                     completion?(roomUsers)
+                    print("Current room users: \(roomUsers)")
                     for userID in roomUsers {
                         self.getUser(id: userID, completion: nil)
                     }
@@ -247,13 +258,57 @@ class DBProvider {
         }
     }
     
-    func createLocationRoom(id: String, name: String, description: String?, password: String?) {
-        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.DESCRIPTION: description ?? "", Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0]
+    func createLocationRoom(id: String, name: String, description: String?, password: String?, lat: String, long: String) {
+        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.DESCRIPTION: description ?? "", Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0, Constants.LATITUDE: lat, Constants.LONGITUDE: long]
         roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             if !snapshot.hasChild(id) {
                 self.roomsRef.child(id).setValue(data)
             }
         })
+        locationRoomsRef.observeSingleEvent(of: .value, with: {(snapshot) in
+            if !snapshot.hasChild(id) {
+                self.locationRoomsRef.child(id).setValue(data)
+            }
+        })
+    }
+    
+    func getLocationRooms(completion: GetLocationRoomsHandler?) {
+        locationRoomsRef.observeSingleEvent(of: DataEventType.value) {
+            (snapshot: DataSnapshot) in
+            
+            var rooms = [LocationRoom]()
+            
+            if let roomData = snapshot.value as? NSDictionary {
+                
+                for (id, value) in roomData {
+                    
+                    if let room = value as? NSDictionary {
+                        
+                        if let roomName = room[Constants.ROOM_NAME] as? String {
+                            
+                            if let description = room[Constants.DESCRIPTION] as? String {
+                                
+                                if let password = room[Constants.PASSWORD] as? String {
+                                    
+                                    if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
+                                        
+                                        if let latitude = room[Constants.LATITUDE] as? String {
+                                            
+                                            if let longitude = room[Constants.LONGITUDE] as? String {
+                                                
+                                                let room = LocationRoom(name: roomName, description: description, id: id as! String, password: password, activeUsers: activeUsers, latitude: latitude, longitude: longitude)
+                                                rooms.append(room)
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            completion?(rooms)
+        }
     }
     
     func getActiveRooms(completion: GetRoomsHandler?) {

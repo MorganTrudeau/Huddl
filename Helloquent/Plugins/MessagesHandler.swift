@@ -147,7 +147,6 @@ class MessagesProvider {
                                                         self.delegate?.messageReceived(message: message!)
                                                         messages.append(Message(senderID: senderID, senderName: senderName, text: text, url: url))
                                                         let index = messages.count - 1
-                                                        print("Index: \(index)")
                                                         self.loadMessageMedia(senderID: senderID, senderName: senderName, url: url, roomID: self.m_dbProvider.m_currentRoomID!, index: index, completion: {() in
                                                         self.m_cacheStorage.cacheMessages(roomID: roomID, messages: messages)
                                                         })
@@ -214,7 +213,9 @@ class MessagesProvider {
                                                 jsqMessages.append(JSQMessage(senderId: senderID, displayName: senderName, media: placeHolderImage))
                                                 messages.append(Message(senderID: senderID, senderName: senderName, text: text, url: url))
                                                 let index = messages.count - 1
-                                                self.loadMessageMedia(senderID: senderID, senderName: senderName, url: url, roomID: self.m_dbProvider.m_currentRoomID!, index: index, completion: nil)
+                                                DispatchQueue.global().async {
+                                                    self.loadMessageMedia(senderID: senderID, senderName: senderName, url: url, roomID: self.m_dbProvider.m_currentRoomID!, index: index, completion: nil)
+                                                }
                                             }
                                         }
                                     }
@@ -236,7 +237,6 @@ class MessagesProvider {
     
     func loadMessageMedia(senderID: String, senderName: String, url: String, roomID: String, index: Int, completion: DefaultClosure?) {
         if !(try! m_cacheStorage.m_mediaStorage.existsObject(ofType: ImageWrapper.self, forKey: url)) {
-            DispatchQueue.global().async {
                 if let mediaURL = URL(string: url) {
                     do {
                         let data = try Data(contentsOf: mediaURL)
@@ -252,9 +252,8 @@ class MessagesProvider {
                                         photo?.appliesMediaViewMaskAsOutgoing = false
                                     }
                                     let message = JSQMessage(senderId: senderID, displayName: senderName, media: photo)
-                                    DispatchQueue.main.async {
-                                        self.delegate?.mediaMessageReceived(message: message!, roomID: roomID, index: index)
-                                    }
+                                    self.delegate?.mediaMessageReceived(message: message!, roomID: roomID, index: index)
+                                    print("Image downloaded with url: \(url)")
                                     completion?()
                                 }
                             })
@@ -265,16 +264,14 @@ class MessagesProvider {
                                 video?.appliesMediaViewMaskAsOutgoing = false
                             }
                             let message = JSQMessage(senderId: senderID, displayName: senderName, media: video)
-                            DispatchQueue.main.async {
-                                self.delegate?.mediaMessageReceived(message: message!, roomID: roomID, index: index)
-                            }
+                            self.delegate?.mediaMessageReceived(message: message!, roomID: roomID, index: index)
                             completion?()
                         }
                     } catch {
                         print("Error downloading Message Media Data")
                     }
                 }
-            }
+            
         }
     }
     
