@@ -14,13 +14,14 @@ class MapVC : UIViewController {
     
     @IBOutlet weak var mapView: NMAMapView!
     
-    var m_locationRooms = [LocationRoom]()
+    var m_locationRooms = [NMAMapObject:LocationRoom]()
     var m_mapObjects = [NMAMapObject]()
+    var m_tapLocation: CGPoint?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Create geo coordinate
-        let geoCoordCenter: NMAGeoCoordinates = NMAGeoCoordinates(latitude: 49.260327, longitude: -123.115025)
+        let geoCoordCenter: NMAGeoCoordinates = (NMAPositioningManager.shared().currentPosition?.coordinates)!
         // Set map view with geo center
         self.mapView?.set(geoCenter: geoCoordCenter, animation: NMAMapAnimation.none)
         // Set zoom level
@@ -38,36 +39,55 @@ class MapVC : UIViewController {
         
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
         
-        let tap = UITapGestureRecognizer(target: self, action: #selector (MapVC.markerTap))
-        tap.poin
+        let tap = UITapGestureRecognizer(target: self, action: #selector(MapVC.onMarkerTap))
+        tap.cancelsTouchesInView = false
         
-        let recognizer = UITap
+        mapView.addGestureRecognizer(tap)
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         DBProvider.Instance.getLocationRooms(completion: {(rooms) in
-            self.m_locationRooms = rooms
-            
-            for room in self.m_locationRooms {
+            for room in rooms {
                 DispatchQueue.global().async {
                     let coords = NMAGeoCoordinates(latitude: Double(room.latitude)!, longitude: Double(room.longitude)!)
-                    let marker = NMAMapMarker(geoCoordinates: coords, image: UIImage(named: "marker")!)
+                    let marker = NMAMapMarker(geoCoordinates: coords)
+                    self.m_locationRooms[marker] = room
                     marker.anchorOffset = CGPoint(x: 0, y: 18)
                     marker.title = room.name
                     marker.textDescription = room.description
+                    if room.activeUsers > 0 {
+                        marker.icon = UIImage(named: "green_marker")!
+                    } else {
+                        marker.icon = UIImage(named: "red_marker")!
+                    }
                     self.m_mapObjects.append(marker)
+                    
                     DispatchQueue.main.async {
-                        self.mapView.add(objects: self.m_mapObjects)
+                        self.mapView.add(marker)
                     }
                 }
             }
         })
     }
     
-    @objc func markerTap() {
-        mapView.visibleObjects(at: <#T##CGPoint#>)
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        self.mapView.remove(objects: self.m_mapObjects)
+        self.m_mapObjects.removeAll()
+    }
+    
+    @objc func onMarkerTap(recognizer: UITapGestureRecognizer) {
+        let location = recognizer.location(in: mapView)
+        let visibleMarkers: [NMAMapMarker] = mapView.visibleObjects(at: location) as! [NMAMapMarker]
+        for marker in visibleMarkers {
+            marker.showInfoBubble()
+            marker.infoBubbleEventBlock = {() in
+                self.alertUser(title: "hi", message: "hi")
+            }
+        }
     }
     
     func alertUser(title: String, message: String) {

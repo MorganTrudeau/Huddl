@@ -27,8 +27,6 @@
 		F947B3432016B83600E8CB41 /* SignUpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F947B3422016B83600E8CB41 /* SignUpVC.swift */; };
 		F947B345201ADFA900E8CB41 /* RoomsContainerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F947B344201ADFA800E8CB41 /* RoomsContainerVC.swift */; };
 		F95613BC20291A2000D9BEB2 /* MapVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95613BB20291A2000D9BEB2 /* MapVC.swift */; };
-		F95613BE202930C600D9BEB2 /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F95613BD202930C600D9BEB2 /* NMAKit.framework */; };
-		F95613BF202930C600D9BEB2 /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F95613BD202930C600D9BEB2 /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC381FED050700CC3C58 /* AuthProvider.swift */; };
 		F973BC3B1FEDA66800CC3C58 /* DBProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */; };
 		F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3C1FEDA7B000CC3C58 /* Constants.swift */; };
@@ -36,14 +34,17 @@
 		F983B84C20230FFB00080AB5 /* CacheStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F983B84B20230FFB00080AB5 /* CacheStorage.swift */; };
 		F9C747D720108FBA00F311D8 /* SavedRooms.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F9C747D520108FBA00F311D8 /* SavedRooms.xcdatamodeld */; };
 		F9C747D92010914C00F311D8 /* CoreDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C747D82010914C00F311D8 /* CoreDataProvider.swift */; };
+		F9C9F47E202991A800294846 /* ProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C9F47D202991A800294846 /* ProfileVC.swift */; };
 		F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */; };
 		F9E264D41FFD4EED00605CA7 /* SavedRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */; };
 		F9E69A7E20172CFB0014733D /* LoadingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E69A7D20172CFB0014733D /* LoadingOverlay.swift */; };
 		F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EA8BEC20008A6400A98421 /* ColorHandler.swift */; };
 		F9ECA255202337A400289D7C /* CodableStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECA254202337A400289D7C /* CodableStructs.swift */; };
 		F9ECA25720269BF100289D7C /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECA25620269BF100289D7C /* Reachability.swift */; };
+		F9F110BE20296B4600FBCF46 /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9F110BD20296B4600FBCF46 /* NMAKit.framework */; };
+		F9F110BF20296B4600FBCF46 /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F9F110BD20296B4600FBCF46 /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F9F7E396201FB67100ABD6B8 /* ImageDisplayVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */; };
-		F9F7E398201FE51D00ABD6B8 /* ProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E397201FE51D00ABD6B8 /* ProfileVC.swift */; };
+		F9F7E398201FE51D00ABD6B8 /* EditProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E397201FE51D00ABD6B8 /* EditProfileVC.swift */; };
 		F9F7E39A202002D000ABD6B8 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E399202002D000ABD6B8 /* Helper.swift */; };
 /* End PBXBuildFile section */
 
@@ -71,7 +72,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				F95613BF202930C600D9BEB2 /* NMAKit.framework in Embed Frameworks */,
+				F9F110BF20296B4600FBCF46 /* NMAKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -111,7 +112,6 @@
 		F947B3422016B83600E8CB41 /* SignUpVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpVC.swift; sourceTree = "<group>"; };
 		F947B344201ADFA800E8CB41 /* RoomsContainerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomsContainerVC.swift; sourceTree = "<group>"; };
 		F95613BB20291A2000D9BEB2 /* MapVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapVC.swift; sourceTree = "<group>"; };
-		F95613BD202930C600D9BEB2 /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NMAKit.framework; sourceTree = "<group>"; };
 		F973BC381FED050700CC3C58 /* AuthProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthProvider.swift; sourceTree = "<group>"; };
 		F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DBProvider.swift; sourceTree = "<group>"; };
 		F973BC3C1FEDA7B000CC3C58 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
@@ -119,14 +119,16 @@
 		F983B84B20230FFB00080AB5 /* CacheStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheStorage.swift; sourceTree = "<group>"; };
 		F9C747D620108FBA00F311D8 /* SavedRooms.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SavedRooms.xcdatamodel; sourceTree = "<group>"; };
 		F9C747D82010914C00F311D8 /* CoreDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProvider.swift; sourceTree = "<group>"; };
+		F9C9F47D202991A800294846 /* ProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileVC.swift; sourceTree = "<group>"; };
 		F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesHandler.swift; sourceTree = "<group>"; };
 		F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRoomsVC.swift; sourceTree = "<group>"; };
 		F9E69A7D20172CFB0014733D /* LoadingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingOverlay.swift; sourceTree = "<group>"; };
 		F9EA8BEC20008A6400A98421 /* ColorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHandler.swift; sourceTree = "<group>"; };
 		F9ECA254202337A400289D7C /* CodableStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableStructs.swift; sourceTree = "<group>"; };
 		F9ECA25620269BF100289D7C /* Reachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
+		F9F110BD20296B4600FBCF46 /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NMAKit.framework; sourceTree = "<group>"; };
 		F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDisplayVC.swift; sourceTree = "<group>"; };
-		F9F7E397201FE51D00ABD6B8 /* ProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileVC.swift; sourceTree = "<group>"; };
+		F9F7E397201FE51D00ABD6B8 /* EditProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileVC.swift; sourceTree = "<group>"; };
 		F9F7E399202002D000ABD6B8 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -135,7 +137,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F95613BE202930C600D9BEB2 /* NMAKit.framework in Frameworks */,
+				F9F110BE20296B4600FBCF46 /* NMAKit.framework in Frameworks */,
 				4C97677652B24F944C9A1913 /* Pods_Helloquent.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -185,7 +187,7 @@
 		F90D101C1FECDFB90012283B = {
 			isa = PBXGroup;
 			children = (
-				F95613BD202930C600D9BEB2 /* NMAKit.framework */,
+				F9F110BD20296B4600FBCF46 /* NMAKit.framework */,
 				F90D10271FECDFB90012283B /* Helloquent */,
 				F90D103C1FECDFB90012283B /* HelloquentTests */,
 				F90D10471FECDFB90012283B /* HelloquentUITests */,
@@ -262,7 +264,8 @@
 				F90555F9201B0B210053267A /* UserRoomsTableView.swift */,
 				F9179B78200FD9060057AAEF /* ActiveRoomsVC.swift */,
 				F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */,
-				F9F7E397201FE51D00ABD6B8 /* ProfileVC.swift */,
+				F9C9F47D202991A800294846 /* ProfileVC.swift */,
+				F9F7E397201FE51D00ABD6B8 /* EditProfileVC.swift */,
 				F973BC401FEDDA8700CC3C58 /* ChatVC.swift */,
 				F9179B76200EBDFC0057AAEF /* TabBarVC.swift */,
 				F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */,
@@ -300,6 +303,7 @@
 				305C6280B34B32D4666D380F /* [CP] Embed Pods Frameworks */,
 				B7DAFF3DF0D00F6FA42464A8 /* [CP] Copy Pods Resources */,
 				F9C747D420107F4E00F311D8 /* Embed Frameworks */,
+				F9C9F47A20296C7D00294846 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -606,6 +610,19 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		F9C9F47A20296C7D00294846 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Fabric/run\" 1c0d5cd9ce8815fb189fe496cf4ad74c5059026b b2d19aa39f673208ee74a1b6c016d4027cced88caf20289cdabd44dfafa55283";
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -620,7 +637,7 @@
 				F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */,
 				F9ECA255202337A400289D7C /* CodableStructs.swift in Sources */,
 				F9E264D41FFD4EED00605CA7 /* SavedRoomsVC.swift in Sources */,
-				F9F7E398201FE51D00ABD6B8 /* ProfileVC.swift in Sources */,
+				F9F7E398201FE51D00ABD6B8 /* EditProfileVC.swift in Sources */,
 				F947B345201ADFA900E8CB41 /* RoomsContainerVC.swift in Sources */,
 				F973BC411FEDDA8700CC3C58 /* ChatVC.swift in Sources */,
 				F90D105B1FECE33B0012283B /* SigninVC.swift in Sources */,
@@ -634,6 +651,7 @@
 				F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */,
 				F9F7E396201FB67100ABD6B8 /* ImageDisplayVC.swift in Sources */,
 				F9179B77200EBDFC0057AAEF /* TabBarVC.swift in Sources */,
+				F9C9F47E202991A800294846 /* ProfileVC.swift in Sources */,
 				F90555F8201B0AF60053267A /* LocationRoomsTableView.swift in Sources */,
 				F9F7E39A202002D000ABD6B8 /* Helper.swift in Sources */,
 				F983B84C20230FFB00080AB5 /* CacheStorage.swift in Sources */,
@@ -808,6 +826,7 @@
 				CLANG_ENABLE_MODULES = YES;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 4G2FEEY64T;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

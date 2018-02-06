@@ -195,11 +195,13 @@ class DBProvider {
                     user[Constants.DISPLAY_NAME] = displayName
                     user[Constants.COLOR] = color
                     data.value = user
+                    
+                    // Store updated user in cache
+                    self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: user[Constants.AVATAR] as! String))
+                    
                     DispatchQueue.main.sync {
                         completion?(false)
                     }
-                    // Store updated user in cache
-                    self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: user[Constants.AVATAR] as! String))
                 }
                 return TransactionResult.success(withValue: data)})
             }
@@ -481,6 +483,15 @@ class DBProvider {
             }
             return TransactionResult.success(withValue: data)
         })
+        locationRoomsRef.child(m_currentRoomID!).runTransactionBlock({(data: MutableData) in
+            if var room = data.value as? [String: Any] {
+                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
+                activeUsers = activeUsers! + 1
+                room[Constants.ACTIVE_USERS] = activeUsers
+                data.value = room
+            }
+            return TransactionResult.success(withValue: data)
+        })
     }
     
     func decreaseActiveUsers(completion: DefaultClosure?) {
@@ -493,10 +504,16 @@ class DBProvider {
                 room[Constants.ACTIVE_USERS] = activeUsers
                 data.value = room
             }
-            return TransactionResult.success(withValue: data)}, andCompletionBlock:     {(error: Error?, success: Bool, snapshot: DataSnapshot?) in
-                if success {
-                    completion?()
-                }
+            return TransactionResult.success(withValue: data)
+        })
+        locationRoomsRef.child(m_currentRoomID!).runTransactionBlock({(data: MutableData) in
+            if var room = data.value as? [String: Any] {
+                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
+                activeUsers = activeUsers! - 1
+                room[Constants.ACTIVE_USERS] = activeUsers
+                data.value = room
+            }
+            return TransactionResult.success(withValue: data)
         })
     }
     

@@ -93,7 +93,7 @@ class SignUpVC: UIViewController, UITextFieldDelegate {
     }
 
     @IBAction func signUp(_ sender: Any) {
-        if m_emailTextField.text != "" && m_displayNameTextField.text != "" && m_passwordTextField.text != "" {
+        if m_emailTextField.text != "" && m_displayNameTextField.text != "" && m_passwordTextField.text != "" && (m_passwordTextField.text?.count)! > 5 {
             if m_passwordTextField.text! == m_confirmPassTextField.text! {
                 present(m_loadingOverlay, animated: false, completion: nil)
             

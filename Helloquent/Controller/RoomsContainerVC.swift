@@ -9,6 +9,7 @@
 import Foundation
 import UIKit
 import NMAKit
+import Crashlytics
 
 protocol RoomContainerDelegate: class {
     func textChanged(query: String)

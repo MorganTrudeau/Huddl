@@ -18,6 +18,8 @@ pod 'FacebookShare'
 pod 'CropViewController'
 pod 'Cache'
 pod ‘SDWebImage’
+pod 'Fabric'
+pod 'Crashlytics'
 
 
   target 'HelloquentTests' do
