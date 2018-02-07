@@ -7,21 +7,21 @@
 	<key>AD_UNIT_ID_FOR_INTERSTITIAL_TEST</key>
 	<string>ca-app-pub-3940256099942544/4411468910</string>
 	<key>CLIENT_ID</key>
-	<string>194276532478-kjk5ad0lp6o19p7i0hgsmskm4leju1if.apps.googleusercontent.com</string>
+	<string>259053654722-lrksb6fecqi2uo9sgu6385qccge71fn5.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.194276532478-kjk5ad0lp6o19p7i0hgsmskm4leju1if</string>
+	<string>com.googleusercontent.apps.259053654722-lrksb6fecqi2uo9sgu6385qccge71fn5</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCJb6CfeJA8kLtMmJXAKtJTL8hyy56KaqI</string>
+	<string>AIzaSyDCYdH40Mx0AXU9M4MYZvP2UuGaWrvVwwM</string>
 	<key>GCM_SENDER_ID</key>
-	<string>194276532478</string>
+	<string>259053654722</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.morgantrudeau.Helloquent</string>
+	<string>com.morgantrudeau.hello.Helloquent</string>
 	<key>PROJECT_ID</key>
-	<string>helloquent-a4460</string>
+	<string>rooms-68d7a</string>
 	<key>STORAGE_BUCKET</key>
-	<string>helloquent-a4460.appspot.com</string>
+	<string>rooms-68d7a.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<true></true>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -33,8 +33,8 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:194276532478:ios:27677f2be6bbc632</string>
+	<string>1:259053654722:ios:cb3d5a3c21553421</string>
 	<key>DATABASE_URL</key>
-	<string>https://helloquent-a4460.firebaseio.com</string>
+	<string>https://rooms-68d7a.firebaseio.com</string>
 </dict>
 </plist>

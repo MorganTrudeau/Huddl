@@ -90,7 +90,7 @@ class DBProvider {
     }
     
     var storageRef: StorageReference {
-        return Storage.storage().reference(forURL: "gs://helloquent-a4460.appspot.com")
+        return Storage.storage().reference(forURL: "gs://rooms-68d7a.appspot.com/")
     }
     
     var imageStorageRef: StorageReference {
@@ -132,12 +132,14 @@ class DBProvider {
     
     func updateRoomUsers(roomUser: String) {
         self.roomsRef.child(self.m_currentRoomID!).observeSingleEvent(of: .value, with: {(snapshot) in
-            if let room = snapshot.value as? NSDictionary {
-                if var roomUsers = room[Constants.ROOM_USERS] as? [String] {
-                    roomUsers.append(roomUser)
-                    print("Updated room users: \(roomUsers)")
-                    self.roomsRef.child("\(self.m_currentRoomID!)/\(Constants.ROOM_USERS)").setValue(roomUsers)
-                }
+            var room = snapshot.value as! NSDictionary
+            if var roomUsers = room[Constants.ROOM_USERS] as? [String] {
+                roomUsers.append(roomUser)
+                print("Updated room users: \(roomUsers)")
+                self.roomsRef.child("\(self.m_currentRoomID!)/\(Constants.ROOM_USERS)").setValue(roomUsers)
+            } else {
+                room.setValue([roomUser], forKey: Constants.ROOM_USERS)
+                self.roomsRef.child(self.m_currentRoomID!).setValue(room)
             }
         })
     }

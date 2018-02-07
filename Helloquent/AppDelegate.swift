@@ -8,7 +8,9 @@
 //
 
 import UIKit
+import UserNotifications
 import Firebase
+import FirebaseMessaging
 import FBSDKCoreKit
 import NMAKit
 import CoreData
@@ -16,19 +18,33 @@ import Fabric
 import Crashlytics
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
 
     var window: UIWindow?
  
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         Fabric.with([Crashlytics.self])
-        // Override point for customization after application launch.
         FirebaseApp.configure()
         
-        let kHelloMapAppID = "0aYWf5y8QAumkfswAbWF"
-        let kHelloMapAppCode = "bk8BbVRRxoxZyreZUasvRA"
-        
+        let kHelloMapAppID = "mAyUaYF8MsSg1cNc1BEM"
+        let kHelloMapAppCode = "gnvNZrF5ywXEIooG2O0fGA"
         NMAApplicationContext.set(appId: kHelloMapAppID, appCode: kHelloMapAppCode)
+        
+        if #available(iOS 10.0, *) {
+            // For iOS 10 display notification (sent via APNS)
+            UNUserNotificationCenter.current().delegate = self
+            
+            let authOptions: UNAuthorizationOptions = [.alert, .badge, .sound]
+            UNUserNotificationCenter.current().requestAuthorization(
+                options: authOptions,
+                completionHandler: {_, _ in })
+        } else {
+            let settings: UIUserNotificationSettings =
+                UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
+            application.registerUserNotificationSettings(settings)
+        }
+        
+        application.registerForRemoteNotifications()
         
         return true
     }
@@ -36,6 +52,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
         let handled: Bool = FBSDKApplicationDelegate.sharedInstance().application(app, open: url, sourceApplication: UIApplicationOpenURLOptionsKey.sourceApplication.rawValue, annotation: UIApplicationOpenURLOptionsKey.annotation)
         return handled
+    }
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
     }
     
     func applicationWillResignActive(_ application: UIApplication) {

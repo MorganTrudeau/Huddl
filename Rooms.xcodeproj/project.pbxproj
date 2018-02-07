@@ -18,12 +18,13 @@
 		F90D103E1FECDFB90012283B /* HelloquentTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D103D1FECDFB90012283B /* HelloquentTests.swift */; };
 		F90D10491FECDFB90012283B /* HelloquentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D10481FECDFB90012283B /* HelloquentUITests.swift */; };
 		F90D105B1FECE33B0012283B /* SigninVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D105A1FECE33B0012283B /* SigninVC.swift */; };
-		F90D105F1FECFAFD0012283B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */; };
 		F9179B77200EBDFC0057AAEF /* TabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B76200EBDFC0057AAEF /* TabBarVC.swift */; };
 		F9179B79200FD9060057AAEF /* ActiveRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B78200FD9060057AAEF /* ActiveRoomsVC.swift */; };
 		F9282ED22022A18000E009A5 /* SplashScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9282ED12022A18000E009A5 /* SplashScreenVC.swift */; };
 		F93364D81FEDE89D002A3718 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F93364D71FEDE89D002A3718 /* Assets.xcassets */; };
 		F93364DA1FEDE8BF002A3718 /* avatar.gif in Resources */ = {isa = PBXBuildFile; fileRef = F93364D91FEDE8BF002A3718 /* avatar.gif */; };
+		F93BC74E202ACD1D00F42038 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F93BC74D202ACD1D00F42038 /* GoogleService-Info.plist */; };
+		F93BC750202AD3CE00F42038 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F93BC74F202AD3CE00F42038 /* UserNotifications.framework */; };
 		F947B3432016B83600E8CB41 /* SignUpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F947B3422016B83600E8CB41 /* SignUpVC.swift */; };
 		F947B345201ADFA900E8CB41 /* RoomsContainerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F947B344201ADFA800E8CB41 /* RoomsContainerVC.swift */; };
 		F95613BC20291A2000D9BEB2 /* MapVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95613BB20291A2000D9BEB2 /* MapVC.swift */; };
@@ -103,12 +104,14 @@
 		F90D10481FECDFB90012283B /* HelloquentUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelloquentUITests.swift; sourceTree = "<group>"; };
 		F90D104A1FECDFB90012283B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F90D105A1FECE33B0012283B /* SigninVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigninVC.swift; sourceTree = "<group>"; };
-		F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F9179B76200EBDFC0057AAEF /* TabBarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarVC.swift; sourceTree = "<group>"; };
 		F9179B78200FD9060057AAEF /* ActiveRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRoomsVC.swift; sourceTree = "<group>"; };
 		F9282ED12022A18000E009A5 /* SplashScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenVC.swift; sourceTree = "<group>"; };
 		F93364D71FEDE89D002A3718 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F93364D91FEDE8BF002A3718 /* avatar.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = avatar.gif; path = Assets.xcassets/avatar.gif; sourceTree = "<group>"; };
+		F93BC74C202ACAB100F42038 /* Helloquent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Helloquent.entitlements; sourceTree = "<group>"; };
+		F93BC74D202ACD1D00F42038 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		F93BC74F202AD3CE00F42038 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		F947B3422016B83600E8CB41 /* SignUpVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpVC.swift; sourceTree = "<group>"; };
 		F947B344201ADFA800E8CB41 /* RoomsContainerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomsContainerVC.swift; sourceTree = "<group>"; };
 		F95613BB20291A2000D9BEB2 /* MapVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapVC.swift; sourceTree = "<group>"; };
@@ -137,6 +140,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F93BC750202AD3CE00F42038 /* UserNotifications.framework in Frameworks */,
 				F9F110BE20296B4600FBCF46 /* NMAKit.framework in Frameworks */,
 				4C97677652B24F944C9A1913 /* Pods_Helloquent.framework in Frameworks */,
 			);
@@ -177,6 +181,7 @@
 		F299D65C296DA368F66065C4 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F93BC74F202AD3CE00F42038 /* UserNotifications.framework */,
 				45133CF7D71936EB63E66199 /* Pods_Helloquent.framework */,
 				C9903F0212B6980D79CB696E /* Pods_HelloquentTests.framework */,
 				0B01B6A9C2126C136662B5F3 /* Pods_HelloquentUITests.framework */,
@@ -210,6 +215,7 @@
 		F90D10271FECDFB90012283B /* Helloquent */ = {
 			isa = PBXGroup;
 			children = (
+				F93BC74C202ACAB100F42038 /* Helloquent.entitlements */,
 				F93364D71FEDE89D002A3718 /* Assets.xcassets */,
 				F93364D91FEDE8BF002A3718 /* avatar.gif */,
 				F90D10591FECE2DF0012283B /* Plugins */,
@@ -217,9 +223,9 @@
 				F90D10561FECE2C90012283B /* Model */,
 				F90D10281FECDFB90012283B /* AppDelegate.swift */,
 				F90D102C1FECDFB90012283B /* Main.storyboard */,
+				F93BC74D202ACD1D00F42038 /* GoogleService-Info.plist */,
 				F90D10311FECDFB90012283B /* LaunchScreen.storyboard */,
 				F90D10341FECDFB90012283B /* Info.plist */,
-				F90D105E1FECFAFD0012283B /* GoogleService-Info.plist */,
 				F9C747D520108FBA00F311D8 /* SavedRooms.xcdatamodeld */,
 			);
 			path = Helloquent;
@@ -370,6 +376,14 @@
 						CreatedOnToolsVersion = 9.2;
 						LastSwiftMigration = 0920;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 1;
+							};
+							com.apple.Push = {
+								enabled = 1;
+							};
+						};
 					};
 					F90D10381FECDFB90012283B = {
 						CreatedOnToolsVersion = 9.2;
@@ -410,7 +424,7 @@
 			files = (
 				F90D10331FECDFB90012283B /* LaunchScreen.storyboard in Resources */,
 				F93364DA1FEDE8BF002A3718 /* avatar.gif in Resources */,
-				F90D105F1FECFAFD0012283B /* GoogleService-Info.plist in Resources */,
+				F93BC74E202ACD1D00F42038 /* GoogleService-Info.plist in Resources */,
 				F93364D81FEDE89D002A3718 /* Assets.xcassets in Resources */,
 				F90D102E1FECDFB90012283B /* Main.storyboard in Resources */,
 			);
@@ -453,6 +467,7 @@
 				"${BUILT_PRODUCTS_DIR}/GoogleToolboxForMac/GoogleToolboxForMac.framework",
 				"${BUILT_PRODUCTS_DIR}/JSQMessagesViewController/JSQMessagesViewController.framework",
 				"${BUILT_PRODUCTS_DIR}/JSQSystemSoundPlayer/JSQSystemSoundPlayer.framework",
+				"${BUILT_PRODUCTS_DIR}/Protobuf/Protobuf.framework",
 				"${BUILT_PRODUCTS_DIR}/SDWebImage/SDWebImage.framework",
 				"${BUILT_PRODUCTS_DIR}/leveldb-library/leveldb.framework",
 				"${BUILT_PRODUCTS_DIR}/nanopb/nanopb.framework",
@@ -472,6 +487,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/GoogleToolboxForMac.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JSQMessagesViewController.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/JSQSystemSoundPlayer.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Protobuf.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SDWebImage.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/leveldb.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/nanopb.framework",
@@ -824,10 +840,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Helloquent/Helloquent.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = 4G2FEEY64T;
+				DEVELOPMENT_TEAM = 76CNXZG585;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -836,7 +853,7 @@
 				INFOPLIST_FILE = Helloquent/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.morgantrudeau.Helloquent;
+				PRODUCT_BUNDLE_IDENTIFIER = com.morgantrudeau.hello.Helloquent;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
@@ -854,9 +871,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Helloquent/Helloquent.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 4G2FEEY64T;
+				DEVELOPMENT_TEAM = 76CNXZG585;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -865,7 +883,7 @@
 				INFOPLIST_FILE = Helloquent/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 10;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.morgantrudeau.Helloquent;
+				PRODUCT_BUNDLE_IDENTIFIER = com.morgantrudeau.hello.Helloquent;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_INSTALL_OBJC_HEADER = NO;
