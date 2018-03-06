@@ -11,29 +11,35 @@
 
 ### Login Screen
 
-<img src="screenshots/login.png" width="200">
+<img src="screenshots/login.png" width="250">
+
 
 ### Signup Screen
 
-<img src="screenshots/sign_up.png" width="200">
+<img src="screenshots/sign_up.png" width="250">
+
 
 ### Home Sceen
 
-<img src="screenshots/home.png" width="200">
+<img src="screenshots/home.png" width="250">
+
 
 ### Searching for Cool Places Screen
 
-<img src="screenshots/search.png" width="200">
+<img src="screenshots/search.png" width="250">
+
 
 ### Map Showing Active Rooms
 
-<img src="screenshots/map.png" width="200">
+
+<img src="screenshots/map.png" width="250">
 
 ### Chat Room
 
-<img src="screenshots/chat.png" width="200">
+<img src="screenshots/chat.png" width="250">
+
 
 ### Profile Screen
 
-<img src="screenshots/profile.png" width="200">
+<img src="screenshots/profile.png" width="250">
 
