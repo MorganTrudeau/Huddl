@@ -1,5 +1,4 @@
-# Rooms
-**Location Based Chatting**
+# Rooms : **Location Based Chatting**
 
 ## Project Summary
 
@@ -12,7 +11,7 @@
 
 ### Login Screen
 
-![alt text](screenshots/login.png)
+![alt text](screenshots/login.png | width=100)
 
 ### Signup Screen
 
