@@ -11,7 +11,7 @@
 
 ### Login Screen
 
-![alt text](screenshots/login.png | width=100)
+![alt text](screenshots/login.png){:height="50%" width="50%"}
 
 ### Signup Screen
 
