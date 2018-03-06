@@ -12,12 +12,12 @@ import JSQMessagesViewController
 import MobileCoreServices
 import AVKit
 import Cache
+import FirebaseMessaging
 
-class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, CacheDelegate, MediaMessageDelegate {
+class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, ImageCacheDelegate, MediaMessageDelegate {
     
     var m_saveRoomButton: UIBarButtonItem?
     
-    let m_coreDataProvider = CoreDataProvider.Instance
     let m_messagesProvider = MessagesProvider.Instance
     let m_dbProvider = DBProvider.Instance
     let m_authProvider = AuthProvider.Instance
@@ -26,23 +26,25 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
     
     var m_messages = [JSQMessage]()
     
+    // Room variables
+    var m_userMenu = UIView()
     var m_isRoomSaved = false
     var m_savedRooms = [Room]()
     var m_currentRoom: Room?
     var m_roomUsers = [String]()
+    
+    // Chat variables
+    var m_receiver: User?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        m_currentRoom = m_dbProvider.m_currentRoom!
         
-        m_cacheStorage.delegate = self
+        m_cacheStorage.imageCacheDelegate = self
         m_messagesProvider.delegate = self
         m_picker.delegate = self
         
-        NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleResignActive), name: NSNotification.Name(rawValue: "ResignActiveNotification"), object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.handleBecomeActive), name: NSNotification.Name(rawValue: "BecomeActiveNotification"), object: nil)
-        
         NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.keyboardWillShow), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(ChatVC.keyboardWillHide), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
         
         // Values set for display JSQMessages
         self.senderId = m_authProvider.userID()
@@ -52,24 +54,46 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
         if let savedRooms = try? m_cacheStorage.m_roomStorage.object(ofType: [Room].self, forKey: "saved") {
             m_savedRooms = savedRooms
         }
+        
         m_isRoomSaved = m_savedRooms.contains(where: { $0.id == m_currentRoom?.id })
         
-        
+        // Get User information for users that have posted in room
         self.m_dbProvider.getRoomUsers(completion: {(roomUsers) in
             self.m_roomUsers = roomUsers
         })
         
-        
         setUpUI()
-        loadUIWithCache()
-        updateCache()
+        loadCachedMessages()
+        handleNotifications()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        // If any new messages from database
+        loadDatabaseMessages()
+        // Observes new messages added to database
+        m_messagesProvider.observeRoomMessages()
+        self.tabBarController?.tabBar.isHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(true)
+        m_messagesProvider.removeRoomObservers()
+        self.tabBarController?.tabBar.isHidden = false
+        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
     }
     
     func setUpUI() {
+        self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
+        self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
+        
         self.collectionView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
         
         // Create Heart button to save room
         m_saveRoomButton = UIBarButtonItem(image: UIImage(named: "heart"), style: .plain, target: self, action: #selector(ChatVC.saveRoomButtonClicked))
+        
+        self.navigationItem.rightBarButtonItem  = m_saveRoomButton
+        self.navigationItem.title = m_currentRoom!.name;
         
         // Set color of heart
         if !self.m_isRoomSaved {
@@ -77,91 +101,46 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
         } else {
             self.m_saveRoomButton?.tintColor = UIColor(red: 133/255, green: 51/255, blue: 1, alpha: 1)
         }
-        
-        self.navigationItem.rightBarButtonItem  = m_saveRoomButton
-        self.navigationItem.title = m_currentRoom!.name;
-        
         collectionView.collectionViewLayout.incomingAvatarViewSize = CGSize(width: 40, height: 40)
         collectionView.collectionViewLayout.outgoingAvatarViewSize = CGSize(width: 40, height: 40)
     }
     
-    func loadUIWithCache() {
+    func loadCachedMessages() {
         if try! m_cacheStorage.m_messagesStorage.existsObject(ofType: [Message].self, forKey: m_currentRoom!.id) {
             m_cacheStorage.fetchMessages(roomID: m_currentRoom!.id, completion: {(messages) in
                 self.m_messages = messages
                 self.collectionView.reloadData()
                 self.collectionView.layoutIfNeeded()
                 self.scrollToBottom(animated: false)
-                
             })
         }
     }
     
-    func updateCache() {
-        // Update cache with current rooms messages and return users who have posted in room
+    func loadDatabaseMessages() {
         self.m_messagesProvider.getRoomMessages(roomID: self.m_currentRoom!.id, completion: {(messages) in
             self.m_messages += messages
             self.collectionView.reloadData()
             self.collectionView.layoutIfNeeded()
             self.scrollToBottom(animated: true)
         })
-        
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        // Observes new messages added to database
-        m_messagesProvider.observeRoomMessages()
-            
-        self.tabBarController?.tabBar.isHidden = true
-    }
-    
-    /**
-     Increase active users in Firebase when view appears
-    **/
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(true)
-        m_dbProvider.increaseActiveUsers()
-    }
-    
-    /**
-     Decrease active users in Firebase when view disappears
-     **/
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(true)
-        self.tabBarController?.tabBar.isHidden = false
-        m_messagesProvider.removeRoomObservers()
-        m_dbProvider.decreaseActiveUsers(completion: nil)
-    }
-    
-    /**
-     Increase active users in Firebase when app become active
-     **/
-    
-    @objc func handleBecomeActive() {
-        m_dbProvider.increaseActiveUsers()
-    }
-    
-    /**
-     Decrease active users in Firebase when app becomes inactive
-    **/
-    
-    @objc func handleResignActive() {
-        m_dbProvider.decreaseActiveUsers(completion: nil)
-    }
-    
-    /**
-        Keyboard Functions
-    **/
-    
-    @objc func keyboardWillShow(notification: NSNotification) {
-        self.topContentAdditionalInset = -65
-    }
-    
-    @objc func keyboardWillHide(notification: NSNotification) {
+    // Removes notifications for room if present
+    func handleNotifications() {
+        if try! m_cacheStorage.m_roomStorage.existsObject(ofType: Int.self, forKey: m_currentRoom!.id) {
+            // Remove notification on tableview
+            try? m_cacheStorage.m_roomStorage.removeObject(forKey: m_currentRoom!.id)
+            // Reduce or remove badge on tab bar
+            if var roomNotifications = try? m_cacheStorage.m_roomStorage.object(ofType: [String].self, forKey: "room") {
+                roomNotifications = roomNotifications.filter { $0 != m_currentRoom!.id }
+                if roomNotifications.count > 0 {
+                    self.tabBarController?.tabBar.items![0].badgeValue = String(roomNotifications.count)
+                } else {
+                    self.tabBarController?.tabBar.items![0].badgeValue = nil
+                }
+                m_cacheStorage.cacheTabNotifications(notifications: roomNotifications, type: "room")
+            }
+        }
     }
 
     /**
@@ -230,6 +209,14 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
         cell.messageBubbleTopLabel.textColor = UIColor.init(white: 0.9, alpha: 1)
+        cell.avatarImageView.isUserInteractionEnabled = true
+        
+        if m_messages[indexPath.row].senderId != m_authProvider.userID() {
+            let tap = UITapGestureRecognizer(target: self, action: #selector(ChatVC.presentUserMenu))
+            tap.numberOfTapsRequired = 1
+            cell.avatarImageView.addGestureRecognizer(tap)
+        }
+
         return cell
     }
     
@@ -301,7 +288,7 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
         
         // Save message in Firebase and cache
-        m_messagesProvider.sendRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, url: nil, roomID: m_currentRoom!.id)
+        m_messagesProvider.sendRoomMessage(senderID: senderId, senderName: senderDisplayName, text: text, url: nil, room: m_currentRoom!)
         
         // Add message to collectionview
         m_messages.append(JSQMessage(senderId: senderId, displayName: senderDisplayName, text: text))
@@ -310,6 +297,7 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
         self.scrollToBottom(animated: false)
         
         if !m_roomUsers.contains(senderId) {
+            m_roomUsers.append(senderId)
             m_dbProvider.updateRoomUsers(roomUser: senderId)
         }
         
@@ -365,7 +353,7 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
             self.collectionView.reloadData()
             
             // Save image message in Firebase and cache
-            m_messagesProvider.saveMedia(image: mediaPick, video: nil, senderID: self.senderId, senderName: self.senderDisplayName, roomID: m_currentRoom!.id)
+            m_messagesProvider.saveMedia(image: mediaPick, video: nil, senderID: self.senderId, senderName: self.senderDisplayName, room: m_currentRoom!, receiverID: nil)
             
         } else if let mediaPick = info[UIImagePickerControllerMediaURL] as? URL {
             // Add media message to local messages variable and reload
@@ -374,7 +362,7 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
             self.collectionView.reloadData()
             
             // Save video message to Firebase database and cache
-            m_messagesProvider.saveMedia(image: nil, video: mediaPick, senderID: self.senderId, senderName: self.senderDisplayName, roomID: m_currentRoom!.id)
+            m_messagesProvider.saveMedia(image: nil, video: mediaPick, senderID: self.senderId, senderName: self.senderDisplayName, room: m_currentRoom!, receiverID: nil)
         }
         // Dismiss picker
         dismiss(animated: true, completion: nil)
@@ -397,22 +385,36 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
     }
     
     func saveRoom() {
+        m_dbProvider.increaseLikes()
         m_savedRooms.append(m_currentRoom!)
         m_cacheStorage.cacheRooms(type: "saved", rooms: m_savedRooms)
+        Messaging.messaging().subscribe(toTopic: m_currentRoom!.id)
+        print("Subscribed to \(m_currentRoom!.id)")
     }
     
     func unsaveRoom() {
+        m_dbProvider.decreaseLikes()
         let index = m_savedRooms.index(where: { $0.id == m_currentRoom!.id })
         m_savedRooms.remove(at: index!)
         m_cacheStorage.cacheRooms(type: "saved", rooms: m_savedRooms)
+        Messaging.messaging().unsubscribe(fromTopic: m_currentRoom!.id)
+        print("Unsubscribed to \(m_currentRoom!.id)")
+    }
+    
+    /**
+     Keyboard Functions
+     **/
+    
+    @objc func keyboardWillShow(notification: NSNotification) {
+        self.topContentAdditionalInset = -65
     }
     
     /**
         Delegation functions
     **/
     
-    func mediaMessageReceived(message: JSQMessage, roomID: String, index: Int) {
-        if roomID == m_currentRoom?.id {
+    func mediaMessageReceived(message: JSQMessage, id: String, index: Int) {
+        if id == m_currentRoom?.id {
             m_messages[index] = message
             let indexPath = IndexPath(row: index, section: 0)
             collectionView.reloadItems(at: [indexPath])
@@ -420,15 +422,93 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
     }
     
     func messageReceived(message: JSQMessage) {
-        DispatchQueue.main.sync {
-            m_messages.append(message)
-            collectionView.reloadData()
-            self.collectionView.layoutIfNeeded()
-            self.scrollToBottom(animated: true)
+        DispatchQueue.main.async {
+            self.m_messages.append(message)
+            self.collectionView.reloadData()
+            if (self.collectionView.contentOffset.y >= self.collectionView.contentSize.height - self.collectionView.frame.size.height + (self.navigationController?.navigationBar.frame.size.height)!) {
+                self.collectionView.layoutIfNeeded()
+                self.scrollToBottom(animated: true)
+            }
         }
     }
     
-    func cacheUpdated() {
+    func imageCacheUpdated() {
         collectionView.reloadData()
     }
+    
+    @objc func presentUserMenu(sender: UITapGestureRecognizer) {
+        let tapLocation = sender.location(in: self.collectionView)
+        let indexPath: IndexPath = self.collectionView.indexPathForItem(at: tapLocation)!
+        let messageAtIndex = m_messages[indexPath.row]
+        let userID = messageAtIndex.senderId
+        let user = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: userID!)
+        m_receiver = user
+        
+        m_userMenu = UIView.init(frame: CGRect(x: 0, y: 0, width: 250, height: 150))
+        m_userMenu.center.y = self.view.center.y
+        m_userMenu.center.x = self.view.center.x
+        m_userMenu.layer.cornerRadius = 8
+        m_userMenu.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
+        self.view.addSubview(m_userMenu)
+        
+        let avatarView = UIImageView.init(frame: CGRect(x: 100, y: 10, width: 50, height: 50))
+        avatarView.image = UIImage(named: "avatar.gif")
+        avatarView.layer.masksToBounds = true
+        avatarView.layer.cornerRadius = 25
+        
+        let userNameText = UILabel.init(frame: CGRect(x: 0, y: 70, width: 250, height: 20))
+        userNameText.text = user?.name
+        userNameText.textAlignment = .center
+        userNameText.textColor = UIColor.white
+        userNameText.font = UIFont.boldSystemFont(ofSize: 19)
+        
+        let messageButton = UIButton.init(frame: CGRect(x: 80, y: 100, width: 40, height: 40))
+        messageButton.setImage(UIImage(named: "chats_white"), for: .normal)
+        messageButton.backgroundColor = UIColor(white: 0.18, alpha: 1)
+        messageButton.layer.borderWidth = 2
+        messageButton.layer.borderColor = UIColor(white: 0.16, alpha: 1).cgColor
+        messageButton.layer.cornerRadius = 5
+        messageButton.addTarget(self, action: #selector(ChatVC.displayPersonalChat), for: .touchUpInside)
+        
+        let cancelButton = UIButton.init(frame: CGRect(x: 130, y: 100, width: 40, height: 40))
+        cancelButton.setImage(UIImage(named: "cancel"), for: .normal)
+        cancelButton.backgroundColor = UIColor(white: 0.18, alpha: 1)
+        cancelButton.layer.borderWidth = 2
+        cancelButton.layer.borderColor = UIColor(white: 0.16, alpha: 1).cgColor
+        cancelButton.layer.cornerRadius = 5
+        cancelButton.addTarget(self, action: #selector(ChatVC.dismissUserMenu), for: .touchUpInside)
+    
+        m_userMenu.addSubview(avatarView)
+        m_userMenu.addSubview(userNameText)
+        m_userMenu.addSubview(messageButton)
+        m_userMenu.addSubview(cancelButton)
+    }
+    
+    @objc func dismissUserMenu() {
+        m_userMenu.removeFromSuperview()
+    }
+    
+    @objc func displayPersonalChat() {
+        performSegue(withIdentifier: "personal_chat_segue", sender: nil)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        m_userMenu.removeFromSuperview()
+        // Check whether chat exists between users
+        let user = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: m_authProvider.userID())
+        let chats = user!.chats
+        let personalChatVC = segue.destination as! PersonalChatVC
+        let chatID = chats[m_receiver!.id]
+        
+        if chatID != nil {
+            personalChatVC.m_currentChatID = chatID!
+            personalChatVC.m_receiverUserID = m_receiver!.id
+        } else {
+            personalChatVC.m_currentChatID = "\(m_authProvider.userID())\(m_receiver!.id)"
+            personalChatVC.m_receiverUserID = m_receiver!.id
+            personalChatVC.m_newChat = true
+        }
+        
+    }
+    
 }

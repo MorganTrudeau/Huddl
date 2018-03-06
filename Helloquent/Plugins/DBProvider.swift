@@ -22,13 +22,15 @@ protocol UserEnteredRoom: class {
     func userEnteredRoom()
 }
 
+protocol LikesDelegate: class {
+    func likesReceived(likes: Int, indexPath: IndexPath)
+}
+
 typealias DefaultClosure = () -> Void
 
-typealias SaveHandler = (_ success: Bool) -> Void
+typealias SuccessHandler = (_ success: Bool) -> Void
 
-typealias ActiveUsersHandler = (_ activeUsers: Int, _ index: Int) -> Void
-
-typealias CreateRoomHandler = (_ room: Room, _ success: Bool) -> Void
+typealias CreateRoomHandler = (_ room: Room?, _ success: Bool) -> Void
 
 typealias GetRoomsHandler = (_ rooms: [Room]) -> Void
 
@@ -40,6 +42,8 @@ typealias AvatarHandler = (_ avatar: UIImage) -> Void
 
 typealias RoomUserHandler = (_ roomUsers: [String]) ->  Void
 
+typealias UserHandler = (_ user: User) -> Void
+
 class DBProvider {
     
     private static let _instance = DBProvider()
@@ -49,10 +53,10 @@ class DBProvider {
     
     weak var delegateRooms: FetchRoomData?
     weak var delegateUserEnteredRoom: UserEnteredRoom?
+    weak var delegateLikes: LikesDelegate?
     
-    var m_currentRoomID: String?
-    var m_roomAddedHandle: UInt?
-    var m_roomChangedHandle: UInt?
+    var m_currentRoom: Room?
+    var m_currentChatID: String?
     
     let m_cacheStorage = CacheStorage.Instance
     let m_authProvider = AuthProvider.Instance
@@ -69,6 +73,14 @@ class DBProvider {
         return dbRef.child(Constants.ROOMS)
     }
     
+    var chatsRef: DatabaseReference {
+        return dbRef.child(Constants.CHATS)
+    }
+    
+    var likedRoomsRef: DatabaseReference {
+        return dbRef.child(Constants.LIKED_ROOMS)
+    }
+    
     var userRoomsRef: DatabaseReference {
         return dbRef.child(Constants.USER_ROOMS)
     }
@@ -77,12 +89,20 @@ class DBProvider {
         return dbRef.child(Constants.LOCATION_ROOMS)
     }
     
-    var messagesRef: DatabaseReference {
-        return dbRef.child(Constants.MESSAGES)
+    var roomMessagesRef: DatabaseReference {
+        return dbRef.child(Constants.ROOM_MESSAGES)
     }
     
-    var roomMessagesRef: DatabaseReference {
-        return messagesRef.child(m_currentRoomID!)
+    var roomMessagesChildRef: DatabaseReference {
+        return roomMessagesRef.child(m_currentRoom!.id)
+    }
+    
+    var chatMessagesRef: DatabaseReference {
+        return dbRef.child(Constants.CHAT_MESSAGES)
+    }
+    
+    var chatMessagesChildRef: DatabaseReference {
+        return chatMessagesRef.child(m_currentChatID!)
     }
     
     var mediaMessagesRef: DatabaseReference {
@@ -110,18 +130,26 @@ class DBProvider {
         usersRef.child(withID).setValue(data)
     }
     
-    func getUser(id: String, completion: DefaultClosure?) {
+    func getUser(id: String, completion: UserHandler?) {
         self.usersRef.observeSingleEvent(of: .value, with: {(snapshot) in
             DispatchQueue.global().async {
                 if let userData = snapshot.childSnapshot(forPath: id).value as? NSDictionary {
                     if let name = userData[Constants.DISPLAY_NAME] as? String {
                         if let color = userData[Constants.COLOR] as? String {
                             if let avatar = userData[Constants.AVATAR] as? String {
-                                let user = User(id: id, name: name, color: color, avatar: avatar)
-                                self.m_cacheStorage.cacheUser(user: user)
-                                self.loadMedia(url: user.avatar, completion: {() in
-                                    completion?()
-                                })
+                                if let chats = userData[Constants.CHATS] as? [String:String] {
+                                    let user = User(id: id, name: name, color: color, avatar: avatar, chats: chats)
+                                    self.m_cacheStorage.cacheUser(user: user)
+                                    self.loadMedia(url: user.avatar, completion: {() in
+                                        completion?(user)
+                                    })
+                                } else {
+                                    let user = User(id: id, name: name, color: color, avatar: avatar, chats: [:])
+                                    self.m_cacheStorage.cacheUser(user: user)
+                                    self.loadMedia(url: user.avatar, completion: {() in
+                                        completion?(user)
+                                    })
+                                }
                             }
                         }
                     }
@@ -131,21 +159,21 @@ class DBProvider {
     }
     
     func updateRoomUsers(roomUser: String) {
-        self.roomsRef.child(self.m_currentRoomID!).observeSingleEvent(of: .value, with: {(snapshot) in
+        self.roomsRef.child(self.m_currentRoom!.id).observeSingleEvent(of: .value, with: {(snapshot) in
             var room = snapshot.value as! NSDictionary
             if var roomUsers = room[Constants.ROOM_USERS] as? [String] {
                 roomUsers.append(roomUser)
                 print("Updated room users: \(roomUsers)")
-                self.roomsRef.child("\(self.m_currentRoomID!)/\(Constants.ROOM_USERS)").setValue(roomUsers)
+                self.roomsRef.child("\(self.m_currentRoom!.id)/\(Constants.ROOM_USERS)").setValue(roomUsers)
             } else {
                 room.setValue([roomUser], forKey: Constants.ROOM_USERS)
-                self.roomsRef.child(self.m_currentRoomID!).setValue(room)
+                self.roomsRef.child(self.m_currentRoom!.id).setValue(room)
             }
         })
     }
     
     func getRoomUsers(completion: RoomUserHandler?) {
-        self.roomsRef.child(self.m_currentRoomID!).observeSingleEvent(of: .value, with: {(snapshot) in
+        self.roomsRef.child(self.m_currentRoom!.id).observeSingleEvent(of: .value, with: {(snapshot) in
             if let room = snapshot.value as? NSDictionary {
                 if let roomUsers = room[Constants.ROOM_USERS] as? [String] {
                     completion?(roomUsers)
@@ -158,7 +186,7 @@ class DBProvider {
         })
     }
     
-    func saveProfile(displayName: String, color: String, avatar: UIImage?, completion: SaveHandler?) {
+    func saveProfile(displayName: String, color: String, avatar: UIImage?, completion: SuccessHandler?) {
         
         // Update current user profile
         if avatar != nil {
@@ -174,9 +202,6 @@ class DBProvider {
                 // Store image in cache
                 self.m_cacheStorage.cacheImage(id: metadataURL, image: avatar!)
                 
-                // Store updated user in cache
-                self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: metadataURL))
-                
                 // Update user in Firebase
                 self.usersRef.child(AuthProvider.Instance.userID()).runTransactionBlock({(data: MutableData) in
                     if var user = data.value as? [String: Any] {
@@ -184,6 +209,10 @@ class DBProvider {
                         user[Constants.DISPLAY_NAME] = displayName
                         user[Constants.COLOR] = color
                         data.value = user
+                        
+                        // Store updated user in cache
+                        self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: metadataURL, chats: user[Constants.CHATS] as! [String:String]))
+                        
                         DispatchQueue.main.sync {
                             completion?(true)
                         }
@@ -199,7 +228,7 @@ class DBProvider {
                     data.value = user
                     
                     // Store updated user in cache
-                    self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: user[Constants.AVATAR] as! String))
+                    self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: user[Constants.AVATAR] as! String, chats: user[Constants.CHATS] as! [String:String]))
                     
                     DispatchQueue.main.sync {
                         completion?(false)
@@ -212,43 +241,72 @@ class DBProvider {
     // Room Functions
     
     func createRoom(name: String, description: String?, password: String?, roomCreated: CreateRoomHandler?){
-        var success = false
         var newRoom: Room?
-        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.DESCRIPTION: description ?? "", Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0]
+        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.DESCRIPTION: description ?? "", Constants.PASSWORD: password ?? "", Constants.LIKES: 0]
         userRoomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             if !snapshot.hasChild(name) {
-                
-                self.userRoomsRef.child(name).setValue(data)
+                self.userRoomsRef.childByAutoId().setValue(data)
                 self.roomsRef.child(name).setValue(data)
-                newRoom = Room(name: name, description: description!, id: name, password: password!, activeUsers: 0)
-                success = true
+                newRoom = Room(name: name, description: description!, id: name, password: password!, likes: 0)
+                roomCreated?(newRoom!, true)
+            } else {
+                roomCreated?(nil, false)
             }
-            roomCreated?(newRoom!, success)
+        })
+    }
+    
+    func createLocationRoom(id: String, name: String, description: String?, password: String?, lat: String, long: String) {
+        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.DESCRIPTION: description ?? "", Constants.PASSWORD: password ?? "", Constants.LIKES: 0, Constants.LATITUDE: lat, Constants.LONGITUDE: long]
+        roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
+            if !snapshot.hasChild(id) {
+                self.roomsRef.child(id).setValue(data)
+                self.locationRoomsRef.child(id).setValue(data)
+            }
+        })
+    }
+    
+    func createChat(receiverID: String) {
+        let chatID = "\(m_authProvider.userID())\(receiverID)"
+        let senderID = m_authProvider.userID()
+        
+        // Create chat reference for sender
+        self.usersRef.child(senderID).observeSingleEvent(of: .value, with: {(snapshot) in
+            var user = snapshot.value as! NSDictionary
+            if var chats = user[Constants.CHATS] as? NSDictionary {
+                chats.setValue(chatID, forKey: receiverID)
+                self.usersRef.child(senderID).setValue(chats)
+            } else {
+                user.setValue([receiverID:chatID], forKey: Constants.CHATS)
+                self.usersRef.child(senderID).setValue(user)
+            }
+        })
+        
+        // Create chat reference for receiver
+        self.usersRef.child(receiverID).observeSingleEvent(of: .value, with: {(snapshot) in
+            var user = snapshot.value as! NSDictionary
+            if var chats = user[Constants.CHATS] as? NSDictionary {
+                chats.setValue(chatID, forKey: senderID)
+                self.usersRef.child(receiverID).setValue(chats)
+            } else {
+                user.setValue([senderID:chatID], forKey: Constants.CHATS)
+                self.usersRef.child(receiverID).setValue(user)
+            }
         })
     }
     
     func getUserRooms(completion: GetRoomsHandler?) {
         userRoomsRef.observeSingleEvent(of: DataEventType.value) {
             (snapshot: DataSnapshot) in
-            
             var rooms = [Room]()
-            
             if let roomData = snapshot.value as? NSDictionary {
-                
                 for (key, value) in roomData {
-                    
                     if let room = value as? NSDictionary {
-                        
                         if let roomName = room[Constants.ROOM_NAME] as? String {
-                            
                             if let description = room[Constants.DESCRIPTION] as? String {
-                                
                                 if let password = room[Constants.PASSWORD] as? String {
-                                    
-                                    if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
-                                        
+                                    if let likes = room[Constants.LIKES] as? Int {
                                         let id = key as! String
-                                        let newRoom = Room(name: roomName, description: description, id: id, password: password, activeUsers: activeUsers)
+                                        let newRoom = Room(name: roomName, description: description, id: id, password: password, likes: likes)
                                         rooms.append(newRoom)
                                     }
                                 }
@@ -257,50 +315,26 @@ class DBProvider {
                     }
                 }
             }
+            rooms.sort(by: { $0.name < $1.name })
             completion?(rooms)
             self.m_cacheStorage.cacheRooms(type: "user", rooms: rooms)
         }
     }
     
-    func createLocationRoom(id: String, name: String, description: String?, password: String?, lat: String, long: String) {
-        let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.DESCRIPTION: description ?? "", Constants.PASSWORD: password ?? "", Constants.ACTIVE_USERS: 0, Constants.LATITUDE: lat, Constants.LONGITUDE: long]
-        roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
-            if !snapshot.hasChild(id) {
-                self.roomsRef.child(id).setValue(data)
-            }
-        })
-        locationRoomsRef.observeSingleEvent(of: .value, with: {(snapshot) in
-            if !snapshot.hasChild(id) {
-                self.locationRoomsRef.child(id).setValue(data)
-            }
-        })
-    }
-    
     func getLocationRooms(completion: GetLocationRoomsHandler?) {
         locationRoomsRef.observeSingleEvent(of: DataEventType.value) {
             (snapshot: DataSnapshot) in
-            
             var rooms = [LocationRoom]()
-            
             if let roomData = snapshot.value as? NSDictionary {
-                
                 for (id, value) in roomData {
-                    
                     if let room = value as? NSDictionary {
-                        
                         if let roomName = room[Constants.ROOM_NAME] as? String {
-                            
                             if let description = room[Constants.DESCRIPTION] as? String {
-                                
                                 if let password = room[Constants.PASSWORD] as? String {
-                                    
-                                    if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
-                                        
+                                    if let likes = room[Constants.LIKES] as? Int {
                                         if let latitude = room[Constants.LATITUDE] as? String {
-                                            
                                             if let longitude = room[Constants.LONGITUDE] as? String {
-                                                
-                                                let room = LocationRoom(name: roomName, description: description, id: id as! String, password: password, activeUsers: activeUsers, latitude: latitude, longitude: longitude)
+                                                let room = LocationRoom(name: roomName, description: description, id: id as! String, password: password, likes: likes, latitude: latitude, longitude: longitude)
                                                 rooms.append(room)
                                             }
                                         }
@@ -315,65 +349,19 @@ class DBProvider {
         }
     }
     
-    func getActiveRooms(completion: GetRoomsHandler?) {
-        roomsRef.observeSingleEvent(of: DataEventType.value) {
+    func getLikedRooms(completion: GetRoomsHandler?) {
+        likedRoomsRef.observeSingleEvent(of: DataEventType.value) {
             (snapshot: DataSnapshot) in
-            
             var rooms = [Room]()
-            
             if let roomData = snapshot.value as? NSDictionary {
-                
                 for (key, value) in roomData {
-                    
                     if let room = value as? NSDictionary {
-                        
-                        if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
-                            
-                            if activeUsers > 0 {
-                        
-                                if let roomName = room[Constants.ROOM_NAME] as? String {
-                                
-                                    if let description = room[Constants.DESCRIPTION] as? String {
-                                
-                                        if let password = room[Constants.PASSWORD] as? String {
-                                    
-                                            let id = key as! String
-                                            let newRoom = Room(name: roomName, description: description, id: id, password: password, activeUsers: activeUsers)
-                                            rooms.append(newRoom)
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-            completion?(rooms)
-        }
-    }
-    
-    func getSavedRooms(savedIDs: [String], completion: GetRoomsHandler?) {
-        
-        var rooms = [Room]()
-        
-        roomsRef.observeSingleEvent(of: .value, with: {(snapshot) in
-            
-            for id in savedIDs {
-                
-                if snapshot.hasChild(id) {
-                    
-                    if let room = snapshot.childSnapshot(forPath: id).value as? NSDictionary {
-                        
-                        if let roomName = room[Constants.ROOM_NAME] as? String {
-                            
-                            if let description = room[Constants.DESCRIPTION] as? String {
-                                
-                                if let password = room[Constants.PASSWORD] as? String {
-                                    
-                                    if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
-                                        
-                                        let id = id
-                                        let newRoom = Room(name: roomName, description: description, id: id, password: password, activeUsers: activeUsers)
+                        if let likes = room[Constants.LIKES] as? Int  {
+                            if let roomName = room[Constants.ROOM_NAME] as? String {
+                                if let description = room[Constants.DESCRIPTION] as? String {
+                                    if let password = room[Constants.PASSWORD] as? String {
+                                        let id = key as! String
+                                        let newRoom = Room(name: roomName, description: description, id: id, password: password, likes: likes)
                                         rooms.append(newRoom)
                                     }
                                 }
@@ -382,79 +370,32 @@ class DBProvider {
                     }
                 }
             }
+            rooms.sort(by: { $0.likes > $1.likes })
             completion?(rooms)
-        })
-    }
-    
-    func hasRoom(roomID: String, index: Int, completion: ActiveUsersHandler?) {
-        roomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
-            
-            if snapshot.hasChild(roomID) {
-                
-                let child = snapshot.childSnapshot(forPath: "\(roomID)/active_users")
-                    
-                if let activeUsers = child.value as? Int {
-        
-                    completion?(activeUsers, index)
-                }
-            } else {
-                completion?(0, index)
-            }
-        })
-    }
-    
-    func observeRoomsChanged() {
-        m_roomChangedHandle = roomsRef.observe(DataEventType.childChanged) { (snapshot: DataSnapshot) in
-            self.delegateUserEnteredRoom?.userEnteredRoom()
         }
     }
     
-    func observeRoomsAdded() {
-        m_roomAddedHandle = roomsRef.observe(DataEventType.childAdded) {(snapshot: DataSnapshot) in
-                
-            if let data = snapshot.value as? NSDictionary {
-                            
-                if let roomName = data[Constants.ROOM_NAME] as? String {
-                    
-                    if let description = data[Constants.DESCRIPTION] as? String {
-                    
-                        if let password =  data[Constants.PASSWORD] as? String {
-                        
-                            if let activeUsers = data[Constants.ACTIVE_USERS] as? Int {
-                                
-                                let id = snapshot.key as String
-                                let newRoom = Room(name: id, description: roomName, id: description, password: password, activeUsers: activeUsers)
-                                self.delegateRooms?.roomDataReceived(room: newRoom)
-                            }
-                        }
-                    }
-                }
+    func getLikes(id: String, indexPath: IndexPath) {
+        likedRoomsRef.child("\(id)/\(Constants.LIKES)").observeSingleEvent(of: .value, with: {(snapshot) in
+            if let likes = snapshot.value as? Int {
+                self.delegateLikes?.likesReceived(likes: likes, indexPath: indexPath)
             }
-        }
+        })
     }
     
     func getRooms() {
         roomsRef.observeSingleEvent(of: DataEventType.value) {
             (snapshot: DataSnapshot) in
-            
             var rooms = [Room]()
-            
             if let roomData = snapshot.value as? NSDictionary {
-                
                 for (key, value) in roomData {
-                    
                     if let room = value as? NSDictionary {
-                        
                         if let roomName = room[Constants.ROOM_NAME] as? String {
-                            
                             if let description = room[Constants.DESCRIPTION] as? String {
-                            
                                 if let password = room[Constants.PASSWORD] as? String {
-                                
-                                    if let activeUsers = room[Constants.ACTIVE_USERS] as? Int {
-                                        
+                                    if let likes = room[Constants.LIKES] as? Int {
                                         let id = key as! String
-                                        let newRoom = Room(name: roomName, description: description, id: id, password: password, activeUsers: activeUsers)
+                                        let newRoom = Room(name: roomName, description: description, id: id, password: password, likes: likes)
                                         rooms.append(newRoom)
                                     }
                                 }
@@ -467,52 +408,64 @@ class DBProvider {
         }
     }
     
-    func removeRoomsObserver(withHandle: String) {
-        if withHandle == Constants.CHILD_ADDED_HANDLE {
-            roomsRef.removeObserver(withHandle: m_roomAddedHandle!)
-        } else if withHandle == Constants.CHILD_CHANGED_HANDLE {
-            roomsRef.removeObserver(withHandle: m_roomChangedHandle!)
-        }
-    }
-    
-    func increaseActiveUsers() {
-        roomsRef.child(m_currentRoomID!).runTransactionBlock({(data: MutableData) in
-            if var room = data.value as? [String: Any] {
-                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
-                activeUsers = activeUsers! + 1
-                room[Constants.ACTIVE_USERS] = activeUsers
-                data.value = room
+    func hasLikedRoom(id: String, completion: @escaping SuccessHandler) {
+        likedRoomsRef.observeSingleEvent(of: .value, with: {(snapshot) in
+            if snapshot.hasChild(id) {
+                completion(true)
+            } else {
+                completion(false)
             }
-            return TransactionResult.success(withValue: data)
-        })
-        locationRoomsRef.child(m_currentRoomID!).runTransactionBlock({(data: MutableData) in
-            if var room = data.value as? [String: Any] {
-                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
-                activeUsers = activeUsers! + 1
-                room[Constants.ACTIVE_USERS] = activeUsers
-                data.value = room
-            }
-            return TransactionResult.success(withValue: data)
         })
     }
     
-    func decreaseActiveUsers(completion: DefaultClosure?) {
-        roomsRef.child(m_currentRoomID!).runTransactionBlock({(data: MutableData) in
-            if var room = data.value as? [String: Any] {
-                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
-                if activeUsers! > 0 {
-                    activeUsers = activeUsers! - 1
+    func increaseLikes() {
+        hasLikedRoom(id: m_currentRoom!.id, completion: {(hasRoom) in
+            if hasRoom {
+                self.likedRoomsRef.child(self.m_currentRoom!.id).runTransactionBlock({(data: MutableData) in
+                    if var room = data.value as? [String: Any] {
+                        var likes = room[Constants.LIKES] as? Int
+                        likes = likes! + 1
+                        room[Constants.LIKES] = likes
+                        data.value = room
+                    }
+                    return TransactionResult.success(withValue: data)
+                })
+            } else {
+                let likedRoom: Dictionary<String, Any> = [Constants.ROOM_NAME: self.m_currentRoom!.name, Constants.DESCRIPTION: self.m_currentRoom!.description , Constants.PASSWORD: self.m_currentRoom!.password , Constants.LIKES: 1]
+                self.likedRoomsRef.child(self.m_currentRoom!.id).setValue(likedRoom)
+            }
+        })
+    }
+    
+    func decreaseLikes() {
+        likedRoomsRef.child(m_currentRoom!.id).observeSingleEvent(of: .value, with: {(snapshot) in
+            if let room = snapshot.value as? NSDictionary {
+                if let likes = room[Constants.LIKES] as? Int {
+                    if likes > 1 {
+                        self.likedRoomsRef.child(self.m_currentRoom!.id).runTransactionBlock({(data: MutableData) in
+                            if var room = data.value as? [String: Any] {
+                                var likes = room[Constants.LIKES] as? Int
+                                if likes! > 0 {
+                                    likes = likes! - 1
+                                }
+                                room[Constants.LIKES] = likes
+                                data.value = room
+                            }
+                            return TransactionResult.success(withValue: data)
+                        })
+                    } else {
+                        self.likedRoomsRef.child(self.m_currentRoom!.id).removeValue()
+                    }
                 }
-                room[Constants.ACTIVE_USERS] = activeUsers
-                data.value = room
             }
-            return TransactionResult.success(withValue: data)
         })
-        locationRoomsRef.child(m_currentRoomID!).runTransactionBlock({(data: MutableData) in
+        roomsRef.child(m_currentRoom!.id).runTransactionBlock({(data: MutableData) in
             if var room = data.value as? [String: Any] {
-                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
-                activeUsers = activeUsers! - 1
-                room[Constants.ACTIVE_USERS] = activeUsers
+                var likes = room[Constants.LIKES] as? Int
+                if likes! > 0 {
+                    likes = likes! - 1
+                }
+                room[Constants.LIKES] = likes
                 data.value = room
             }
             return TransactionResult.success(withValue: data)
@@ -545,7 +498,91 @@ class DBProvider {
             completion?()
         }
     }
-
     
+    /**
+     Functions for future implementation
+    **/
+    
+//    func increaseActiveUsers() {
+//        roomsRef.child(m_currentRoom!.id).runTransactionBlock({(data: MutableData) in
+//            if var room = data.value as? [String: Any] {
+//                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
+//                activeUsers = activeUsers! + 1
+//                room[Constants.ACTIVE_USERS] = activeUsers
+//                data.value = room
+//            }
+//            return TransactionResult.success(withValue: data)
+//        })
+//        locationRoomsRef.child(m_currentRoom!.id).runTransactionBlock({(data: MutableData) in
+//            if var room = data.value as? [String: Any] {
+//                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
+//                activeUsers = activeUsers! + 1
+//                room[Constants.ACTIVE_USERS] = activeUsers
+//                data.value = room
+//            }
+//            return TransactionResult.success(withValue: data)
+//        })
+//    }
+//    
+//    func decreaseActiveUsers(completion: DefaultClosure?) {
+//        roomsRef.child(m_currentRoom!.id).runTransactionBlock({(data: MutableData) in
+//            if var room = data.value as? [String: Any] {
+//                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
+//                if activeUsers! > 0 {
+//                    activeUsers = activeUsers! - 1
+//                }
+//                room[Constants.ACTIVE_USERS] = activeUsers
+//                data.value = room
+//            }
+//            return TransactionResult.success(withValue: data)
+//        })
+//        locationRoomsRef.child(m_currentRoom!.id).runTransactionBlock({(data: MutableData) in
+//            if var room = data.value as? [String: Any] {
+//                var activeUsers = room[Constants.ACTIVE_USERS] as? Int
+//                activeUsers = activeUsers! - 1
+//                room[Constants.ACTIVE_USERS] = activeUsers
+//                data.value = room
+//            }
+//            return TransactionResult.success(withValue: data)
+//        })
+//    }
+//    
+//    func removeRoomsObserver(withHandle: String) {
+//        if withHandle == Constants.CHILD_ADDED_HANDLE {
+//            roomsRef.removeObserver(withHandle: m_roomAddedHandle!)
+//        } else if withHandle == Constants.CHILD_CHANGED_HANDLE {
+//            roomsRef.removeObserver(withHandle: m_roomChangedHandle!)
+//        }
+//    }
+//
+//    func observeRoomsChanged() {
+//        m_roomChangedHandle = roomsRef.observe(DataEventType.childChanged) { (snapshot: DataSnapshot) in
+//            self.delegateUserEnteredRoom?.userEnteredRoom()
+//        }
+//    }
+//    
+//    func observeRoomsAdded() {
+//        m_roomAddedHandle = roomsRef.observe(DataEventType.childAdded) {(snapshot: DataSnapshot) in
+//            
+//            if let data = snapshot.value as? NSDictionary {
+//                
+//                if let roomName = data[Constants.ROOM_NAME] as? String {
+//                    
+//                    if let description = data[Constants.DESCRIPTION] as? String {
+//                        
+//                        if let password =  data[Constants.PASSWORD] as? String {
+//                            
+//                            if let likes = data[Constants.LIKES] as? Int {
+//                                
+//                                let id = snapshot.key as String
+//                                let newRoom = Room(name: id, description: roomName, id: description, password: password, likes: likes)
+//                                self.delegateRooms?.roomDataReceived(room: newRoom)
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
     
 }

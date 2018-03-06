@@ -24,4 +24,8 @@ class LoadingOverlay: UIViewController {
         self.view.addSubview(activityIndicator)
         activityIndicator.startAnimating()
     }
+    
+    func showLoadIndicatorView(view: UIView) {
+        
+    }
 }

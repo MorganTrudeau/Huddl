@@ -100,12 +100,12 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
             if let vc = segue.destination as? ChatVC {
                 let selectedRoom = m_filteredRooms[m_index!]
                 
-                let room = Room(name: selectedRoom.name, description: selectedRoom.description, id: selectedRoom.id, password: selectedRoom.password, activeUsers: selectedRoom.activeUsers)
+                let room = Room(name: selectedRoom.name, description: selectedRoom.description, id: selectedRoom.id, password: selectedRoom.password, likes: selectedRoom.likes)
                 
                 vc.m_currentRoom = room
                 
                 // Pass selected Room to DBProvider so it knows where to save
-                m_dbProvider.m_currentRoomID = room.id
+                m_dbProvider.m_currentRoom = room
             }
         }
     }
@@ -146,6 +146,9 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
             self.m_userRooms = rooms
             if self.m_query != "" {
                 self.m_filteredRooms = self.m_userRooms.filter { $0.name.lowercased().contains(self.m_query.lowercased()) }
+                self.m_filteredRooms.sort(by: { $0.name < $1.name })
+            } else {
+                self.m_filteredRooms.sort(by: { $0.name < $1.name })
             }
             self.m_userRoomsTableView.reloadData()
             self.m_refreshControl.endRefreshing()
@@ -173,12 +176,15 @@ class UserRoomsTableView: UIViewController, UITableViewDelegate, UITableViewData
     
     func roomCreated(room: Room) {
         m_userRooms.append(room)
+        m_userRooms.sort(by: { $0.name < $1.name })
         if m_query != "" {
             if room.name.lowercased().contains(m_query.lowercased()) {
                 m_filteredRooms.append(room)
+                m_filteredRooms.sort(by: { $0.name < $1.name })
             }
         } else {
             m_filteredRooms.append(room)
+            m_filteredRooms.sort(by: { $0.name < $1.name })
         }
         m_userRoomsTableView.reloadData()
     }

@@ -12,7 +12,25 @@
 		<key>Rooms.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>20</integer>
+			<integer>0</integer>
+		</dict>
+	</dict>
+	<key>SuppressBuildableAutocreation</key>
+	<dict>
+		<key>F90D10241FECDFB90012283B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>F90D10381FECDFB90012283B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>F90D10431FECDFB90012283B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
 		</dict>
 	</dict>
 </dict>

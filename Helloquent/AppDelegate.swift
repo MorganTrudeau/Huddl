@@ -18,13 +18,14 @@ import Fabric
 import Crashlytics
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate, MessagingDelegate {
 
     var window: UIWindow?
  
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        
+        Messaging.messaging().delegate = self
         Fabric.with([Crashlytics.self])
-        FirebaseApp.configure()
         
         let kHelloMapAppID = "mAyUaYF8MsSg1cNc1BEM"
         let kHelloMapAppCode = "gnvNZrF5ywXEIooG2O0fGA"
@@ -45,8 +46,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         }
         
         application.registerForRemoteNotifications()
+        FirebaseApp.configure()
         
         return true
+    }
+    
+    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String) {
+
     }
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
@@ -55,12 +61,73 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        
+        // Print full message.
+        let roomID = userInfo["roomID"] as! String?
+        let senderID = userInfo["senderID"] as! String
+        let roomName = userInfo["roomName"] as! String?
+        let chatID = userInfo["chatID"] as! String?
+        if senderID != AuthProvider.Instance.userID() {
+            if (application.applicationState == UIApplicationState.inactive || application.applicationState == UIApplicationState.background) {
+                let visibleVC = (application.topMostViewController())!
+                if chatID != nil {
+                    let storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                    let tabBarVC = storyboard.instantiateViewController(withIdentifier: "TabBarVC") as! TabBarVC
+                    let roomsContainerNav = storyboard.instantiateViewController(withIdentifier: "RoomsContainerNav") as! UINavigationController
+                    let chatsNav = storyboard.instantiateViewController(withIdentifier: "PersonalChatsNav") as! UINavigationController
+                    let mapNav = storyboard.instantiateViewController(withIdentifier: "MapNav") as! UINavigationController
+                    let profileNav = storyboard.instantiateViewController(withIdentifier: "ProfileNav") as! UINavigationController
+                    
+                    tabBarVC.viewControllers = [roomsContainerNav, chatsNav, mapNav, profileNav]
+                    self.window?.rootViewController = tabBarVC
+                    
+                    let personalChatVC = storyboard.instantiateViewController(withIdentifier: "PersonalChatVC") as! PersonalChatVC
+                    personalChatVC.m_receiverUserID = senderID
+                    personalChatVC.m_currentChatID = chatID!
+                    tabBarVC.selectedIndex = 1
+                    chatsNav.pushViewController(personalChatVC, animated: false)
+                    chatsNav.navigationBar.tintColor = UIColor(red: 133/255, green: 51/255, blue: 1, alpha: 1)
+                } else {
+                    let room = Room(name: roomName!, description: "", id: roomID!, password: "", likes: 0)
+                    DBProvider.Instance.m_currentRoom = room
+                    if !visibleVC.isKind(of: ChatVC.classForCoder()) {
+                        let storyboard: UIStoryboard = UIStoryboard(name: "Main", bundle: nil)
+                        let tabBarVC = storyboard.instantiateViewController(withIdentifier: "TabBarVC") as! TabBarVC
+                        let roomsContainerNav = storyboard.instantiateViewController(withIdentifier: "RoomsContainerNav") as! UINavigationController
+                        let chatsNav = storyboard.instantiateViewController(withIdentifier: "PersonalChatsNav") as! UINavigationController
+                        let mapNav = storyboard.instantiateViewController(withIdentifier: "MapNav") as! UINavigationController
+                        let profileNav = storyboard.instantiateViewController(withIdentifier: "ProfileNav") as! UINavigationController
+                        
+                        tabBarVC.viewControllers = [roomsContainerNav, chatsNav, mapNav, profileNav]
+                        self.window?.rootViewController = tabBarVC
+                        
+                        let chatVC = storyboard.instantiateViewController(withIdentifier: "ChatVC") as! ChatVC
+                        roomsContainerNav.pushViewController(chatVC, animated: false)
+                        roomsContainerNav.navigationBar.tintColor = UIColor(red: 133/255, green: 51/255, blue: 1, alpha: 1)
+                    }
+                }
+            } else {
+                if roomID != nil {
+                    NotificationCenter.default.post(name: NSNotification.Name("SetBadge"), object: nil, userInfo: ["room_id": roomID!])
+                    CacheStorage.Instance.increaseCellNotifications(id: roomID!)
+                } else {
+                    NotificationCenter.default.post(name: NSNotification.Name("SetBadge"), object: nil, userInfo: ["chat_id": chatID!])
+                    CacheStorage.Instance.increaseCellNotifications(id: chatID!)
+                    DBProvider.Instance.getUser(id: AuthProvider.Instance.userID(), completion: nil)
+                }
+            }
+        }
     }
     
     func applicationWillResignActive(_ application: UIApplication) {
         // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
         // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
         NotificationCenter.default.post(name: NSNotification.Name("ResignActiveNotification"), object: nil)
+    }
+    
+    func applicationDidBecomeActive(_ application: UIApplication) {
+        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        NotificationCenter.default.post(name: NSNotification.Name("BecomeActiveNotification"), object: nil)
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
@@ -72,43 +139,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
     }
 
-    func applicationDidBecomeActive(_ application: UIApplication) {
-        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
-        NotificationCenter.default.post(name: NSNotification.Name("BecomeActiveNotification"), object: nil)
-    }
-
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     
-    lazy var persistentContainer: NSPersistentContainer = {
-        /*
-         The persistent container for the application. This implementation
-         creates and returns a container, having loaded the store for the
-         application to it. This property is optional since there are legitimate
-         error conditions that could cause the creation of the store to fail.
-         */
-        let container = NSPersistentContainer(name: "")
-        container.loadPersistentStores(completionHandler: { (storeDescription, error) in
-            
-            if let error = error as NSError? {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
-                
-                /*
-                 Typical reasons for an error here include:
-                 * The parent directory does not exist, cannot be created, or disallows writing.
-                 * The persistent store is not accessible, due to permissions or data protection when the device is locked.
-                 * The device is out of space.
-                 * The store could not be migrated to the current model version.
-                 Check the error message to determine what the actual problem was.
-                 */
-                fatalError("Unresolved error \(error), \(error.userInfo)")
-            }
-        })
-        return container
-    }()
-
-
 }
 

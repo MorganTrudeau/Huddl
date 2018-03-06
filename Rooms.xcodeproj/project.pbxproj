@@ -19,12 +19,13 @@
 		F90D10491FECDFB90012283B /* HelloquentUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D10481FECDFB90012283B /* HelloquentUITests.swift */; };
 		F90D105B1FECE33B0012283B /* SigninVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D105A1FECE33B0012283B /* SigninVC.swift */; };
 		F9179B77200EBDFC0057AAEF /* TabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B76200EBDFC0057AAEF /* TabBarVC.swift */; };
-		F9179B79200FD9060057AAEF /* ActiveRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B78200FD9060057AAEF /* ActiveRoomsVC.swift */; };
+		F9179B79200FD9060057AAEF /* LikedRoomsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B78200FD9060057AAEF /* LikedRoomsTableView.swift */; };
 		F9282ED22022A18000E009A5 /* SplashScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9282ED12022A18000E009A5 /* SplashScreenVC.swift */; };
 		F93364D81FEDE89D002A3718 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F93364D71FEDE89D002A3718 /* Assets.xcassets */; };
 		F93364DA1FEDE8BF002A3718 /* avatar.gif in Resources */ = {isa = PBXBuildFile; fileRef = F93364D91FEDE8BF002A3718 /* avatar.gif */; };
 		F93BC74E202ACD1D00F42038 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F93BC74D202ACD1D00F42038 /* GoogleService-Info.plist */; };
 		F93BC750202AD3CE00F42038 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F93BC74F202AD3CE00F42038 /* UserNotifications.framework */; };
+		F93EED1620355912006FE726 /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93EED1520355912006FE726 /* ChatTableViewCell.swift */; };
 		F947B3432016B83600E8CB41 /* SignUpVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F947B3422016B83600E8CB41 /* SignUpVC.swift */; };
 		F947B345201ADFA900E8CB41 /* RoomsContainerVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F947B344201ADFA800E8CB41 /* RoomsContainerVC.swift */; };
 		F95613BC20291A2000D9BEB2 /* MapVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F95613BB20291A2000D9BEB2 /* MapVC.swift */; };
@@ -33,17 +34,18 @@
 		F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3C1FEDA7B000CC3C58 /* Constants.swift */; };
 		F973BC411FEDDA8700CC3C58 /* ChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC401FEDDA8700CC3C58 /* ChatVC.swift */; };
 		F983B84C20230FFB00080AB5 /* CacheStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F983B84B20230FFB00080AB5 /* CacheStorage.swift */; };
+		F9BA66B3202B75F50085226F /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9BA66B2202B75F50085226F /* NMAKit.framework */; };
+		F9BA66B4202B75F50085226F /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F9BA66B2202B75F50085226F /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		F9BDD5FD2031147400D59027 /* PersonalChatsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BDD5FC2031147400D59027 /* PersonalChatsVC.swift */; };
+		F9BDD5FF20321DAD00D59027 /* PersonalChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BDD5FE20321DAD00D59027 /* PersonalChatVC.swift */; };
 		F9C747D720108FBA00F311D8 /* SavedRooms.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F9C747D520108FBA00F311D8 /* SavedRooms.xcdatamodeld */; };
-		F9C747D92010914C00F311D8 /* CoreDataProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C747D82010914C00F311D8 /* CoreDataProvider.swift */; };
 		F9C9F47E202991A800294846 /* ProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9C9F47D202991A800294846 /* ProfileVC.swift */; };
 		F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */; };
-		F9E264D41FFD4EED00605CA7 /* SavedRoomsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */; };
+		F9E264D41FFD4EED00605CA7 /* SavedRoomsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E264D31FFD4EED00605CA7 /* SavedRoomsTableView.swift */; };
 		F9E69A7E20172CFB0014733D /* LoadingOverlay.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9E69A7D20172CFB0014733D /* LoadingOverlay.swift */; };
 		F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9EA8BEC20008A6400A98421 /* ColorHandler.swift */; };
 		F9ECA255202337A400289D7C /* CodableStructs.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECA254202337A400289D7C /* CodableStructs.swift */; };
 		F9ECA25720269BF100289D7C /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9ECA25620269BF100289D7C /* Reachability.swift */; };
-		F9F110BE20296B4600FBCF46 /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9F110BD20296B4600FBCF46 /* NMAKit.framework */; };
-		F9F110BF20296B4600FBCF46 /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F9F110BD20296B4600FBCF46 /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F9F7E396201FB67100ABD6B8 /* ImageDisplayVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */; };
 		F9F7E398201FE51D00ABD6B8 /* EditProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E397201FE51D00ABD6B8 /* EditProfileVC.swift */; };
 		F9F7E39A202002D000ABD6B8 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E399202002D000ABD6B8 /* Helper.swift */; };
@@ -73,7 +75,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				F9F110BF20296B4600FBCF46 /* NMAKit.framework in Embed Frameworks */,
+				F9BA66B4202B75F50085226F /* NMAKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -105,13 +107,14 @@
 		F90D104A1FECDFB90012283B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F90D105A1FECE33B0012283B /* SigninVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SigninVC.swift; sourceTree = "<group>"; };
 		F9179B76200EBDFC0057AAEF /* TabBarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarVC.swift; sourceTree = "<group>"; };
-		F9179B78200FD9060057AAEF /* ActiveRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveRoomsVC.swift; sourceTree = "<group>"; };
+		F9179B78200FD9060057AAEF /* LikedRoomsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikedRoomsTableView.swift; sourceTree = "<group>"; };
 		F9282ED12022A18000E009A5 /* SplashScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenVC.swift; sourceTree = "<group>"; };
 		F93364D71FEDE89D002A3718 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F93364D91FEDE8BF002A3718 /* avatar.gif */ = {isa = PBXFileReference; lastKnownFileType = image.gif; name = avatar.gif; path = Assets.xcassets/avatar.gif; sourceTree = "<group>"; };
 		F93BC74C202ACAB100F42038 /* Helloquent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Helloquent.entitlements; sourceTree = "<group>"; };
 		F93BC74D202ACD1D00F42038 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F93BC74F202AD3CE00F42038 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
+		F93EED1520355912006FE726 /* ChatTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatTableViewCell.swift; sourceTree = "<group>"; };
 		F947B3422016B83600E8CB41 /* SignUpVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpVC.swift; sourceTree = "<group>"; };
 		F947B344201ADFA800E8CB41 /* RoomsContainerVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomsContainerVC.swift; sourceTree = "<group>"; };
 		F95613BB20291A2000D9BEB2 /* MapVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapVC.swift; sourceTree = "<group>"; };
@@ -120,16 +123,17 @@
 		F973BC3C1FEDA7B000CC3C58 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		F973BC401FEDDA8700CC3C58 /* ChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatVC.swift; sourceTree = "<group>"; };
 		F983B84B20230FFB00080AB5 /* CacheStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheStorage.swift; sourceTree = "<group>"; };
+		F9BA66B2202B75F50085226F /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NMAKit.framework; sourceTree = "<group>"; };
+		F9BDD5FC2031147400D59027 /* PersonalChatsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalChatsVC.swift; sourceTree = "<group>"; };
+		F9BDD5FE20321DAD00D59027 /* PersonalChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalChatVC.swift; sourceTree = "<group>"; };
 		F9C747D620108FBA00F311D8 /* SavedRooms.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SavedRooms.xcdatamodel; sourceTree = "<group>"; };
-		F9C747D82010914C00F311D8 /* CoreDataProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataProvider.swift; sourceTree = "<group>"; };
 		F9C9F47D202991A800294846 /* ProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileVC.swift; sourceTree = "<group>"; };
 		F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MessagesHandler.swift; sourceTree = "<group>"; };
-		F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRoomsVC.swift; sourceTree = "<group>"; };
+		F9E264D31FFD4EED00605CA7 /* SavedRoomsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedRoomsTableView.swift; sourceTree = "<group>"; };
 		F9E69A7D20172CFB0014733D /* LoadingOverlay.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadingOverlay.swift; sourceTree = "<group>"; };
 		F9EA8BEC20008A6400A98421 /* ColorHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorHandler.swift; sourceTree = "<group>"; };
 		F9ECA254202337A400289D7C /* CodableStructs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CodableStructs.swift; sourceTree = "<group>"; };
 		F9ECA25620269BF100289D7C /* Reachability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
-		F9F110BD20296B4600FBCF46 /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NMAKit.framework; sourceTree = "<group>"; };
 		F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDisplayVC.swift; sourceTree = "<group>"; };
 		F9F7E397201FE51D00ABD6B8 /* EditProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileVC.swift; sourceTree = "<group>"; };
 		F9F7E399202002D000ABD6B8 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
@@ -140,8 +144,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F9BA66B3202B75F50085226F /* NMAKit.framework in Frameworks */,
 				F93BC750202AD3CE00F42038 /* UserNotifications.framework in Frameworks */,
-				F9F110BE20296B4600FBCF46 /* NMAKit.framework in Frameworks */,
 				4C97677652B24F944C9A1913 /* Pods_Helloquent.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -192,7 +196,7 @@
 		F90D101C1FECDFB90012283B = {
 			isa = PBXGroup;
 			children = (
-				F9F110BD20296B4600FBCF46 /* NMAKit.framework */,
+				F9BA66B2202B75F50085226F /* NMAKit.framework */,
 				F90D10271FECDFB90012283B /* Helloquent */,
 				F90D103C1FECDFB90012283B /* HelloquentTests */,
 				F90D10471FECDFB90012283B /* HelloquentUITests */,
@@ -255,6 +259,7 @@
 				F973BC3C1FEDA7B000CC3C58 /* Constants.swift */,
 				F9F7E399202002D000ABD6B8 /* Helper.swift */,
 				F9ECA254202337A400289D7C /* CodableStructs.swift */,
+				F93EED1520355912006FE726 /* ChatTableViewCell.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -266,16 +271,18 @@
 				F90D105A1FECE33B0012283B /* SigninVC.swift */,
 				F947B3422016B83600E8CB41 /* SignUpVC.swift */,
 				F947B344201ADFA800E8CB41 /* RoomsContainerVC.swift */,
+				F9179B78200FD9060057AAEF /* LikedRoomsTableView.swift */,
 				F90555F7201B0AF60053267A /* LocationRoomsTableView.swift */,
 				F90555F9201B0B210053267A /* UserRoomsTableView.swift */,
-				F9179B78200FD9060057AAEF /* ActiveRoomsVC.swift */,
-				F9E264D31FFD4EED00605CA7 /* SavedRoomsVC.swift */,
+				F9E264D31FFD4EED00605CA7 /* SavedRoomsTableView.swift */,
+				F9BDD5FC2031147400D59027 /* PersonalChatsVC.swift */,
+				F95613BB20291A2000D9BEB2 /* MapVC.swift */,
 				F9C9F47D202991A800294846 /* ProfileVC.swift */,
 				F9F7E397201FE51D00ABD6B8 /* EditProfileVC.swift */,
 				F973BC401FEDDA8700CC3C58 /* ChatVC.swift */,
+				F9BDD5FE20321DAD00D59027 /* PersonalChatVC.swift */,
 				F9179B76200EBDFC0057AAEF /* TabBarVC.swift */,
 				F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */,
-				F95613BB20291A2000D9BEB2 /* MapVC.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -287,7 +294,6 @@
 				F973BC3A1FEDA66800CC3C58 /* DBProvider.swift */,
 				F9E264CE1FF708FD00605CA7 /* MessagesHandler.swift */,
 				F9EA8BEC20008A6400A98421 /* ColorHandler.swift */,
-				F9C747D82010914C00F311D8 /* CoreDataProvider.swift */,
 				F9E69A7D20172CFB0014733D /* LoadingOverlay.swift */,
 				F983B84B20230FFB00080AB5 /* CacheStorage.swift */,
 				F9ECA25620269BF100289D7C /* Reachability.swift */,
@@ -646,26 +652,28 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F9C747D92010914C00F311D8 /* CoreDataProvider.swift in Sources */,
 				F9C747D720108FBA00F311D8 /* SavedRooms.xcdatamodeld in Sources */,
 				F9EA8BED20008A6400A98421 /* ColorHandler.swift in Sources */,
 				F9282ED22022A18000E009A5 /* SplashScreenVC.swift in Sources */,
 				F9E264CF1FF708FD00605CA7 /* MessagesHandler.swift in Sources */,
 				F9ECA255202337A400289D7C /* CodableStructs.swift in Sources */,
-				F9E264D41FFD4EED00605CA7 /* SavedRoomsVC.swift in Sources */,
+				F9E264D41FFD4EED00605CA7 /* SavedRoomsTableView.swift in Sources */,
 				F9F7E398201FE51D00ABD6B8 /* EditProfileVC.swift in Sources */,
 				F947B345201ADFA900E8CB41 /* RoomsContainerVC.swift in Sources */,
+				F9BDD5FD2031147400D59027 /* PersonalChatsVC.swift in Sources */,
 				F973BC411FEDDA8700CC3C58 /* ChatVC.swift in Sources */,
 				F90D105B1FECE33B0012283B /* SigninVC.swift in Sources */,
 				F90D10291FECDFB90012283B /* AppDelegate.swift in Sources */,
 				F9E69A7E20172CFB0014733D /* LoadingOverlay.swift in Sources */,
 				F947B3432016B83600E8CB41 /* SignUpVC.swift in Sources */,
+				F93EED1620355912006FE726 /* ChatTableViewCell.swift in Sources */,
 				F973BC3B1FEDA66800CC3C58 /* DBProvider.swift in Sources */,
 				F95613BC20291A2000D9BEB2 /* MapVC.swift in Sources */,
 				F973BC391FED050700CC3C58 /* AuthProvider.swift in Sources */,
-				F9179B79200FD9060057AAEF /* ActiveRoomsVC.swift in Sources */,
+				F9179B79200FD9060057AAEF /* LikedRoomsTableView.swift in Sources */,
 				F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */,
 				F9F7E396201FB67100ABD6B8 /* ImageDisplayVC.swift in Sources */,
+				F9BDD5FF20321DAD00D59027 /* PersonalChatVC.swift in Sources */,
 				F9179B77200EBDFC0057AAEF /* TabBarVC.swift in Sources */,
 				F9C9F47E202991A800294846 /* ProfileVC.swift in Sources */,
 				F90555F8201B0AF60053267A /* LocationRoomsTableView.swift in Sources */,

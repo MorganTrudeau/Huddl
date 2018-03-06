@@ -77,12 +77,12 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
                 let selectedRoomdescription = cell!.detailTextLabel!.text
                 var selectedRoomID = "\(place.position.latitude ?? 1)\(place.position.longitude ?? 1)"
                 selectedRoomID = selectedRoomID.replacingOccurrences(of: ".", with: "")
-                let selectedRoom = Room(name: selectedRoomName!, description: selectedRoomdescription!, id: selectedRoomID, password: "", activeUsers: 0)
+                let selectedRoom = Room(name: selectedRoomName!, description: selectedRoomdescription!, id: selectedRoomID, password: "", likes: 0)
                 
                 vc.m_currentRoom = selectedRoom
                     
                 // Pass selected room ID to dbProvider to use as child ID
-                m_dbProvider.m_currentRoomID = selectedRoom.id
+                m_dbProvider.m_currentRoom = selectedRoom
                     
                 // Create location room in database
                 m_dbProvider.createLocationRoom(id: selectedRoomID, name: selectedRoomName!, description: selectedRoomdescription, password: "", lat: String(place.position.latitude), long: String(place.position.longitude))
@@ -95,19 +95,31 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
         m_placeRequest?.cancel()
         
         let currentPosition = NMAPositioningManager.shared().currentPosition?.coordinates
-        let bounding = NMAGeoBoundingBox.init(center: currentPosition!, width: 45, height: 45)
-        
-        m_placeRequest = NMAPlaces.shared().makeAutoSuggestionRequest(location: currentPosition!, partialTerm: query)
+        if currentPosition != nil {
+            let bounding = NMAGeoBoundingBox.init(center: currentPosition!, width: 45, height: 45)
+            
+            m_placeRequest = NMAPlaces.shared().makeAutoSuggestionRequest(location: currentPosition!, partialTerm: query)
             m_placeRequest?.viewport = bounding
-        m_placeRequest?.collectionSize = 10
-        m_placeRequest?.start(block: {(request: NMARequest, data: Any?, error: Error?) in
-            if error == nil {
-                
-                let requestData = data as! [NMAAutoSuggest]
-                self.m_locationRooms = requestData.filter { $0.isKind(of: NMAAutoSuggestPlace.self) } as! [NMAAutoSuggestPlace]
-                self.m_locationRoomsTableView.reloadData()
-            }
-        })
+            m_placeRequest?.collectionSize = 10
+            m_placeRequest?.start(block: {(request: NMARequest, data: Any?, error: Error?) in
+                if error == nil {
+                    
+                    let requestData = data as! [NMAAutoSuggest]
+                    self.m_locationRooms = requestData.filter { $0.isKind(of: NMAAutoSuggestPlace.self) } as! [NMAAutoSuggestPlace]
+                    self.m_locationRoomsTableView.reloadData()
+                }
+            })
+        } else {
+            alertUser(title: "Positioning Error", message: "Location not found")
+        }
+    }
+    
+    func alertUser(title: String, message: String) {
+        
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(ok)
+        present(alert, animated: true, completion: nil)
     }
     
     // Delegate Functions

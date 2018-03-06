@@ -97,48 +97,32 @@ class EditProfileVC: UIViewController, UICollectionViewDelegate, UICollectionVie
         self.navigationItem.backBarButtonItem?.isEnabled = false
         self.navigationItem.leftBarButtonItem = cancelButton
         self.navigationItem.rightBarButtonItem = saveButton
-    
         
         m_profileImageView.layer.borderWidth = 1.0
         m_profileImageView.layer.masksToBounds = false
         m_profileImageView.layer.borderColor = UIColor.black.cgColor
         m_profileImageView.layer.cornerRadius = (m_profileImageView?.frame.size.height)!/2
         m_profileImageView.clipsToBounds = true
-        m_profileImageView.center.y = CGFloat(150)
+        m_profileImageView.center.y = view.frame.size.height*0.25
         
-        m_changeImageButton.center.y = CGFloat(240)
+        m_changeImageButton.center.y = CGFloat(m_profileImageView.center.y + 90)
         
-        m_displayNameLabel.center.y = CGFloat(290)
+        m_displayNameLabel.center.y = CGFloat(m_changeImageButton.center.y + 45)
         
-        m_displayNameTextField.center.y = CGFloat(320)
+        m_displayNameTextField.center.y = CGFloat(m_displayNameLabel.center.y + 25)
+        m_displayNameTextField.isUserInteractionEnabled = true
         m_displayNameTextField.underlined()
         
-        m_colorLabel.center.y = CGFloat(380)
+        m_colorLabel.center.y = CGFloat(m_displayNameTextField.center.y + 60)
         
-        m_colorCollectionView.center.y = CGFloat(480)
+        m_colorCollectionView.center.y = CGFloat(m_colorLabel.center.y + 95)
         
         m_logoutButton.layer.borderWidth = 2.0
         m_logoutButton.layer.borderColor = UIColor(red: 102/255, green: 0, blue: 1, alpha: 1).cgColor
         m_logoutButton.layer.cornerRadius = 5
-        
-        
-        /////// Crash
-        let crashButton = UIButton(frame: CGRect(x: 0, y: view.frame.size.height*0.94, width: 100, height: 30))
-        crashButton.center.x = view.center.x
-        crashButton.setTitle("Dont Press", for: .normal)
-        crashButton.setTitleColor(UIColor.red, for: .normal)
-        crashButton.layer.borderWidth = 2
-        crashButton.layer.borderColor = UIColor.red.cgColor
-        crashButton.addTarget(self, action: #selector(EditProfileVC.crash), for: .touchUpInside)
-        view.addSubview(crashButton)
-        ///////
+        m_logoutButton.center.y = CGFloat(m_colorCollectionView.center.y + 110)
+        m_logoutButton.center.x = self.view.center.x
     }
-    
-    ///////
-    @objc func crash() {
-        Crashlytics.sharedInstance().crash()
-    }
-    ///////
     
     // Color picker collectionView Functions
     
@@ -161,19 +145,8 @@ class EditProfileVC: UIViewController, UICollectionViewDelegate, UICollectionVie
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath:
         IndexPath) {
-        
-//        var cell: UICollectionViewCell
-//
-//        // Remove border from current cell
-//        cell = m_colorCollectionView.cellForItem(at: m_selectedCellIndexPath!)!
-//        cell.layer.borderWidth = 0
-//
-//        // Apply border to selected cell
         m_selectedCellIndexPath = indexPath
         m_colorCollectionView.reloadData()
-//        cell = m_colorCollectionView.cellForItem(at: indexPath)!
-//        cell.layer.borderWidth = 4
-//        cell.layer.borderColor = UIColor.black.cgColor
     }
     
     // Change Profile Picture Functions
@@ -249,7 +222,8 @@ class EditProfileVC: UIViewController, UICollectionViewDelegate, UICollectionVie
     
     @IBAction func logout(_ sender: Any) {
         if AuthProvider.Instance.logout() {
-            dismiss(animated: true, completion: nil)
+            let signInVC = self.storyboard?.instantiateViewController(withIdentifier: "SigninVC")
+            self.present(signInVC!, animated: true, completion: nil)
         }
     }
     

@@ -30,6 +30,23 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
     @IBOutlet weak var m_roomsSegControl: UISegmentedControl!
     @IBOutlet weak var m_roomsSearchBar: UISearchBar!
     
+    var m_currentTableView: UIViewController?
+    var m_addRoomButton: UIBarButtonItem?
+    var m_roomTextImageView: UIImageView?
+    let m_roomTextImage = UIImage(named: "rooms_text")
+    
+    /**
+     Child Table View
+    **/
+    
+    lazy var m_likedRoomsTableView: LikedRoomsTableView = {
+        let viewController: UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LikedRoomsTableView") as! LikedRoomsTableView
+        self.addChildViewController(viewController)
+        self.view.addSubview(viewController.view)
+        viewController.view.frame = m_tableContainer.frame
+        return viewController as! LikedRoomsTableView
+    }()
+    
     lazy var m_locationRoomsTableView: LocationRoomsTableView = {
         let viewController:UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "LocationRoomsTableView") as! LocationRoomsTableView
         self.addChildViewController(viewController)
@@ -46,9 +63,13 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         return viewController as! UserRoomsTableView
     }()
     
-    var m_addRoomButton: UIBarButtonItem?
-    var m_roomTextImageView: UIImageView?
-    let m_roomTextImage = UIImage(named: "rooms_text")
+    lazy var m_savedRoomsTableView: SavedRoomsTableView = {
+        let viewController: UIViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SavedRoomsTableView") as! SavedRoomsTableView
+        self.addChildViewController(viewController)
+        self.view.addSubview(viewController.view)
+        viewController.view.frame = m_tableContainer.frame
+        return viewController as! SavedRoomsTableView
+    }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,6 +77,8 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         m_roomsSearchBar.delegate = self
         
         NMAPositioningManager.shared().startPositioning()
+        
+        AuthProvider.Instance.setNotificationToken()
         
         DBProvider.Instance.getUser(id: AuthProvider.Instance.userID(), completion: nil)
         
@@ -73,11 +96,21 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         m_roomTextImageView?.tintColor = UIColor.lightText
         
         if m_roomsSegControl.selectedSegmentIndex == 0 {
+            m_likedRoomsTableView.didMove(toParentViewController: self)
+            m_currentTableView = m_likedRoomsTableView
+            delegate = m_likedRoomsTableView.self
+        } else if m_roomsSegControl.selectedSegmentIndex == 1 {
             m_locationRoomsTableView.didMove(toParentViewController: self)
+            m_currentTableView = m_locationRoomsTableView
             delegate = m_locationRoomsTableView.self
-        } else {
+        } else if m_roomsSegControl.selectedSegmentIndex == 2 {
             m_userRoomsTableView.didMove(toParentViewController: self)
+            m_currentTableView = m_userRoomsTableView
             delegate = m_userRoomsTableView.self
+        } else {
+            m_savedRoomsTableView.didMove(toParentViewController: self)
+            m_currentTableView = m_savedRoomsTableView
+            delegate = m_savedRoomsTableView.self
         }
         
         self.navigationController?.navigationBar.addSubview(m_roomTextImageView!)
@@ -85,9 +118,11 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        m_roomsSearchBar.resignFirstResponder()
-        m_roomTextImageView?.removeFromSuperview()
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
+        if m_roomsSearchBar != nil {
+            m_roomsSearchBar.resignFirstResponder()
+            m_roomsSearchBar.text = ""
+            m_roomTextImageView?.removeFromSuperview()
+        }
     }
     
     func setUpUI() {
@@ -100,34 +135,41 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
-        
-
+    }
+    
+    func switchTableView(tableView: UIViewController) {
+        m_currentTableView!.willMove(toParentViewController: nil)
+        self.addChildViewController(tableView)
+        self.transition(from: m_currentTableView!, to: tableView, duration: 0.2, options: .curveLinear, animations: nil, completion: {(finished) in
+            self.m_currentTableView!.removeFromParentViewController()
+            tableView.didMove(toParentViewController: self)
+            self.m_currentTableView = tableView
+            self.delegate?.textChanged(query: self.m_roomsSearchBar.text!)
+        })
     }
 
     @IBAction func segIndexChanged(_ sender: Any) {
         switch m_roomsSegControl.selectedSegmentIndex {
         case 0:
-            m_userRoomsTableView.willMove(toParentViewController: nil)
-            self.addChildViewController(m_locationRoomsTableView)
-            self.transition(from: m_userRoomsTableView, to: m_locationRoomsTableView, duration: 0.25, options: .curveLinear, animations: nil, completion: {(finished) in
-                self.m_userRoomsTableView.removeFromParentViewController()
-                self.m_locationRoomsTableView.didMove(toParentViewController: self)
-                self.delegate = self.m_locationRoomsTableView.self
-                self.m_roomsSearchBar.placeholder = "Search Place"
-                self.navigationItem.rightBarButtonItem = nil
-                self.delegate?.textChanged(query: self.m_roomsSearchBar.text!)
-            })
+            switchTableView(tableView: m_likedRoomsTableView)
+            self.m_roomsSearchBar.placeholder = "Filter"
+            self.navigationItem.rightBarButtonItem = nil
+            delegate = m_likedRoomsTableView.self
         case 1:
-            m_locationRoomsTableView.willMove(toParentViewController: nil)
-            self.addChildViewController(m_userRoomsTableView)
-            self.transition(from: m_locationRoomsTableView, to: m_userRoomsTableView, duration: 0.25, options: .curveLinear, animations: nil, completion: {(finished) in
-                self.m_locationRoomsTableView.removeFromParentViewController()
-                self.m_userRoomsTableView.didMove(toParentViewController: self)
-                self.delegate = self.m_userRoomsTableView.self
-                self.m_roomsSearchBar.placeholder = "Filter"
-                self.navigationItem.rightBarButtonItem = self.m_addRoomButton
-                self.delegate?.textChanged(query: self.m_roomsSearchBar.text!)
-            })
+            switchTableView(tableView: m_locationRoomsTableView)
+            self.m_roomsSearchBar.placeholder = "Search Place"
+            self.navigationItem.rightBarButtonItem = nil
+            delegate = m_locationRoomsTableView.self
+        case 2:
+            switchTableView(tableView: m_userRoomsTableView)
+            self.m_roomsSearchBar.placeholder = "Filter"
+            self.navigationItem.rightBarButtonItem = m_addRoomButton
+            delegate = m_userRoomsTableView.self
+        case 3:
+            switchTableView(tableView: m_savedRoomsTableView)
+            self.m_roomsSearchBar.placeholder = "Filter"
+            self.navigationItem.rightBarButtonItem = nil
+            delegate = m_savedRoomsTableView.self
         default:
             break
         }
@@ -157,7 +199,6 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
     }
     
     @objc func addRoomButtonClicked() {
-        
         let alert: UIAlertController = UIAlertController.init(title: "Create A Room", message: "Enter room name", preferredStyle: .alert)
         
         let submit: UIAlertAction = UIAlertAction.init(title: "Submit", style: .default, handler: {(action: UIAlertAction) in
@@ -176,7 +217,7 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
                                 
                                 DBProvider.Instance.createRoom(name: nameTextField.text!, description: descriptionTextField.text,   password: passWordTextField.text, roomCreated: {(room, success) in
                                     if success{
-                                        self.delegate?.roomCreated(room: room)
+                                        self.delegate?.roomCreated(room: room!)
                                     } else {
                                         self.alertUser(title: "Room Name Already Exists", message: "Enter another room name")
                                     }

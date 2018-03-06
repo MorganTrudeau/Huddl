@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import NMAKit
 
-class ActiveRoomsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
+class ActiveRoomsTableView: UIViewController, UITableViewDelegate, UITableViewDataSource, UISearchBarDelegate {
     
     @IBOutlet weak var m_roomsTableView: UITableView!
     @IBOutlet weak var m_roomsSearchBar: UISearchBar!

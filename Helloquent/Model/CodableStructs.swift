@@ -13,6 +13,13 @@ struct User: Codable {
     var name: String
     var color: String
     var avatar: String
+    var chats: [String:String]
+}
+
+struct Chat: Codable {
+    let id: String
+    let name: String
+    let avatar: String
 }
 
 struct Room: Codable {
@@ -20,7 +27,7 @@ struct Room: Codable {
     var description: String
     let id: String
     var password: String
-    var activeUsers: Int
+    var likes: Int
 }
 
 struct LocationRoom: Codable {
@@ -28,7 +35,7 @@ struct LocationRoom: Codable {
     var description: String
     let id: String
     var password: String
-    var activeUsers: Int
+    var likes: Int
     var latitude: String
     var longitude: String
 }

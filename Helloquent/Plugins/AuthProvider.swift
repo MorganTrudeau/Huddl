@@ -8,6 +8,7 @@
 
 import Foundation
 import FirebaseAuth
+import FirebaseMessaging
 import FirebaseDatabase
 import FBSDKLoginKit
 import SDWebImage
@@ -49,8 +50,6 @@ class AuthProvider {
             if error != nil {
                 self.handleErrors(error: error! as NSError, loginHandler: loginHandler)
             } else {
-                loginHandler?(nil)
-                
                 // Check Firebase for user exists, if not save in DB
                 DBProvider.Instance.usersRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
                     if !snapshot.hasChild(user!.uid) {
@@ -58,7 +57,26 @@ class AuthProvider {
                         let userColor = ColorHandler.Instance.userColor()
                         DBProvider.Instance.createUser(withID: user!.uid, email: "", displayName: (user!.displayName)!, password: "", color: userColor)
                     }
+                    loginHandler?(nil)
                 })
+            }
+        })
+    }
+    
+    // Set FCM notification token for current user
+    func setNotificationToken() {
+        let fcmToken = Messaging.messaging().fcmToken
+        DBProvider.Instance.usersRef.child(AuthProvider.Instance.userID()).observeSingleEvent(of: .value, with: {(snapshot) in
+            if let user = snapshot.value as? NSDictionary {
+                if let token = user[Constants.TOKEN] as? String {
+                    if token != fcmToken! {
+                        user.setValue(fcmToken, forKey: Constants.TOKEN)
+                        DBProvider.Instance.usersRef.child(AuthProvider.Instance.userID()).setValue(user)
+                    }
+                } else {
+                    user.setValue(fcmToken, forKey: Constants.TOKEN)
+                    DBProvider.Instance.usersRef.child(AuthProvider.Instance.userID()).setValue(user)
+                }
             }
         })
     }

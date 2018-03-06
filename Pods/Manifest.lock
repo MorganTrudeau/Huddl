@@ -6,8 +6,8 @@ PODS:
     - Bolts/Tasks
   - Bolts/Tasks (1.9.0)
   - Cache (4.1.2)
-  - Crashlytics (3.9.3):
-    - Fabric (~> 1.7.2)
+  - Crashlytics (3.10.0):
+    - Fabric (~> 1.7.3)
   - CropViewController (2.3.6)
   - Fabric (1.7.3)
   - FacebookCore (0.3.0):
@@ -117,7 +117,7 @@ DEPENDENCIES:
 SPEC CHECKSUMS:
   Bolts: ac6567323eac61e203f6a9763667d0f711be34c8
   Cache: bd0233fc688b5e83a27bcd87807db7e6f23adcc5
-  Crashlytics: dbb07d01876c171c5ccbdf7826410380189e452c
+  Crashlytics: a989ef242b66605577a425733797f810bd2725eb
   CropViewController: e6d4bd512d15a1709e9ddf71fe7d98ffd05dda0f
   Fabric: bb495bb9a7a7677c6d03a1f8b83d95bc49b47e41
   FacebookCore: 3ffa190a3f1f96cec0e44d3fc221bc322c595ffa
@@ -143,6 +143,6 @@ SPEC CHECKSUMS:
   Protobuf: 8a9838fba8dae3389230e1b7f8c104aa32389c03
   SDWebImage: 6da6c8bca115addc4de8613362e1b15f66333825
 
-PODFILE CHECKSUM: 4706a676f4d412348353b32281aa94f9320e7521
+PODFILE CHECKSUM: 1515cbedaa8a81e868b89dbd380c4bea5c4d2232
 
 COCOAPODS: 1.4.0
