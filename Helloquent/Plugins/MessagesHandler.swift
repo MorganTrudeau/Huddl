@@ -51,7 +51,7 @@ class MessagesProvider {
                 if let cachedMessages = try? self.m_cacheStorage.m_messagesStorage.object(ofType: [Message].self, forKey: room.id) {
                     messages = cachedMessages
                 }
-                // Contruct codable message to cache
+                // Construct codable message to cache
                 let message = Message(senderID: senderID, senderName: senderName, text: text ?? "", url: url ?? "")
                 messages.append(message)
                 

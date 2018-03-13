@@ -33,10 +33,10 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
     var m_currentTableView: UIViewController?
     var m_addRoomButton: UIBarButtonItem?
     var m_roomTextImageView: UIImageView?
-    let m_roomTextImage = UIImage(named: "rooms_text")
+    let m_roomTextImage = UIImage(named: "huddl")
     
     /**
-     Child Table View
+     Child Table Views
     **/
     
     lazy var m_likedRoomsTableView: LikedRoomsTableView = {
@@ -76,8 +76,6 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
         
         m_roomsSearchBar.delegate = self
         
-        NMAPositioningManager.shared().startPositioning()
-        
         AuthProvider.Instance.setNotificationToken()
         
         DBProvider.Instance.getUser(id: AuthProvider.Instance.userID(), completion: nil)
@@ -87,14 +85,18 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        NMAPositioningManager.shared().startPositioning()
         
-        m_roomTextImageView = UIImageView.init(frame: CGRect(x: 0, y: 0, width: 70, height: 30))
+        m_roomTextImageView = UIImageView.init(frame: CGRect(x: 0, y: 6, width: 70, height: 30))
         m_roomTextImageView?.image = m_roomTextImage
         m_roomTextImageView?.center.x = (self.navigationController?.navigationBar.center.x)!
-        m_roomTextImageView?.center.y = (self.navigationController?.navigationBar.center.y)! - 22
         m_roomTextImageView?.image = m_roomTextImageView?.image?.withRenderingMode(.alwaysTemplate)
         m_roomTextImageView?.tintColor = UIColor.lightText
         
+        self.navigationController?.navigationBar.addSubview(m_roomTextImageView!)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
         if m_roomsSegControl.selectedSegmentIndex == 0 {
             m_likedRoomsTableView.didMove(toParentViewController: self)
             m_currentTableView = m_likedRoomsTableView
@@ -112,8 +114,6 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
             m_currentTableView = m_savedRoomsTableView
             delegate = m_savedRoomsTableView.self
         }
-        
-        self.navigationController?.navigationBar.addSubview(m_roomTextImageView!)
     }
     
     override func viewWillDisappear(_ animated: Bool) {

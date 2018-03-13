@@ -17,7 +17,7 @@ class SplashScreenVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let roomTextImage = UIImage(named: "rooms_text")
+        let roomTextImage = UIImage(named: "huddl")
         let roomTextImageView = UIImageView(image: roomTextImage)
         roomTextImageView.center.x = self.view.center.x
         roomTextImageView.center.y = self.view.center.y

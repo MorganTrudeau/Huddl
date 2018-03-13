@@ -19,24 +19,10 @@ class MapVC : UIViewController {
     var m_tapLocation: CGPoint?
     var m_roomMenu = UIView()
     var m_selectedRoom: LocationRoom?
+    var m_geoCoordCenter = NMAGeoCoordinates(latitude: 49.2827, longitude: -123.1207)
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Create geo coordinate
-        let geoCoordCenter: NMAGeoCoordinates = (NMAPositioningManager.shared().currentPosition?.coordinates)!
-        // Set map view with geo center
-        self.mapView?.set(geoCenter: geoCoordCenter, animation: NMAMapAnimation.none)
-        // Set zoom level
-        self.mapView?.zoomLevel = 9
-        
-        let m_roomTextImage = UIImage(named: "rooms_text")
-        let m_roomTextImageView = UIImageView.init(frame: CGRect(x: 0, y: 0, width: 70, height: 30))
-        m_roomTextImageView.image = m_roomTextImage
-        m_roomTextImageView.center.x = (self.navigationController?.navigationBar.center.x)!
-        m_roomTextImageView.center.y = (self.navigationController?.navigationBar.center.y)! - 22
-        m_roomTextImageView.image = m_roomTextImageView.image?.withRenderingMode(.alwaysTemplate)
-        m_roomTextImageView.tintColor = UIColor.lightText
-        
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(MapVC.onMarkerTap))
@@ -47,6 +33,16 @@ class MapVC : UIViewController {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        NMAPositioningManager.shared().startPositioning()
+        
+        // Create geo coordinate
+        if let geoCoordCenter = NMAPositioningManager.shared().currentPosition?.coordinates {
+            m_geoCoordCenter = geoCoordCenter
+        }
+        // Set map view with geo center
+        self.mapView?.set(geoCenter: m_geoCoordCenter, animation: NMAMapAnimation.none)
+        // Set zoom level
+        self.mapView?.zoomLevel = 9
         
         DBProvider.Instance.getLocationRooms(completion: {(rooms) in
             DispatchQueue.global().async {

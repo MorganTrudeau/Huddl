@@ -95,6 +95,7 @@ class DBProvider {
     
     var roomMessagesChildRef: DatabaseReference {
         return roomMessagesRef.child(m_currentRoom!.id)
+        print(m_currentRoom!.id)
     }
     
     var chatMessagesRef: DatabaseReference {
@@ -160,14 +161,15 @@ class DBProvider {
     
     func updateRoomUsers(roomUser: String) {
         self.roomsRef.child(self.m_currentRoom!.id).observeSingleEvent(of: .value, with: {(snapshot) in
-            var room = snapshot.value as! NSDictionary
-            if var roomUsers = room[Constants.ROOM_USERS] as? [String] {
-                roomUsers.append(roomUser)
-                print("Updated room users: \(roomUsers)")
-                self.roomsRef.child("\(self.m_currentRoom!.id)/\(Constants.ROOM_USERS)").setValue(roomUsers)
-            } else {
-                room.setValue([roomUser], forKey: Constants.ROOM_USERS)
-                self.roomsRef.child(self.m_currentRoom!.id).setValue(room)
+            if var room = snapshot.value as? NSDictionary {
+                if var roomUsers = room[Constants.ROOM_USERS] as? [String] {
+                    roomUsers.append(roomUser)
+                    print("Updated room users: \(roomUsers)")
+                    self.roomsRef.child("\(self.m_currentRoom!.id)/\(Constants.ROOM_USERS)").setValue(roomUsers)
+                } else {
+                    room.setValue([roomUser], forKey: Constants.ROOM_USERS)
+                    self.roomsRef.child(self.m_currentRoom!.id).setValue(room)
+                }
             }
         })
     }
@@ -211,7 +213,7 @@ class DBProvider {
                         data.value = user
                         
                         // Store updated user in cache
-                        self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: metadataURL, chats: user[Constants.CHATS] as! [String:String]))
+                        self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: metadataURL, chats: user[Constants.CHATS] as? [String:String] ?? [:]))
                         
                         DispatchQueue.main.sync {
                             completion?(true)
@@ -228,7 +230,7 @@ class DBProvider {
                     data.value = user
                     
                     // Store updated user in cache
-                    self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: user[Constants.AVATAR] as! String, chats: user[Constants.CHATS] as! [String:String]))
+                    self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: user[Constants.AVATAR] as! String, chats: user[Constants.CHATS] as? [String:String] ?? [:]))
                     
                     DispatchQueue.main.sync {
                         completion?(false)
@@ -238,16 +240,19 @@ class DBProvider {
             }
     }
     
-    // Room Functions
+    /**
+     Room Functions
+     **/
     
     func createRoom(name: String, description: String?, password: String?, roomCreated: CreateRoomHandler?){
         var newRoom: Room?
         let data: Dictionary<String, Any> = [Constants.ROOM_NAME: name, Constants.DESCRIPTION: description ?? "", Constants.PASSWORD: password ?? "", Constants.LIKES: 0]
         userRoomsRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             if !snapshot.hasChild(name) {
-                self.userRoomsRef.childByAutoId().setValue(data)
-                self.roomsRef.child(name).setValue(data)
-                newRoom = Room(name: name, description: description!, id: name, password: password!, likes: 0)
+                let uudid =  UUID().uuidString
+                self.userRoomsRef.child(uudid).setValue(data)
+                self.roomsRef.child(uudid).setValue(data)
+                newRoom = Room(name: name, description: description!, id: uudid, password: password!, likes: 0)
                 roomCreated?(newRoom!, true)
             } else {
                 roomCreated?(nil, false)
@@ -274,7 +279,8 @@ class DBProvider {
             var user = snapshot.value as! NSDictionary
             if var chats = user[Constants.CHATS] as? NSDictionary {
                 chats.setValue(chatID, forKey: receiverID)
-                self.usersRef.child(senderID).setValue(chats)
+                user.setValue(chats, forKey: Constants.CHATS)
+                self.usersRef.child(senderID).setValue(user)
             } else {
                 user.setValue([receiverID:chatID], forKey: Constants.CHATS)
                 self.usersRef.child(senderID).setValue(user)
@@ -286,12 +292,14 @@ class DBProvider {
             var user = snapshot.value as! NSDictionary
             if var chats = user[Constants.CHATS] as? NSDictionary {
                 chats.setValue(chatID, forKey: senderID)
-                self.usersRef.child(receiverID).setValue(chats)
+                self.usersRef.child("\(receiverID)/\(Constants.CHATS)").setValue(chats)
             } else {
                 user.setValue([senderID:chatID], forKey: Constants.CHATS)
                 self.usersRef.child(receiverID).setValue(user)
             }
         })
+        // Upadate cache with new chats
+        self.getUser(id: self.m_authProvider.userID(), completion: nil)
     }
     
     func getUserRooms(completion: GetRoomsHandler?) {

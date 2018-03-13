@@ -17,6 +17,7 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
     let m_dbProvider = DBProvider.Instance
     
     var m_index: IndexPath?
+    var m_currentPosition = NMAGeoCoordinates(latitude: 0, longitude: 0)
     var m_locationRooms = [NMAAutoSuggestPlace]()
     var m_placeRequest: NMAAutoSuggestionRequest?
     
@@ -27,6 +28,16 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
         super.viewDidLoad()
         m_locationRoomsTableView.delegate = self
         m_locationRoomsTableView.dataSource = self
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        if !NMAPositioningManager.shared().isActive {
+            NMAPositioningManager.shared().startPositioning()
+        }
+        if let currentPosition = NMAPositioningManager.shared().currentPosition?.coordinates {
+            m_currentPosition = currentPosition 
+        }
     }
     
     // TableView Functions
@@ -94,24 +105,25 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
         // Cancel any pending requests
         m_placeRequest?.cancel()
         
-        let currentPosition = NMAPositioningManager.shared().currentPosition?.coordinates
-        if currentPosition != nil {
-            let bounding = NMAGeoBoundingBox.init(center: currentPosition!, width: 45, height: 45)
-            
-            m_placeRequest = NMAPlaces.shared().makeAutoSuggestionRequest(location: currentPosition!, partialTerm: query)
-            m_placeRequest?.viewport = bounding
-            m_placeRequest?.collectionSize = 10
-            m_placeRequest?.start(block: {(request: NMARequest, data: Any?, error: Error?) in
-                if error == nil {
-                    
-                    let requestData = data as! [NMAAutoSuggest]
-                    self.m_locationRooms = requestData.filter { $0.isKind(of: NMAAutoSuggestPlace.self) } as! [NMAAutoSuggestPlace]
-                    self.m_locationRoomsTableView.reloadData()
-                }
-            })
-        } else {
-            alertUser(title: "Positioning Error", message: "Location not found")
+        if !NMAPositioningManager.shared().isActive {
+            NMAPositioningManager.shared().startPositioning()
         }
+        if let currentPosition = NMAPositioningManager.shared().currentPosition?.coordinates {
+            m_currentPosition = currentPosition
+        }
+        
+        let bounding = NMAGeoBoundingBox.init(center: m_currentPosition, width: 45, height: 45)
+        
+        m_placeRequest = NMAPlaces.shared().makeAutoSuggestionRequest(location: m_currentPosition, partialTerm: query)
+        m_placeRequest?.viewport = bounding
+        m_placeRequest?.collectionSize = 10
+        m_placeRequest?.start(block: {(request: NMARequest, data: Any?, error: Error?) in
+            if error == nil {
+                let requestData = data as! [NMAAutoSuggest]
+                self.m_locationRooms = requestData.filter { $0.isKind(of: NMAAutoSuggestPlace.self) } as! [NMAAutoSuggestPlace]
+                self.m_locationRoomsTableView.reloadData()
+            }
+        })
     }
     
     func alertUser(title: String, message: String) {

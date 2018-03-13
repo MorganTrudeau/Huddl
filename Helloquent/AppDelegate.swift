@@ -27,8 +27,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         Messaging.messaging().delegate = self
         Fabric.with([Crashlytics.self])
         
-        let kHelloMapAppID = "mAyUaYF8MsSg1cNc1BEM"
-        let kHelloMapAppCode = "gnvNZrF5ywXEIooG2O0fGA"
+        let kHelloMapAppID = "WGItU7a0q8159FCZOAW6"
+        let kHelloMapAppCode = "5IMS7GYiV-dxl2Jb2eT-FQ"
         NMAApplicationContext.set(appId: kHelloMapAppID, appCode: kHelloMapAppCode)
         
         if #available(iOS 10.0, *) {

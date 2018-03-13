@@ -87,7 +87,7 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
         
-        self.collectionView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
+        collectionView.backgroundColor = UIColor.init(white: 0.4, alpha: 1)
         
         // Create Heart button to save room
         m_saveRoomButton = UIBarButtonItem(image: UIImage(named: "heart"), style: .plain, target: self, action: #selector(ChatVC.saveRoomButtonClicked))
@@ -153,7 +153,7 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
  
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
         let message = m_messages[indexPath.item]
-        var avatar = UIImage(named: "avatar.gif")
+        var avatar = UIImage(named: "avatar")
         if let user = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: message.senderId) {
             if let avatarImage = try? m_cacheStorage.m_mediaStorage.object(ofType: ImageWrapper.self, forKey: user.avatar).image {
                 avatar = avatarImage
@@ -452,9 +452,12 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
         self.view.addSubview(m_userMenu)
         
         let avatarView = UIImageView.init(frame: CGRect(x: 100, y: 10, width: 50, height: 50))
-        avatarView.image = UIImage(named: "avatar.gif")
+        avatarView.image = UIImage(named: "avatar")
         avatarView.layer.masksToBounds = true
         avatarView.layer.cornerRadius = 25
+        if let avatar = try? m_cacheStorage.m_mediaStorage.object(ofType: ImageWrapper.self, forKey: user!.avatar) {
+            avatarView.image = avatar.image
+        }
         
         let userNameText = UILabel.init(frame: CGRect(x: 0, y: 70, width: 250, height: 20))
         userNameText.text = user?.name

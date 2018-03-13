@@ -10,7 +10,7 @@ import Foundation
 import UIKit
 import Cache
 
-class PersonalChatsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, NotificationCacheDelegate {
+class PersonalChatsVC: UIViewController, UITableViewDelegate, UITableViewDataSource, NotificationCacheDelegate, ImageCacheDelegate {
     
     @IBOutlet weak var m_personalChatsTableView: UITableView!
     
@@ -27,6 +27,7 @@ class PersonalChatsVC: UIViewController, UITableViewDelegate, UITableViewDataSou
         m_personalChatsTableView.delegate = self
         m_personalChatsTableView.dataSource = self
         m_cacheStorage.notificationCacheDelegate = self
+        m_cacheStorage.imageCacheDelegate = self
         loadChats()
         setUpUI()
     }
@@ -69,32 +70,34 @@ class PersonalChatsVC: UIViewController, UITableViewDelegate, UITableViewDataSou
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "chat_cell", for: indexPath) as! ChatTableViewCell
         
-        let user = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: m_userIDs[indexPath.row])
-        var avatar = UIImage(named: "avatar.gif")
-        if let cachedAvatar = try? m_cacheStorage.m_mediaStorage.object(ofType: ImageWrapper.self, forKey: user!.avatar) {
-            avatar = cachedAvatar.image
-        }
+        var avatar = UIImage(named: "user")
         
-        cell.avatarImage.layer.masksToBounds = true
-        cell.avatarImage.layer.cornerRadius = 25
-        cell.avatarImage.image = avatar
-        
-        cell.nameLabel.text = user!.name
-        
-        if let notifications = try? m_cacheStorage.m_roomStorage.object(ofType: Int.self, forKey: m_chats[user!.id]!) {
-            let messagesNotification = UILabel.init(frame: CGRect(x: cell.frame.size.width - 40, y: 0, width: 30, height: 30))
-            messagesNotification.center.y = 30
-            messagesNotification.backgroundColor = UIColor.lightGray
-            messagesNotification.textAlignment = .center
-            messagesNotification.textColor = UIColor.white
-            messagesNotification.layer.masksToBounds = true
-            messagesNotification.layer.cornerRadius = 15
-            messagesNotification.font = UIFont.boldSystemFont(ofSize: 18)
-            messagesNotification.text = String(notifications)
-            messagesNotification.tag = 1
-            cell.contentView.addSubview(messagesNotification)
-        } else if let notification = cell.viewWithTag(1) {
-            notification.removeFromSuperview()
+        if let user = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: m_userIDs[indexPath.row]) {
+
+            if let cachedAvatar = try? m_cacheStorage.m_mediaStorage.object(ofType: ImageWrapper.self, forKey: user.avatar) {
+                avatar = cachedAvatar.image
+            }
+            
+            cell.nameLabel.text = user.name
+            cell.avatarImage.layer.masksToBounds = true
+            cell.avatarImage.layer.cornerRadius = 25
+            cell.avatarImage.image = avatar
+            
+            if let notifications = try? m_cacheStorage.m_roomStorage.object(ofType: Int.self, forKey: m_chats[user.id]!) {
+                let messagesNotification = UILabel.init(frame: CGRect(x: cell.frame.size.width - 40, y: 0, width: 30, height: 30))
+                messagesNotification.center.y = 30
+                messagesNotification.backgroundColor = UIColor.lightGray
+                messagesNotification.textAlignment = .center
+                messagesNotification.textColor = UIColor.white
+                messagesNotification.layer.masksToBounds = true
+                messagesNotification.layer.cornerRadius = 15
+                messagesNotification.font = UIFont.boldSystemFont(ofSize: 18)
+                messagesNotification.text = String(notifications)
+                messagesNotification.tag = 1
+                cell.contentView.addSubview(messagesNotification)
+            } else if let notification = cell.viewWithTag(1) {
+                notification.removeFromSuperview()
+            }
         }
         
         return cell
@@ -123,6 +126,10 @@ class PersonalChatsVC: UIViewController, UITableViewDelegate, UITableViewDataSou
     **/
     
     func notificationReceived() {
+        m_personalChatsTableView.reloadData()
+    }
+    
+    func imageCacheUpdated() {
         m_personalChatsTableView.reloadData()
     }
 }

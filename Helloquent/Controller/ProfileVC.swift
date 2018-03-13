@@ -49,15 +49,8 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         m_profileImageView.clipsToBounds = true
         m_profileImageView.center.y = view.frame.size.height*0.25
         
-        m_displayNameLabel.center.y = CGFloat(m_profileImageView.center.y + 100)
-        
-        m_displayNameTextField.center.y = CGFloat(m_displayNameLabel.center.y + 25)
         m_displayNameTextField.isUserInteractionEnabled = false
         m_displayNameTextField.underlined()
-        
-        m_colorLabel.center.y = CGFloat(m_displayNameTextField.center.y + 60)
-        
-        m_colorCollectionView.center.y = CGFloat(m_colorLabel.center.y + 95)
     }
     
     func loadUIWithCache() {
