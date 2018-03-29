@@ -14,7 +14,7 @@ import AVKit
 import Cache
 import FirebaseMessaging
 
-class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, ImageCacheDelegate, MediaMessageDelegate {
+class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavigationControllerDelegate, UIPickerViewDelegate, ImageCacheDelegate, MediaMessageDelegate, UIGestureRecognizerDelegate {
     
     var m_saveRoomButton: UIBarButtonItem?
     
@@ -27,11 +27,12 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
     var m_messages = [JSQMessage]()
     
     // Room variables
-    var m_userMenu = UIView()
+    var m_userMenu: UIView?
     var m_isRoomSaved = false
     var m_savedRooms = [Room]()
     var m_currentRoom: Room?
     var m_roomUsers = [String]()
+    var m_selectedMessageIndex: Int?
     
     // Chat variables
     var m_receiver: User?
@@ -443,15 +444,21 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
         let userID = messageAtIndex.senderId
         let user = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: userID!)
         m_receiver = user
+        m_selectedMessageIndex = indexPath.row
         
-        m_userMenu = UIView.init(frame: CGRect(x: 0, y: 0, width: 250, height: 150))
-        m_userMenu.center.y = self.view.center.y
-        m_userMenu.center.x = self.view.center.x
-        m_userMenu.layer.cornerRadius = 8
-        m_userMenu.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
-        self.view.addSubview(m_userMenu)
+        if m_userMenu != nil {
+            dismissUserMenu()
+        }
+        m_userMenu = UIView.init(frame: CGRect(x: 0, y: 0, width: 270, height: 240))
+        m_userMenu!.center.y = self.view.center.y
+        m_userMenu!.center.x = self.view.center.x
+        m_userMenu!.layer.cornerRadius = 8
+        m_userMenu!.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
+        m_userMenu!.clipsToBounds = true
+        self.view.addSubview(m_userMenu!)
         
-        let avatarView = UIImageView.init(frame: CGRect(x: 100, y: 10, width: 50, height: 50))
+        let avatarView = UIImageView.init(frame: CGRect(x: 110
+            , y: 10, width: 50, height: 50))
         avatarView.image = UIImage(named: "avatar")
         avatarView.layer.masksToBounds = true
         avatarView.layer.cornerRadius = 25
@@ -459,44 +466,72 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
             avatarView.image = avatar.image
         }
         
-        let userNameText = UILabel.init(frame: CGRect(x: 0, y: 70, width: 250, height: 20))
+        let userNameText = UILabel.init(frame: CGRect(x: 0, y: 70, width: 270, height: 20))
         userNameText.text = user?.name
         userNameText.textAlignment = .center
         userNameText.textColor = UIColor.white
         userNameText.font = UIFont.boldSystemFont(ofSize: 19)
         
-        let messageButton = UIButton.init(frame: CGRect(x: 80, y: 100, width: 40, height: 40))
-        messageButton.setImage(UIImage(named: "chats_white"), for: .normal)
+        let messageButton = UIButton.init(frame: CGRect(x: 0, y: 120, width: 270, height: 40))
+        messageButton.setTitle("Message", for: .normal)
+//        messageButton.setImage(UIImage(named: "chats_white"), for: .normal)
         messageButton.backgroundColor = UIColor(white: 0.18, alpha: 1)
         messageButton.layer.borderWidth = 2
         messageButton.layer.borderColor = UIColor(white: 0.16, alpha: 1).cgColor
-        messageButton.layer.cornerRadius = 5
         messageButton.addTarget(self, action: #selector(ChatVC.displayPersonalChat), for: .touchUpInside)
         
-        let cancelButton = UIButton.init(frame: CGRect(x: 130, y: 100, width: 40, height: 40))
+        let blockButton = UIButton.init(frame: CGRect(x: 0, y: 160, width: 270, height: 40))
+        blockButton.setTitle("Block", for: .normal)
+//        blockButton.setImage(UIImage(named: "block"), for: .normal)
+        blockButton.backgroundColor = UIColor(white: 0.18, alpha: 1)
+        blockButton.layer.borderWidth = 2
+        blockButton.layer.borderColor = UIColor(white: 0.16, alpha: 1).cgColor
+        blockButton.addTarget(self, action: #selector(ChatVC.blockUser), for: .touchUpInside)
+        
+        let reportButton = UIButton.init(frame: CGRect(x: 0, y: 200, width: 270, height: 40))
+        reportButton.setTitle("Report Message", for: .normal)
+        //        blockButton.setImage(UIImage(named: "block"), for: .normal)
+        reportButton.backgroundColor = UIColor(white: 0.18, alpha: 1)
+        reportButton.layer.borderWidth = 2
+        reportButton.layer.borderColor = UIColor(white: 0.16, alpha: 1).cgColor
+        reportButton.addTarget(self, action: #selector(ChatVC.reportMessage), for: .touchUpInside)
+        
+        let cancelButton = UIButton.init(frame: CGRect(x: 230, y: 0, width: 40, height: 40))
         cancelButton.setImage(UIImage(named: "cancel"), for: .normal)
-        cancelButton.backgroundColor = UIColor(white: 0.18, alpha: 1)
-        cancelButton.layer.borderWidth = 2
-        cancelButton.layer.borderColor = UIColor(white: 0.16, alpha: 1).cgColor
-        cancelButton.layer.cornerRadius = 5
         cancelButton.addTarget(self, action: #selector(ChatVC.dismissUserMenu), for: .touchUpInside)
     
-        m_userMenu.addSubview(avatarView)
-        m_userMenu.addSubview(userNameText)
-        m_userMenu.addSubview(messageButton)
-        m_userMenu.addSubview(cancelButton)
+        m_userMenu!.addSubview(avatarView)
+        m_userMenu!.addSubview(userNameText)
+        m_userMenu!.addSubview(messageButton)
+        m_userMenu!.addSubview(blockButton)
+        m_userMenu!.addSubview(reportButton)
+        m_userMenu!.addSubview(cancelButton)
     }
     
     @objc func dismissUserMenu() {
-        m_userMenu.removeFromSuperview()
+        m_userMenu!.removeFromSuperview()
+        m_userMenu = nil
     }
     
     @objc func displayPersonalChat() {
         performSegue(withIdentifier: "personal_chat_segue", sender: nil)
     }
     
+    @objc func blockUser() {
+        // blockUser in cache to filter content in public chat rooms
+        m_cacheStorage.blockUser(userID: m_receiver!.id)
+        // blockUser in database to they cannot contact user directly
+        m_dbProvider.blockUser(userID: m_receiver!.id)
+        dismissUserMenu()
+    }
+    
+    @objc func reportMessage() {
+        m_dbProvider.reportMessage(roomID: m_currentRoom!.id, message: m_selectedMessageIndex!)
+        dismissUserMenu()
+    }
+    
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        m_userMenu.removeFromSuperview()
+        m_userMenu!.removeFromSuperview()
         // Check whether chat exists between users
         let user = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: m_authProvider.userID())
         let chats = user!.chats

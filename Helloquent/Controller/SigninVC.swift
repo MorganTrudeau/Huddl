@@ -21,21 +21,39 @@ class SigninVC: UIViewController, UITextFieldDelegate {
     
     let authProvider = AuthProvider()
     let m_loadingOverlay = LoadingOverlay()
+    let m_defaults = UserDefaults.standard
     
     private let SIGN_IN_SEGUE: String = "sign_in_segue"
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Add tap and swipe Gestures to dismiss keyboard
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(SigninVC.dismissKeyboard))
         view.addGestureRecognizer(tap)
+        
+        let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(SigninVC.dismissKeyboard))
+        swipeDown.direction = .down
+        self.view.addGestureRecognizer(swipeDown)
         
         m_emailTextField.delegate = self
         m_passwordTextField.delegate = self
         
+        // Used for loading indicator
         m_loadingOverlay.modalPresentationStyle = .overFullScreen
         
         setUpUI()
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        // Present EULA terms
+        if !m_defaults.bool(forKey: "firstRun") {
+            eulaAlert(title: "EULA Compliance", message: "This app has no tolerance for objectionable content or abusive users. Please agree to comply with these terms.")
+        }
+        if AuthProvider.Instance.isLoggedIn() {
+            self.performSegue(withIdentifier: self.SIGN_IN_SEGUE, sender: nil)
+        }
     }
     
     override func viewDidDisappear(_ animated: Bool) {
@@ -68,12 +86,6 @@ class SigninVC: UIViewController, UITextFieldDelegate {
         m_FBLoginButton.layer.cornerRadius = 5
         m_FBLoginButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 15)
         m_FBLoginButton.addSubview(FBImageView)
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        if AuthProvider.Instance.isLoggedIn() {
-            self.performSegue(withIdentifier: self.SIGN_IN_SEGUE, sender: nil)
-        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
@@ -151,6 +163,23 @@ class SigninVC: UIViewController, UITextFieldDelegate {
         let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
         alert.addAction(ok)
         present(alert, animated: true, completion: nil)
+    }
+    
+    func eulaAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let agree = UIAlertAction(title: "AGREE", style: .default, handler: {(_) in
+            self.m_defaults.set(true, forKey: "firstRun")
+        })
+        let disagree = UIAlertAction(title: "DISAGREE", style: .default, handler: {(_) in
+            self.closeApp()
+        })
+        alert.addAction(disagree)
+        alert.addAction(agree)
+        present(alert, animated: true, completion: nil)
+    }
+    
+    @objc func closeApp() {
+        exit(0)
     }
     
     @objc func dismissKeyboard() {

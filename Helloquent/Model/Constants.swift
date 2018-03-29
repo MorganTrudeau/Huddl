@@ -22,6 +22,7 @@ class Constants {
     static let VIDEO_STORAGE = "Video_Storage"
     static let DISPLAY_NAMES = "Display_Names"
     static let LIKED_ROOMS = "Liked_Rooms"
+    static let REPORTS = "Reports"
     
     
     // User
@@ -33,6 +34,7 @@ class Constants {
     static let AVATAR = "avatar"
     static let CHATS = "chats"
     static let TOKEN = "token"
+    static let BLOCKED_USERS = "blocked_users"
     
     // Messages
     static let TEXT = "text"

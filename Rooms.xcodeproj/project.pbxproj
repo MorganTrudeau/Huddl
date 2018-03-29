@@ -12,8 +12,6 @@
 		DF6EE0A8076409BDBC12C4DD /* Pods_HelloquentUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B01B6A9C2126C136662B5F3 /* Pods_HelloquentUITests.framework */; };
 		F90555F8201B0AF60053267A /* LocationRoomsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90555F7201B0AF60053267A /* LocationRoomsTableView.swift */; };
 		F90555FA201B0B210053267A /* UserRoomsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90555F9201B0B210053267A /* UserRoomsTableView.swift */; };
-		F90C4BE62057958200662DEA /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F90C4BE52057958100662DEA /* NMAKit.framework */; };
-		F90C4BE72057958200662DEA /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F90C4BE52057958100662DEA /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F90D10291FECDFB90012283B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F90D10281FECDFB90012283B /* AppDelegate.swift */; };
 		F90D102E1FECDFB90012283B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F90D102C1FECDFB90012283B /* Main.storyboard */; };
 		F90D10331FECDFB90012283B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F90D10311FECDFB90012283B /* LaunchScreen.storyboard */; };
@@ -48,6 +46,9 @@
 		F9F7E396201FB67100ABD6B8 /* ImageDisplayVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */; };
 		F9F7E398201FE51D00ABD6B8 /* EditProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E397201FE51D00ABD6B8 /* EditProfileVC.swift */; };
 		F9F7E39A202002D000ABD6B8 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E399202002D000ABD6B8 /* Helper.swift */; };
+		F9FA181E2064A7BE00C085CD /* BlockListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9FA181D2064A7BE00C085CD /* BlockListVC.swift */; };
+		F9FA18202064DF9800C085CD /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9FA181F2064DF9700C085CD /* NMAKit.framework */; };
+		F9FA18212064DF9800C085CD /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F9FA181F2064DF9700C085CD /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,7 +75,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				F90C4BE72057958200662DEA /* NMAKit.framework in Embed Frameworks */,
+				F9FA18212064DF9800C085CD /* NMAKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -93,7 +94,6 @@
 		C9903F0212B6980D79CB696E /* Pods_HelloquentTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_HelloquentTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		F90555F7201B0AF60053267A /* LocationRoomsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationRoomsTableView.swift; sourceTree = "<group>"; };
 		F90555F9201B0B210053267A /* UserRoomsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRoomsTableView.swift; sourceTree = "<group>"; };
-		F90C4BE52057958100662DEA /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NMAKit.framework; sourceTree = "<group>"; };
 		F90D10251FECDFB90012283B /* Helloquent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Helloquent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F90D10281FECDFB90012283B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F90D102D1FECDFB90012283B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -135,6 +135,8 @@
 		F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageDisplayVC.swift; sourceTree = "<group>"; };
 		F9F7E397201FE51D00ABD6B8 /* EditProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileVC.swift; sourceTree = "<group>"; };
 		F9F7E399202002D000ABD6B8 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
+		F9FA181D2064A7BE00C085CD /* BlockListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockListVC.swift; sourceTree = "<group>"; };
+		F9FA181F2064DF9700C085CD /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NMAKit.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -142,7 +144,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F90C4BE62057958200662DEA /* NMAKit.framework in Frameworks */,
+				F9FA18202064DF9800C085CD /* NMAKit.framework in Frameworks */,
 				F93BC750202AD3CE00F42038 /* UserNotifications.framework in Frameworks */,
 				4C97677652B24F944C9A1913 /* Pods_Helloquent.framework in Frameworks */,
 			);
@@ -194,7 +196,7 @@
 		F90D101C1FECDFB90012283B = {
 			isa = PBXGroup;
 			children = (
-				F90C4BE52057958100662DEA /* NMAKit.framework */,
+				F9FA181F2064DF9700C085CD /* NMAKit.framework */,
 				F90D10271FECDFB90012283B /* Helloquent */,
 				F90D103C1FECDFB90012283B /* HelloquentTests */,
 				F90D10471FECDFB90012283B /* HelloquentUITests */,
@@ -280,6 +282,7 @@
 				F9BDD5FE20321DAD00D59027 /* PersonalChatVC.swift */,
 				F9179B76200EBDFC0057AAEF /* TabBarVC.swift */,
 				F9F7E395201FB67000ABD6B8 /* ImageDisplayVC.swift */,
+				F9FA181D2064A7BE00C085CD /* BlockListVC.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -672,6 +675,7 @@
 				F9BDD5FF20321DAD00D59027 /* PersonalChatVC.swift in Sources */,
 				F9179B77200EBDFC0057AAEF /* TabBarVC.swift in Sources */,
 				F9C9F47E202991A800294846 /* ProfileVC.swift in Sources */,
+				F9FA181E2064A7BE00C085CD /* BlockListVC.swift in Sources */,
 				F90555F8201B0AF60053267A /* LocationRoomsTableView.swift in Sources */,
 				F9F7E39A202002D000ABD6B8 /* Helper.swift in Sources */,
 				F983B84C20230FFB00080AB5 /* CacheStorage.swift in Sources */,

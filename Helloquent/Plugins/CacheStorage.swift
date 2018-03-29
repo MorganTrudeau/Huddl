@@ -56,6 +56,34 @@ class CacheStorage {
         }
     }
     
+    func blockUser(userID: String) {
+        var blockedUsers = [String]()
+        if let cachedBlockedUsers = try? m_userStorage.object(ofType: [String].self, forKey: "blockedUsers") {
+            blockedUsers = cachedBlockedUsers
+        }
+        blockedUsers.append(userID)
+        do{
+            try m_userStorage.setObject(blockedUsers, forKey: "blockedUsers")
+            print("User added to block list")
+        } catch {
+            print("Block user cache error: \(error)")
+        }
+    }
+    
+    func unblockUser(userID: String) {
+        var blockedUsers = [String]()
+        if let cachedBlockedUsers = try? m_userStorage.object(ofType: [String].self, forKey: "blockedUsers") {
+            blockedUsers = cachedBlockedUsers
+        }
+        blockedUsers = blockedUsers.filter { $0 != userID  }
+        do{
+            try m_userStorage.setObject(blockedUsers, forKey: "blockedUsers")
+            print("User removed from block list")
+        } catch {
+            print("Block user cache error: \(error)")
+        }
+    }
+    
     /**
      Image Storage
     **/

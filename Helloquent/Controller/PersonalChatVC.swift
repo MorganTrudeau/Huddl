@@ -28,6 +28,7 @@ class PersonalChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate
     var m_receiverUserID = ""
     var m_receiverUser: User?
     var m_newChat = false
+    var m_userMenu: UIView?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -178,9 +179,13 @@ class PersonalChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate
         cell.messageBubbleTopLabel.textColor = UIColor.init(white: 0.9, alpha: 1)
         cell.avatarImageView.isUserInteractionEnabled = true
         
-        let tap = UITapGestureRecognizer(target: self, action: #selector(ChatVC.presentUserMenu))
-        tap.numberOfTapsRequired = 1
-        cell.avatarImageView.addGestureRecognizer(tap)
+        
+        if m_messages[indexPath.row].senderId != m_authProvider.userID() {
+            let tap = UITapGestureRecognizer(target: self, action: #selector(ChatVC.presentUserMenu))
+            tap.numberOfTapsRequired = 1
+            cell.avatarImageView.addGestureRecognizer(tap)
+        }
+        
         return cell
     }
     
@@ -227,6 +232,8 @@ class PersonalChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate
                     imageDisplay.setView(frame: self.view.frame)
                     self.present(imageDisplay, animated: true, completion: nil)
                 }
+            } else {
+                alertUser(title: "Report Content", message: "Would you like to report this message?")
             }
         }
     }
@@ -240,23 +247,36 @@ class PersonalChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate
     // Saves to Firebase and cache
     // Creates instance of chat for receiver and sender if this is a new chat
     override func didPressSend(_ button: UIButton!, withMessageText text: String!, senderId: String!, senderDisplayName: String!, date: Date!) {
+            m_dbProvider.getBlockedList(completion: {(blockedList) in
+            if (!blockedList.contains { $0 == self.m_receiverUserID }) {
+                // If users do not have an existing chat, creates instance in sender's and receiver's chats
+                if self.m_newChat {
+                    self.m_dbProvider.createChat(receiverID: self.m_receiverUserID)
+                }
+
+                // Save message in Firebase and cache
+                self.m_messagesProvider.sendChatMessage(receiverID: self.m_receiverUserID, senderID: senderId, senderName: senderDisplayName, text: text, url: nil, chatID: self.m_currentChatID)
+                
+                // Add message to collectionview
+                self.m_messages.append(JSQMessage(senderId: senderId, displayName: senderDisplayName, text: text))
+                self.collectionView.reloadData()
+                self.collectionView.layoutIfNeeded()
+                self.scrollToBottom(animated: false)
+                
+                // Clear message input field
+                self.finishSendingMessage()
+            } else {
+                self.alertUser(title: "Cannot send messgage", message: "You are currently blocked")
+            }
+        })
+    }
+    
+    func alertUser(title: String, message: String) {
         
-        // If users do not have an existing chat, creates instance in sender's and receiver's chats
-        if m_newChat {
-            m_dbProvider.createChat(receiverID: m_receiverUserID)
-        }
-        
-        // Save message in Firebase and cache
-        m_messagesProvider.sendChatMessage(receiverID: m_receiverUserID, senderID: senderId, senderName: senderDisplayName, text: text, url: nil, chatID: m_currentChatID)
-        
-        // Add message to collectionview
-        m_messages.append(JSQMessage(senderId: senderId, displayName: senderDisplayName, text: text))
-        self.collectionView.reloadData()
-        self.collectionView.layoutIfNeeded()
-        self.scrollToBottom(animated: false)
-        
-        // Clear message input field
-        finishSendingMessage()
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let ok = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(ok)
+        present(alert, animated: true, completion: nil)
     }
     
     /**
@@ -313,6 +333,66 @@ class PersonalChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate
         }
         // Dismiss picker
         dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func presentUserMenu(sender: UITapGestureRecognizer) {
+        let user = m_receiverUser!
+        
+        if m_userMenu != nil {
+            dismissUserMenu()
+        }
+        m_userMenu = UIView.init(frame: CGRect(x: 0, y: 0, width: 270, height: 150))
+        m_userMenu!.center.y = self.view.center.y
+        m_userMenu!.center.x = self.view.center.x
+        m_userMenu!.layer.cornerRadius = 8
+        m_userMenu!.backgroundColor = UIColor.init(white: 0.2, alpha: 1)
+        self.view.addSubview(m_userMenu!)
+        
+        let avatarView = UIImageView.init(frame: CGRect(x: 110
+            , y: 10, width: 50, height: 50))
+        avatarView.image = UIImage(named: "avatar")
+        avatarView.layer.masksToBounds = true
+        avatarView.layer.cornerRadius = 25
+        if let avatar = try? m_cacheStorage.m_mediaStorage.object(ofType: ImageWrapper.self, forKey: user.avatar) {
+            avatarView.image = avatar.image
+        }
+        
+        let userNameText = UILabel.init(frame: CGRect(x: 0, y: 70, width: 270, height: 20))
+        userNameText.text = user.name
+        userNameText.textAlignment = .center
+        userNameText.textColor = UIColor.white
+        userNameText.font = UIFont.boldSystemFont(ofSize: 19)
+        
+        let blockButton = UIButton.init(frame: CGRect(x: 75, y: 100, width: 120, height: 40))
+        blockButton.setTitle("Block", for: .normal)
+        blockButton.setImage(UIImage(named: "block"), for: .normal)
+        blockButton.backgroundColor = UIColor(white: 0.18, alpha: 1)
+        blockButton.layer.borderWidth = 2
+        blockButton.layer.borderColor = UIColor(white: 0.16, alpha: 1).cgColor
+        blockButton.layer.cornerRadius = 5
+        blockButton.addTarget(self, action: #selector(PersonalChatVC.blockUser), for: .touchUpInside)
+        
+        let cancelButton = UIButton.init(frame: CGRect(x: 230, y: 0, width: 40, height: 40))
+        cancelButton.setImage(UIImage(named: "cancel"), for: .normal)
+        cancelButton.addTarget(self, action: #selector(PersonalChatVC.dismissUserMenu), for: .touchUpInside)
+        
+        m_userMenu!.addSubview(avatarView)
+        m_userMenu!.addSubview(userNameText)
+        m_userMenu!.addSubview(blockButton)
+        m_userMenu!.addSubview(cancelButton)
+    }
+    
+    @objc func dismissUserMenu() {
+        m_userMenu!.removeFromSuperview()
+        m_userMenu = nil
+    }
+    
+    @objc func blockUser() {
+        // blockUser in cache to filter content in public chat rooms
+        m_cacheStorage.blockUser(userID: m_receiverUser!.id)
+        // blockUser in database to they cannot contact user directly
+        m_dbProvider.blockUser(userID: m_receiverUser!.id)
+        dismissUserMenu()
     }
     
     /**

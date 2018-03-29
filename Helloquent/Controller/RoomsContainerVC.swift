@@ -73,13 +73,9 @@ class RoomsContainerVC: UIViewController, UISearchBarDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         m_roomsSearchBar.delegate = self
-        
         AuthProvider.Instance.setNotificationToken()
-        
         DBProvider.Instance.getUser(id: AuthProvider.Instance.userID(), completion: nil)
-        
         setUpUI()
     }
     

@@ -23,15 +23,20 @@ class SignUpVC: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        // Add tap and swipe Gestures to dismiss keyboard
         let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(SigninVC.dismissKeyboard))
         view.addGestureRecognizer(tap)
+        
+        let swipeDown = UISwipeGestureRecognizer(target: self, action: #selector(SigninVC.dismissKeyboard))
+        swipeDown.direction = .down
+        self.view.addGestureRecognizer(swipeDown)
         
         m_displayNameTextField.delegate = self
         m_emailTextField.delegate = self
         m_passwordTextField.delegate = self
         m_confirmPassTextField.delegate = self
         
+        // Used for loading indicator
         m_loadingOverlay.modalPresentationStyle = .overFullScreen
         
         setUpUI()

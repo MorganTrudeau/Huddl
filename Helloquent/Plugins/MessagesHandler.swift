@@ -64,20 +64,20 @@ class MessagesProvider {
     func sendChatMessage(receiverID: String, senderID: String, senderName: String, text: String?, url: String?, chatID: String) {
         // Construct message data to be written to Firebase
         let data: Dictionary<String, Any> = [Constants.RECEIVER_ID: receiverID, Constants.SENDER_ID: senderID, Constants.SENDER_NAME: senderName, Constants.TEXT: text ?? "", Constants.URL: url ?? ""]
-        
+                
         // Write message to Firebase
         // With completion so message cannot be cached offline
-        m_dbProvider.chatMessagesChildRef.childByAutoId().setValue(data, withCompletionBlock: {(error, _) in
+        self.m_dbProvider.chatMessagesChildRef.childByAutoId().setValue(data, withCompletionBlock: {(error, _) in
             if error == nil {
                 var messages = [Message]()
                 // Fetch cached messages from room to update
                 if let cachedMessages = try? self.m_cacheStorage.m_messagesStorage.object(ofType: [Message].self, forKey: chatID) {
-                    messages = cachedMessages
+                            messages = cachedMessages
                 }
                 // Contruct codable message to cache
                 let message = Message(senderID: senderID, senderName: senderName, text: text ?? "", url: url ?? "")
-                messages.append(message)
-                
+                    messages.append(message)
+                    
                 // Cache messages
                 self.m_cacheStorage.cacheMessages(id: chatID, messages: messages)
             }
@@ -146,6 +146,10 @@ class MessagesProvider {
         var messages = [Message]()
         var firstObserve = true
         let roomID = m_dbProvider.m_currentRoom!.id
+        var blockedUsers = [String]()
+        if let cachedBlockedUsers = try? m_cacheStorage.m_userStorage.object(ofType: [String].self, forKey: "blockedUsers") {
+            blockedUsers = cachedBlockedUsers
+        }
         m_dbProvider.roomMessagesChildRef.queryLimited(toLast: 1).observe(DataEventType.value) { (snapshot: DataSnapshot) in
                 if firstObserve {
                     firstObserve = false
@@ -157,7 +161,7 @@ class MessagesProvider {
                         
                         if let messageData = child.value as? NSDictionary {
                             if let senderID = messageData[Constants.SENDER_ID] as? String {
-                                if senderID != AuthProvider.Instance.userID() {
+                                if senderID != AuthProvider.Instance.userID() && (!blockedUsers.contains { $0 == senderID }) {
                                     if let senderName = messageData[Constants.SENDER_NAME] as? String {
                                         if let text = messageData[Constants.TEXT] as? String {
                                             if let url = messageData[Constants.URL] as? String {
@@ -219,6 +223,11 @@ class MessagesProvider {
             messages = cachedMessages
             cachedMessageCount = cachedMessages.count
         }
+        // Load blocked users
+        var blockedUsers = [String]()
+        if let cachedBlockedUsers = try? m_cacheStorage.m_userStorage.object(ofType: [String].self, forKey: "blockedUsers") {
+            blockedUsers = cachedBlockedUsers
+        }
         m_dbProvider.roomMessagesChildRef.observeSingleEvent(of: DataEventType.value, with: {(snapshot: DataSnapshot) in
             newMessageCount = Int(snapshot.childrenCount) - cachedMessageCount
             
@@ -228,22 +237,24 @@ class MessagesProvider {
                     for child in snapshot.children.allObjects as! [DataSnapshot] {
                         if let messageData = child.value as? NSDictionary {
                             if let senderID = messageData[Constants.SENDER_ID] as? String {
-                                if let senderName = messageData[Constants.SENDER_NAME] as? String {
-                                    if let text = messageData[Constants.TEXT] as? String {
-                                        if let url = messageData[Constants.URL] as? String {
-                                            if text != "" {
-                                                jsqMessages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
-                                                messages.append(Message(senderID: senderID, senderName: senderName, text: text, url: url))
-                                            } else {
-                                                let placeHolderImage = JSQPhotoMediaItem.init(image: nil)
-                                                if senderID != AuthProvider.Instance.userID() {
-                                                    placeHolderImage?.appliesMediaViewMaskAsOutgoing = false
-                                                }
-                                                jsqMessages.append(JSQMessage(senderId: senderID, displayName: senderName, media: placeHolderImage))
-                                                messages.append(Message(senderID: senderID, senderName: senderName, text: text, url: url))
-                                                let index = messages.count - 1
-                                                DispatchQueue.global().async {
-                                                    self.loadMessageMedia(senderID: senderID, senderName: senderName, url: url, id: self.m_dbProvider.m_currentRoom!.id, index: index, completion: nil)
+                                if !blockedUsers.contains { $0 == senderID } {
+                                    if let senderName = messageData[Constants.SENDER_NAME] as? String {
+                                        if let text = messageData[Constants.TEXT] as? String {
+                                            if let url = messageData[Constants.URL] as? String {
+                                                if text != "" {
+                                                    jsqMessages.append(JSQMessage(senderId: senderID, displayName: senderName, text: text))
+                                                    messages.append(Message(senderID: senderID, senderName: senderName, text: text, url: url))
+                                                } else {
+                                                    let placeHolderImage = JSQPhotoMediaItem.init(image: nil)
+                                                    if senderID != AuthProvider.Instance.userID() {
+                                                        placeHolderImage?.appliesMediaViewMaskAsOutgoing = false
+                                                    }
+                                                    jsqMessages.append(JSQMessage(senderId: senderID, displayName: senderName, media: placeHolderImage))
+                                                    messages.append(Message(senderID: senderID, senderName: senderName, text: text, url: url))
+                                                    let index = messages.count - 1
+                                                    DispatchQueue.global().async {
+                                                        self.loadMessageMedia(senderID: senderID, senderName: senderName, url: url, id: self.m_dbProvider.m_currentRoom!.id, index: index, completion: nil)
+                                                    }
                                                 }
                                             }
                                         }
@@ -333,7 +344,6 @@ class MessagesProvider {
                     messages = cachedMessages
                 }
                 for child in snapshot.children.allObjects as! [DataSnapshot] {
-                    
                     if let messageData = child.value as? NSDictionary {
                         if let senderID = messageData[Constants.SENDER_ID] as? String {
                             if senderID != AuthProvider.Instance.userID() {
@@ -416,7 +426,6 @@ class MessagesProvider {
                         print("Error downloading Message Media Data")
                     }
                 }
-            
         }
     }
     

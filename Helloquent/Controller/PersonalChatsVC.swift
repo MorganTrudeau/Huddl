@@ -28,7 +28,6 @@ class PersonalChatsVC: UIViewController, UITableViewDelegate, UITableViewDataSou
         m_personalChatsTableView.dataSource = self
         m_cacheStorage.notificationCacheDelegate = self
         m_cacheStorage.imageCacheDelegate = self
-        loadChats()
         setUpUI()
     }
     

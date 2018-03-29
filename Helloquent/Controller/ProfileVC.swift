@@ -17,6 +17,7 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     @IBOutlet weak var m_displayNameTextField: UITextField!
     @IBOutlet weak var m_colorLabel: UILabel!
     @IBOutlet weak var m_colorCollectionView: UICollectionView!
+    @IBOutlet weak var m_blockListButton: UIButton!
     
     let m_picker = UIImagePickerController()
     let m_cacheStorage = CacheStorage.Instance
@@ -51,6 +52,10 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         
         m_displayNameTextField.isUserInteractionEnabled = false
         m_displayNameTextField.underlined()
+        
+        m_blockListButton.layer.borderWidth = 2.0
+        m_blockListButton.layer.borderColor = UIColor(red: 102/255, green: 0, blue: 1, alpha: 1).cgColor
+        m_blockListButton.layer.cornerRadius = 5
     }
     
     func loadUIWithCache() {

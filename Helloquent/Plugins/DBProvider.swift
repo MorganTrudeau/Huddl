@@ -44,6 +44,8 @@ typealias RoomUserHandler = (_ roomUsers: [String]) ->  Void
 
 typealias UserHandler = (_ user: User) -> Void
 
+typealias BlockListHander = (_ blockedList: [String]) -> Void
+
 class DBProvider {
     
     private static let _instance = DBProvider()
@@ -95,7 +97,6 @@ class DBProvider {
     
     var roomMessagesChildRef: DatabaseReference {
         return roomMessagesRef.child(m_currentRoom!.id)
-        print(m_currentRoom!.id)
     }
     
     var chatMessagesRef: DatabaseReference {
@@ -108,6 +109,10 @@ class DBProvider {
     
     var mediaMessagesRef: DatabaseReference {
         return dbRef.child(Constants.MEDIA_MESSAGES)
+    }
+    
+    var reportsRef: DatabaseReference {
+        return dbRef.child(Constants.REPORTS)
     }
     
     var storageRef: StorageReference {
@@ -125,7 +130,7 @@ class DBProvider {
     // User Functions
     
     func createUser(withID: String, email: String, displayName: String, password: String, color: String) {
-        let defaultAvatar = "https://firebasestorage.googleapis.com/v0/b/helloquent-a4460.appspot.com/o/Image_Storage%2F59D84132-6661-4CD6-8DC7-E27E14A530B4?alt=media&token=93865466-8228-433b-938e-1cf10fd7c829"
+        let defaultAvatar = "https://firebasestorage.googleapis.com/v0/b/rooms-68d7a.appspot.com/o/Image_Storage%2F8D87EC4A-9DC6-4405-8DC6-CA1F3FDBAD10?alt=media&token=fcbf3aaf-2b91-413b-8e1c-d5914c39238d"
         let data: Dictionary<String, Any> = [Constants.EMAIL: email, Constants.DISPLAY_NAME: displayName, Constants.PASSWORD: password, Constants.COLOR: color, Constants.AVATAR: defaultAvatar]
         // Store new user in Firebase
         usersRef.child(withID).setValue(data)
@@ -186,6 +191,50 @@ class DBProvider {
                 }
             }
         })
+    }
+    
+    func blockUser(userID: String) {
+        self.usersRef.child(userID).observeSingleEvent(of: .value, with: {(snapshot) in
+            if var user = snapshot.value as? NSDictionary {
+                if var blockedUsers = user[Constants.BLOCKED_USERS] as? [String] {
+                    if (!blockedUsers.contains { $0 == self.m_authProvider.userID() }) {
+                        blockedUsers.append(self.m_authProvider.userID())
+                        print("\(userID) blocked")
+                        self.usersRef.child("\(userID)/\(Constants.BLOCKED_USERS)").setValue(blockedUsers)
+                    }
+                } else {
+                    user.setValue([self.m_authProvider.userID()], forKey: Constants.BLOCKED_USERS)
+                    self.usersRef.child(userID).setValue(user)
+                }
+            }
+        })
+    }
+    
+    func unblockUser(userID: String) {
+        self.usersRef.child(userID).observeSingleEvent(of: .value, with: {(snapshot) in
+            if let user = snapshot.value as? NSDictionary {
+                if var blockedUsers = user[Constants.BLOCKED_USERS] as? [String] {
+                    blockedUsers = blockedUsers.filter { $0 != self.m_authProvider.userID() }
+                    print("\(userID) unblocked")
+                    self.usersRef.child("\(userID)/\(Constants.BLOCKED_USERS)").setValue(blockedUsers)
+                }
+            }
+        })
+    }
+    
+    func getBlockedList(completion: BlockListHander?) {
+        self.usersRef.child(m_authProvider.userID()).observeSingleEvent(of: .value, with: {(snapshot) in
+            if let user = snapshot.value as? NSDictionary {
+                if let blockedUsers = user[Constants.BLOCKED_USERS] as? [String] {
+                    completion?(blockedUsers)
+                }
+            }
+        })
+    }
+    
+    func reportMessage(roomID: String, message: Int) {
+        let uudid =  UUID().uuidString
+        self.reportsRef.child(uudid).setValue([roomID:message])
     }
     
     func saveProfile(displayName: String, color: String, avatar: UIImage?, completion: SuccessHandler?) {
