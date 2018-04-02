@@ -87,6 +87,8 @@ class EditProfileVC: UIViewController, UICollectionViewDelegate, UICollectionVie
     }
     
     func setUpUI() {
+        self.view.layoutIfNeeded()
+        
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
         
@@ -122,6 +124,14 @@ class EditProfileVC: UIViewController, UICollectionViewDelegate, UICollectionVie
         m_logoutButton.layer.cornerRadius = 5
         m_logoutButton.center.y = CGFloat(m_colorCollectionView.center.y + 110)
         m_logoutButton.center.x = self.view.center.x
+        
+        let size = m_colorCollectionView.frame.size.width
+        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        layout.sectionInset = UIEdgeInsets(top: 20, left: 0, bottom: 10, right: 0)
+        layout.itemSize = CGSize.init(width: size*0.15, height: size*0.15)
+        layout.minimumInteritemSpacing = 10
+        layout.minimumLineSpacing = 10
+        m_colorCollectionView!.collectionViewLayout = layout
     }
     
     // Color picker collectionView Functions
@@ -195,17 +205,16 @@ class EditProfileVC: UIViewController, UICollectionViewDelegate, UICollectionVie
                     color = m_stringColors[(m_selectedCellIndexPath?.row)!]
                 }
                 if m_profileImageChanged {
+                    newAvatar = m_profileImageView.image
                     let loadingOverlay = LoadingOverlay()
                     loadingOverlay.modalPresentationStyle = .overFullScreen
                     present(loadingOverlay, animated: false, completion: nil)
-                    newAvatar = m_profileImageView.image
                 }
                 // Update Firebase child
-                DBProvider.Instance.saveProfile(displayName: displayName, color: color!, avatar: newAvatar, completion:{(savedImage) in
-                    if savedImage {
-                        self.dismiss(animated: false, completion: nil)
+                DBProvider.Instance.saveProfile(displayName: displayName, color: color!, avatar: newAvatar, completion: {(savedImage) in
+                    if(savedImage) {
+                        self.dismiss(animated: true, completion: nil)
                     }
-                    self.m_profileImageChanged = false
                     self.navigationController?.popViewController(animated: true)
                 })
             }

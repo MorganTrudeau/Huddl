@@ -40,13 +40,15 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
     }
     
     func setUpUI() {
+        self.view.layoutIfNeeded()
+        
         self.navigationController?.navigationBar.barTintColor = UIColor.init(white: 0.1, alpha: 1)
         self.navigationController?.navigationBar.titleTextAttributes = [NSAttributedStringKey.foregroundColor: UIColor.lightText]
         
         m_profileImageView.layer.borderWidth = 1.0
         m_profileImageView.layer.masksToBounds = false
         m_profileImageView.layer.borderColor = UIColor.black.cgColor
-        m_profileImageView.layer.cornerRadius = (m_profileImageView?.frame.size.height)!/2
+        m_profileImageView.layer.cornerRadius = (m_profileImageView?.frame.size.width)!/2
         m_profileImageView.clipsToBounds = true
         m_profileImageView.center.y = view.frame.size.height*0.25
         
@@ -56,6 +58,14 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         m_blockListButton.layer.borderWidth = 2.0
         m_blockListButton.layer.borderColor = UIColor(red: 102/255, green: 0, blue: 1, alpha: 1).cgColor
         m_blockListButton.layer.cornerRadius = 5
+        
+        let size = m_colorCollectionView.frame.size.width
+        let layout: UICollectionViewFlowLayout = UICollectionViewFlowLayout()
+        layout.sectionInset = UIEdgeInsets(top: 20, left: 0, bottom: 10, right: 0)
+        layout.itemSize = CGSize.init(width: size*0.15, height: size*0.15)
+        layout.minimumInteritemSpacing = 10
+        layout.minimumLineSpacing = 10
+        m_colorCollectionView!.collectionViewLayout = layout
     }
     
     func loadUIWithCache() {
@@ -65,8 +75,10 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
             m_selectedCellIndex = index
             m_colorCollectionView.reloadData()
             
-            if let image = try? m_cacheStorage.m_mediaStorage.object(ofType: ImageWrapper.self, forKey: user.avatar).image {
-                self.m_profileImageView.image = image
+            if let imageWrapper = try? m_cacheStorage.m_mediaStorage.object(ofType: ImageWrapper.self, forKey: user.avatar) {
+                self.m_profileImageView.image = imageWrapper.image
+            } else {
+                self.m_profileImageView.image = UIImage(named: "user")
             }
         }
     }
@@ -89,6 +101,7 @@ class ProfileVC: UIViewController, UICollectionViewDelegate, UICollectionViewDat
         } else {
             cell.layer.borderWidth = 0
         }
+        
         cell.backgroundColor = m_uiColors[indexPath.row]
         cell.layer.cornerRadius = 5
         return cell

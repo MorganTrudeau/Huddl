@@ -16,20 +16,20 @@ class ColorHandler {
         return _instance
     }
     
-    static let c1 = UIColor(red: 227/255, green: 0, blue: 223/255, alpha: 1)
-    static let c2 = UIColor(red: 162/255, green: 0, blue: 227/255, alpha: 1)
-    static let c3 = UIColor(red: 101/255, green: 0, blue: 227/255, alpha: 1)
-    static let c4 = UIColor(red: 0, green: 0, blue: 227/255, alpha: 1)
-    static let c5 = UIColor(red: 0, green: 96/255, blue: 227/255, alpha: 1)
-    static let c6 = UIColor(red: 0, green: 173/255, blue: 227/255, alpha: 1)
-    static let c7 = UIColor(red: 0, green: 220/255, blue: 145/255, alpha: 1)
-    static let c8 = UIColor(red: 0, green: 211/255, blue: 2/255, alpha: 1)
-    static let c9 = UIColor(red: 231/255, green: 84/255, blue: 0, alpha: 1)
-    static let c10 = UIColor(red: 231/255, green: 0, blue: 0, alpha: 1)
+    static let pink = UIColor(red: 1, green: 204/255, blue: 1, alpha: 1)
+    static let red = UIColor(red: 1, green: 102/255, blue: 102/255, alpha: 1)
+    static let orange = UIColor(red: 1, green: 170/255, blue: 128/255, alpha: 1)
+    static let yellow = UIColor(red: 1, green: 1, blue: 153/255, alpha: 1)
+    static let green = UIColor(red: 204/255, green: 1, blue: 153/255, alpha: 1)
+    static let teal = UIColor(red: 179/255, green: 1, blue: 217/255, alpha: 1)
+    static let blue = UIColor(red: 128/255, green: 212/255, blue: 1, alpha: 1)
+    static let violet = UIColor(red: 153/255, green: 153/255, blue: 1, alpha: 1)
+    static let purple = UIColor(red: 221/255, green: 153/255, blue: 1, alpha: 1)
+    static let grey = UIColor(red: 230/255, green: 230/255, blue: 230/255, alpha: 1)
     static let c11 = UIColor(red: 231/255, green: 0, blue: 89/255, alpha: 1)
     
-    let colors: [String] = ["pink", "purple", "darkPurple", "darkBlue", "blue", "lightBlue", "lightGreen", "green", "orange", "red"]
-    let uiColors: [UIColor] = [c1, c2, c3, c4, c5, c6, c7, c8, c9, c10]
+    let colors: [String] = ["pink", "red", "orange", "yellow", "green", "teal", "blue", "violet", "purple", "grey"]
+    let uiColors: [UIColor] = [pink, red, orange, yellow, green, teal, blue, violet, purple, grey]
     
     func userColor() -> String {
         let color = colors[Int(arc4random_uniform(UInt32(colors.count)))]
@@ -41,27 +41,27 @@ class ColorHandler {
         
         switch colorString {
         case "pink":
-            color = ColorHandler.c1
-        case "purple":
-            color = ColorHandler.c2
-        case "darkPurple":
-            color = ColorHandler.c3
-        case "darkBlue":
-            color = ColorHandler.c4
-        case "blue":
-            color = ColorHandler.c5
-        case "lightBlue":
-            color = ColorHandler.c6
-        case "lightGreen":
-            color = ColorHandler.c7
-        case "green":
-            color = ColorHandler.c8
-        case "orange":
-            color = ColorHandler.c9
+            color = ColorHandler.pink
         case "red":
-            color = ColorHandler.c10
+            color = ColorHandler.red
+        case "orange":
+            color = ColorHandler.orange
+        case "yellow":
+            color = ColorHandler.yellow
+        case "green":
+            color = ColorHandler.green
+        case "teal":
+            color = ColorHandler.teal
+        case "blue":
+            color = ColorHandler.blue
+        case "violet":
+            color = ColorHandler.violet
+        case "purple":
+            color = ColorHandler.purple
+        case "grey":
+            color = ColorHandler.grey
         default:
-            color = ColorHandler.c4
+            color = ColorHandler.blue
         }
         
         return color

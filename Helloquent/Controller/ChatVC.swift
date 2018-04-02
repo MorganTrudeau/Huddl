@@ -154,7 +154,7 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
  
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
         let message = m_messages[indexPath.item]
-        var avatar = UIImage(named: "avatar")
+        var avatar = UIImage(named: "user")
         if let user = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: message.senderId) {
             if let avatarImage = try? m_cacheStorage.m_mediaStorage.object(ofType: ImageWrapper.self, forKey: user.avatar).image {
                 avatar = avatarImage
@@ -211,6 +211,7 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
         let cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
         cell.messageBubbleTopLabel.textColor = UIColor.init(white: 0.9, alpha: 1)
         cell.avatarImageView.isUserInteractionEnabled = true
+        cell.textView!.textColor = UIColor.black
         
         if m_messages[indexPath.row].senderId != m_authProvider.userID() {
             let tap = UITapGestureRecognizer(target: self, action: #selector(ChatVC.presentUserMenu))
@@ -459,7 +460,7 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
         
         let avatarView = UIImageView.init(frame: CGRect(x: 110
             , y: 10, width: 50, height: 50))
-        avatarView.image = UIImage(named: "avatar")
+        avatarView.image = UIImage(named: "user")
         avatarView.layer.masksToBounds = true
         avatarView.layer.cornerRadius = 25
         if let avatar = try? m_cacheStorage.m_mediaStorage.object(ofType: ImageWrapper.self, forKey: user!.avatar) {
@@ -474,7 +475,6 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
         
         let messageButton = UIButton.init(frame: CGRect(x: 0, y: 120, width: 270, height: 40))
         messageButton.setTitle("Message", for: .normal)
-//        messageButton.setImage(UIImage(named: "chats_white"), for: .normal)
         messageButton.backgroundColor = UIColor(white: 0.18, alpha: 1)
         messageButton.layer.borderWidth = 2
         messageButton.layer.borderColor = UIColor(white: 0.16, alpha: 1).cgColor
@@ -482,7 +482,6 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
         
         let blockButton = UIButton.init(frame: CGRect(x: 0, y: 160, width: 270, height: 40))
         blockButton.setTitle("Block", for: .normal)
-//        blockButton.setImage(UIImage(named: "block"), for: .normal)
         blockButton.backgroundColor = UIColor(white: 0.18, alpha: 1)
         blockButton.layer.borderWidth = 2
         blockButton.layer.borderColor = UIColor(white: 0.16, alpha: 1).cgColor
@@ -490,7 +489,6 @@ class ChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate, UINavi
         
         let reportButton = UIButton.init(frame: CGRect(x: 0, y: 200, width: 270, height: 40))
         reportButton.setTitle("Report Message", for: .normal)
-        //        blockButton.setImage(UIImage(named: "block"), for: .normal)
         reportButton.backgroundColor = UIColor(white: 0.18, alpha: 1)
         reportButton.layer.borderWidth = 2
         reportButton.layer.borderColor = UIColor(white: 0.16, alpha: 1).cgColor

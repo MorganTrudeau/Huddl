@@ -130,7 +130,7 @@ class DBProvider {
     // User Functions
     
     func createUser(withID: String, email: String, displayName: String, password: String, color: String) {
-        let defaultAvatar = "https://firebasestorage.googleapis.com/v0/b/rooms-68d7a.appspot.com/o/Image_Storage%2F8D87EC4A-9DC6-4405-8DC6-CA1F3FDBAD10?alt=media&token=fcbf3aaf-2b91-413b-8e1c-d5914c39238d"
+        let defaultAvatar = "https://firebasestorage.googleapis.com/v0/b/rooms-68d7a.appspot.com/o/Image_Storage%2F041F1F01-03A7-4749-B9BC-5331B63C20F8?alt=media&token=9cbf6b34-a969-4530-8f91-4d8308e6cbfa"
         let data: Dictionary<String, Any> = [Constants.EMAIL: email, Constants.DISPLAY_NAME: displayName, Constants.PASSWORD: password, Constants.COLOR: color, Constants.AVATAR: defaultAvatar]
         // Store new user in Firebase
         usersRef.child(withID).setValue(data)
@@ -238,7 +238,6 @@ class DBProvider {
     }
     
     func saveProfile(displayName: String, color: String, avatar: UIImage?, completion: SuccessHandler?) {
-        
         // Update current user profile
         if avatar != nil {
             let path = "\(NSUUID().uuidString)"
@@ -264,9 +263,7 @@ class DBProvider {
                         // Store updated user in cache
                         self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: metadataURL, chats: user[Constants.CHATS] as? [String:String] ?? [:]))
                         
-                        DispatchQueue.main.sync {
-                            completion?(true)
-                        }
+                        completion?(true)
                     }
                     return TransactionResult.success(withValue: data)})
             }
@@ -281,9 +278,7 @@ class DBProvider {
                     // Store updated user in cache
                     self.m_cacheStorage.cacheUser(user: User(id: self.m_authProvider.userID(), name: displayName, color: color, avatar: user[Constants.AVATAR] as! String, chats: user[Constants.CHATS] as? [String:String] ?? [:]))
                     
-                    DispatchQueue.main.sync {
-                        completion?(false)
-                    }
+                    completion?(false)
                 }
                 return TransactionResult.success(withValue: data)})
             }

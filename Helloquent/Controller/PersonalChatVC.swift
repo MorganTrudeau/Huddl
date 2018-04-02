@@ -133,7 +133,7 @@ class PersonalChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate
     // Apply avatar beside message
     override func collectionView(_ collectionView: JSQMessagesCollectionView!, avatarImageDataForItemAt indexPath: IndexPath!) -> JSQMessageAvatarImageDataSource! {
         let message = m_messages[indexPath.item]
-        var avatar = UIImage(named: "avatar")
+        var avatar = UIImage(named: "user")
         if let user = try? m_cacheStorage.m_userStorage.object(ofType: User.self, forKey: message.senderId) {
             if let avatarImage = try? m_cacheStorage.m_mediaStorage.object(ofType: ImageWrapper.self, forKey: user.avatar).image {
                 avatar = avatarImage
@@ -350,7 +350,7 @@ class PersonalChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate
         
         let avatarView = UIImageView.init(frame: CGRect(x: 110
             , y: 10, width: 50, height: 50))
-        avatarView.image = UIImage(named: "avatar")
+        avatarView.image = UIImage(named: "user")
         avatarView.layer.masksToBounds = true
         avatarView.layer.cornerRadius = 25
         if let avatar = try? m_cacheStorage.m_mediaStorage.object(ofType: ImageWrapper.self, forKey: user.avatar) {

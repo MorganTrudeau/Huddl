@@ -21,7 +21,8 @@
 		F9179B77200EBDFC0057AAEF /* TabBarVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B76200EBDFC0057AAEF /* TabBarVC.swift */; };
 		F9179B79200FD9060057AAEF /* LikedRoomsTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9179B78200FD9060057AAEF /* LikedRoomsTableView.swift */; };
 		F9282ED22022A18000E009A5 /* SplashScreenVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9282ED12022A18000E009A5 /* SplashScreenVC.swift */; };
-		F93364D81FEDE89D002A3718 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F93364D71FEDE89D002A3718 /* Assets.xcassets */; };
+		F9370E3E2072AA8D00A6A5F7 /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9370E3D2072AA8C00A6A5F7 /* NMAKit.framework */; };
+		F9370E3F2072AA8D00A6A5F7 /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F9370E3D2072AA8C00A6A5F7 /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		F93BC74E202ACD1D00F42038 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F93BC74D202ACD1D00F42038 /* GoogleService-Info.plist */; };
 		F93BC750202AD3CE00F42038 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F93BC74F202AD3CE00F42038 /* UserNotifications.framework */; };
 		F93EED1620355912006FE726 /* ChatTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F93EED1520355912006FE726 /* ChatTableViewCell.swift */; };
@@ -33,6 +34,7 @@
 		F973BC3D1FEDA7B000CC3C58 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC3C1FEDA7B000CC3C58 /* Constants.swift */; };
 		F973BC411FEDDA8700CC3C58 /* ChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F973BC401FEDDA8700CC3C58 /* ChatVC.swift */; };
 		F983B84C20230FFB00080AB5 /* CacheStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F983B84B20230FFB00080AB5 /* CacheStorage.swift */; };
+		F990F6612072DFB9005DBCBC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F990F6602072DFB8005DBCBC /* Assets.xcassets */; };
 		F9BDD5FD2031147400D59027 /* PersonalChatsVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BDD5FC2031147400D59027 /* PersonalChatsVC.swift */; };
 		F9BDD5FF20321DAD00D59027 /* PersonalChatVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9BDD5FE20321DAD00D59027 /* PersonalChatVC.swift */; };
 		F9C747D720108FBA00F311D8 /* SavedRooms.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = F9C747D520108FBA00F311D8 /* SavedRooms.xcdatamodeld */; };
@@ -47,8 +49,6 @@
 		F9F7E398201FE51D00ABD6B8 /* EditProfileVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E397201FE51D00ABD6B8 /* EditProfileVC.swift */; };
 		F9F7E39A202002D000ABD6B8 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9F7E399202002D000ABD6B8 /* Helper.swift */; };
 		F9FA181E2064A7BE00C085CD /* BlockListVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9FA181D2064A7BE00C085CD /* BlockListVC.swift */; };
-		F9FA18202064DF9800C085CD /* NMAKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F9FA181F2064DF9700C085CD /* NMAKit.framework */; };
-		F9FA18212064DF9800C085CD /* NMAKit.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = F9FA181F2064DF9700C085CD /* NMAKit.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,7 +75,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				F9FA18212064DF9800C085CD /* NMAKit.framework in Embed Frameworks */,
+				F9370E3F2072AA8D00A6A5F7 /* NMAKit.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -109,7 +109,7 @@
 		F9179B76200EBDFC0057AAEF /* TabBarVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarVC.swift; sourceTree = "<group>"; };
 		F9179B78200FD9060057AAEF /* LikedRoomsTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikedRoomsTableView.swift; sourceTree = "<group>"; };
 		F9282ED12022A18000E009A5 /* SplashScreenVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SplashScreenVC.swift; sourceTree = "<group>"; };
-		F93364D71FEDE89D002A3718 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		F9370E3D2072AA8C00A6A5F7 /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NMAKit.framework; sourceTree = "<group>"; };
 		F93BC74C202ACAB100F42038 /* Helloquent.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Helloquent.entitlements; sourceTree = "<group>"; };
 		F93BC74D202ACD1D00F42038 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		F93BC74F202AD3CE00F42038 /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
@@ -122,6 +122,7 @@
 		F973BC3C1FEDA7B000CC3C58 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		F973BC401FEDDA8700CC3C58 /* ChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatVC.swift; sourceTree = "<group>"; };
 		F983B84B20230FFB00080AB5 /* CacheStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheStorage.swift; sourceTree = "<group>"; };
+		F990F6602072DFB8005DBCBC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F9BDD5FC2031147400D59027 /* PersonalChatsVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalChatsVC.swift; sourceTree = "<group>"; };
 		F9BDD5FE20321DAD00D59027 /* PersonalChatVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersonalChatVC.swift; sourceTree = "<group>"; };
 		F9C747D620108FBA00F311D8 /* SavedRooms.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SavedRooms.xcdatamodel; sourceTree = "<group>"; };
@@ -136,7 +137,6 @@
 		F9F7E397201FE51D00ABD6B8 /* EditProfileVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditProfileVC.swift; sourceTree = "<group>"; };
 		F9F7E399202002D000ABD6B8 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		F9FA181D2064A7BE00C085CD /* BlockListVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockListVC.swift; sourceTree = "<group>"; };
-		F9FA181F2064DF9700C085CD /* NMAKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = NMAKit.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,7 +144,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F9FA18202064DF9800C085CD /* NMAKit.framework in Frameworks */,
+				F9370E3E2072AA8D00A6A5F7 /* NMAKit.framework in Frameworks */,
 				F93BC750202AD3CE00F42038 /* UserNotifications.framework in Frameworks */,
 				4C97677652B24F944C9A1913 /* Pods_Helloquent.framework in Frameworks */,
 			);
@@ -196,7 +196,7 @@
 		F90D101C1FECDFB90012283B = {
 			isa = PBXGroup;
 			children = (
-				F9FA181F2064DF9700C085CD /* NMAKit.framework */,
+				F9370E3D2072AA8C00A6A5F7 /* NMAKit.framework */,
 				F90D10271FECDFB90012283B /* Helloquent */,
 				F90D103C1FECDFB90012283B /* HelloquentTests */,
 				F90D10471FECDFB90012283B /* HelloquentUITests */,
@@ -219,8 +219,8 @@
 		F90D10271FECDFB90012283B /* Helloquent */ = {
 			isa = PBXGroup;
 			children = (
+				F990F6602072DFB8005DBCBC /* Assets.xcassets */,
 				F93BC74C202ACAB100F42038 /* Helloquent.entitlements */,
-				F93364D71FEDE89D002A3718 /* Assets.xcassets */,
 				F90D10591FECE2DF0012283B /* Plugins */,
 				F90D10581FECE2D40012283B /* Controller */,
 				F90D10561FECE2C90012283B /* Model */,
@@ -430,7 +430,7 @@
 			files = (
 				F90D10331FECDFB90012283B /* LaunchScreen.storyboard in Resources */,
 				F93BC74E202ACD1D00F42038 /* GoogleService-Info.plist in Resources */,
-				F93364D81FEDE89D002A3718 /* Assets.xcassets in Resources */,
+				F990F6612072DFB9005DBCBC /* Assets.xcassets in Resources */,
 				F90D102E1FECDFB90012283B /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

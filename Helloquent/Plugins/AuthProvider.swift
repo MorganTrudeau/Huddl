@@ -65,20 +65,21 @@ class AuthProvider {
     
     // Set FCM notification token for current user
     func setNotificationToken() {
-        let fcmToken = Messaging.messaging().fcmToken
-        DBProvider.Instance.usersRef.child(AuthProvider.Instance.userID()).observeSingleEvent(of: .value, with: {(snapshot) in
-            if let user = snapshot.value as? NSDictionary {
-                if let token = user[Constants.TOKEN] as? String {
-                    if token != fcmToken! {
+        if let fcmToken = Messaging.messaging().fcmToken {
+            DBProvider.Instance.usersRef.child(AuthProvider.Instance.userID()).observeSingleEvent(of: .value, with: {(snapshot) in
+                if let user = snapshot.value as? NSDictionary {
+                    if let token = user[Constants.TOKEN] as? String {
+                        if token != fcmToken {
+                            user.setValue(fcmToken, forKey: Constants.TOKEN)
+                            DBProvider.Instance.usersRef.child(AuthProvider.Instance.userID()).setValue(user)
+                        }
+                    } else {
                         user.setValue(fcmToken, forKey: Constants.TOKEN)
                         DBProvider.Instance.usersRef.child(AuthProvider.Instance.userID()).setValue(user)
                     }
-                } else {
-                    user.setValue(fcmToken, forKey: Constants.TOKEN)
-                    DBProvider.Instance.usersRef.child(AuthProvider.Instance.userID()).setValue(user)
                 }
-            }
-        })
+            })
+        }
     }
     
     func isLoggedIn() -> Bool {
