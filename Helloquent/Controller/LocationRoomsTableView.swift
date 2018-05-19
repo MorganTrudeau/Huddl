@@ -14,12 +14,11 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
     
     @IBOutlet weak var m_locationRoomsTableView: UITableView!
     
-    let m_dbProvider = DBProvider.Instance
+    let m_dbProvider = DBProvider()
+    let m_locationManager = LocationManager()
     
     var m_index: IndexPath?
-    var m_currentPosition = NMAGeoCoordinates(latitude: 0, longitude: 0)
     var m_locationRooms = [NMAAutoSuggestPlace]()
-    var m_placeRequest: NMAAutoSuggestionRequest?
     
     let CELL_ID = "cell"
     let CHAT_SEGUE = "chat_room_segue"
@@ -28,16 +27,6 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
         super.viewDidLoad()
         m_locationRoomsTableView.delegate = self
         m_locationRoomsTableView.dataSource = self
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        if !NMAPositioningManager.shared().isActive {
-            NMAPositioningManager.shared().startPositioning()
-        }
-        if let currentPosition = NMAPositioningManager.shared().currentPosition?.coordinates {
-            m_currentPosition = currentPosition 
-        }
     }
     
     // TableView Functions
@@ -54,6 +43,7 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
         
         let cell = UITableViewCell.init(style: UITableViewCellStyle.subtitle, reuseIdentifier: CELL_ID)
         
+        // format place data
         let place = m_locationRooms[indexPath.row]
         let htmlString: String? = place.highlightedTitle
         let description: String? = place.vicinityDescription?.replacingOccurrences(of: "<br/>", with: ", ").replacingOccurrences(of: "<B>", with: "").replacingOccurrences(of: "</B>", with: "")
@@ -62,17 +52,15 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
             let name = try NSAttributedString.init(data: (htmlString?.data(using: String.Encoding.unicode))!, options: [NSAttributedString.DocumentReadingOptionKey.documentType: NSAttributedString.DocumentType.html], documentAttributes: nil)
             cell.textLabel?.text = name.string
         } catch _ {
-            
+            print("Error formating highlightedTitle")
         }
         return cell;
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         m_locationRoomsTableView.deselectRow(at: indexPath, animated: true)
-        
         // Define selected index to pass to prepare for segue func
         m_index = indexPath
-        
         // Segue into selected room
         performSegue(withIdentifier: CHAT_SEGUE, sender: nil)
     }
@@ -101,31 +89,6 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
         }
     }
     
-    func placesRequest(query: String) {
-        // Cancel any pending requests
-        m_placeRequest?.cancel()
-        
-        if !NMAPositioningManager.shared().isActive {
-            NMAPositioningManager.shared().startPositioning()
-        }
-        if let currentPosition = NMAPositioningManager.shared().currentPosition?.coordinates {
-            m_currentPosition = currentPosition
-        }
-        
-        let bounding = NMAGeoBoundingBox.init(center: m_currentPosition, width: 45, height: 45)
-        
-        m_placeRequest = NMAPlaces.shared().makeAutoSuggestionRequest(location: m_currentPosition, partialTerm: query)
-        m_placeRequest?.viewport = bounding
-        m_placeRequest?.collectionSize = 10
-        m_placeRequest?.start(block: {(request: NMARequest, data: Any?, error: Error?) in
-            if error == nil {
-                let requestData = data as! [NMAAutoSuggest]
-                self.m_locationRooms = requestData.filter { $0.isKind(of: NMAAutoSuggestPlace.self) } as! [NMAAutoSuggestPlace]
-                self.m_locationRoomsTableView.reloadData()
-            }
-        })
-    }
-    
     func alertUser(title: String, message: String) {
         
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
@@ -134,14 +97,16 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
         present(alert, animated: true, completion: nil)
     }
     
-    // Delegate Functions
+    // RoomContainer Delegate Functions
     
     func textChanged(query: String) {
         if query != "" {
-            m_placeRequest?.cancel()
-            placesRequest(query: query)
+            m_locationManager.placesRequest(query: query, completion: {(places) in
+                self.m_locationRooms = places
+                self.m_locationRoomsTableView.reloadData()
+            })
         } else {
-            m_placeRequest?.cancel()
+            m_locationManager.cancelRequest()
             m_locationRooms.removeAll()
             m_locationRoomsTableView.reloadData()
         }
