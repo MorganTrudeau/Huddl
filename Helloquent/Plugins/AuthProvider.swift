@@ -67,7 +67,7 @@ class AuthProvider {
     func setNotificationToken() {
         if let fcmToken = Messaging.messaging().fcmToken {
             DBProvider.Instance.usersRef.child(AuthProvider.Instance.userID()).observeSingleEvent(of: .value, with: {(snapshot) in
-                if let user = snapshot.value as? NSDictionary {
+                if let user = snapshot.value as? NSDictionary { 
                     if let token = user[Constants.TOKEN] as? String {
                         if token != fcmToken {
                             user.setValue(fcmToken, forKey: Constants.TOKEN)

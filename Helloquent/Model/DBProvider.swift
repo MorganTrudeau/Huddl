@@ -27,23 +27,14 @@ protocol LikesDelegate: class {
 }
 
 typealias DefaultClosure = () -> Void
-
 typealias SuccessHandler = (_ success: Bool) -> Void
-
 typealias CreateRoomHandler = (_ room: Room?, _ success: Bool) -> Void
-
 typealias GetRoomsHandler = (_ rooms: [Room]) -> Void
-
 typealias GetLocationRoomsHandler = (_ rooms: [LocationRoom]) -> Void
-
 typealias ColorFetchHandler = (_ color: String) -> Void
-
 typealias AvatarHandler = (_ avatar: UIImage) -> Void
-
 typealias RoomUserHandler = (_ roomUsers: [String]) ->  Void
-
 typealias UserHandler = (_ user: User) -> Void
-
 typealias BlockListHander = (_ blockedList: [String]) -> Void
 
 class DBProvider {

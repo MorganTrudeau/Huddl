@@ -14,7 +14,7 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
     
     @IBOutlet weak var m_locationRoomsTableView: UITableView!
     
-    let m_dbProvider = DBProvider()
+    let m_dbProvider = DBProvider.Instance
     let m_locationManager = LocationManager()
     
     var m_index: IndexPath?
@@ -74,7 +74,7 @@ class LocationRoomsTableView: UIViewController, UITableViewDelegate, UITableView
                 
                 let selectedRoomName = cell!.textLabel!.text
                 let selectedRoomdescription = cell!.detailTextLabel!.text
-                var selectedRoomID = "\(place.position.latitude ?? 1)\(place.position.longitude ?? 1)"
+                var selectedRoomID = "\(place.position.latitude )\(place.position.longitude )"
                 selectedRoomID = selectedRoomID.replacingOccurrences(of: ".", with: "")
                 let selectedRoom = Room(name: selectedRoomName!, description: selectedRoomdescription!, id: selectedRoomID, password: "", likes: 0)
                 

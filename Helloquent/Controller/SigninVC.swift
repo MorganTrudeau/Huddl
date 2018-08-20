@@ -21,7 +21,6 @@ class SigninVC: UIViewController, UITextFieldDelegate {
     
     let authProvider = AuthProvider()
     let m_loadingOverlay = LoadingOverlay()
-    let m_defaults = UserDefaults.standard
     
     private let SIGN_IN_SEGUE: String = "sign_in_segue"
     
@@ -48,7 +47,8 @@ class SigninVC: UIViewController, UITextFieldDelegate {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         // Present EULA terms
-        if !m_defaults.bool(forKey: "firstRun") {
+        let defaults = UserDefaults.standard
+        if !defaults.bool(forKey: "firstRun") {
             eulaAlert(title: "EULA Compliance", message: "This app has no tolerance for objectionable content or abusive users. Please agree to comply with these terms.")
         }
         if AuthProvider.Instance.isLoggedIn() {
@@ -63,7 +63,6 @@ class SigninVC: UIViewController, UITextFieldDelegate {
     }
     
     func setUpUI() {
-        
         let roomTextImage = UIImage(named: "huddl")
         let roomTextImageView = UIImageView(image: roomTextImage)
         roomTextImageView.center.x = self.view.center.x
@@ -89,7 +88,6 @@ class SigninVC: UIViewController, UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        
         let nextTag = textField.tag + 1
         let nextResponder = textField.superview?.viewWithTag(nextTag) as UIResponder!
         if nextResponder != nil {
@@ -168,7 +166,8 @@ class SigninVC: UIViewController, UITextFieldDelegate {
     func eulaAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         let agree = UIAlertAction(title: "AGREE", style: .default, handler: {(_) in
-            self.m_defaults.set(true, forKey: "firstRun")
+            let defaults = UserDefaults.standard
+            defaults.set(true, forKey: "firstRun")
         })
         let disagree = UIAlertAction(title: "DISAGREE", style: .default, handler: {(_) in
             self.closeApp()

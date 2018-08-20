@@ -12,7 +12,6 @@ import NMAKit
 class LocationManager {
     
     private var m_currentPosition = NMAGeoCoordinates(latitude: 0, longitude: 0)
-    private var m_locationRooms = [NMAAutoSuggestPlace]()
     private var m_placeRequest: NMAAutoSuggestionRequest?
     
     func placesRequest(query: String, completion: @escaping (_ locationRooms: [NMAAutoSuggestPlace]) -> Void) {
