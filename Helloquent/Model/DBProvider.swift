@@ -219,6 +219,9 @@ class DBProvider {
                 if let blockedUsers = user[Constants.BLOCKED_USERS] as? [String] {
                     completion?(blockedUsers)
                 }
+                else {
+                    completion?([])
+                }
             }
         })
     }
@@ -320,6 +323,16 @@ class DBProvider {
                 user.setValue([receiverID:chatID], forKey: Constants.CHATS)
                 self.usersRef.child(senderID).setValue(user)
             }
+            if let name = user[Constants.DISPLAY_NAME] as? String {
+                if let color = user[Constants.COLOR] as? String {
+                    if let avatar = user[Constants.AVATAR] as? String {
+                        if let chats = user[Constants.CHATS] as? NSDictionary {
+                            let u = User(id: senderID, name: name, color: color, avatar: avatar, chats: chats as! [String : String])
+                            self.m_cacheStorage.cacheUser(user: u)
+                        }
+                    }
+                }
+            }
         })
         
         // Create chat reference for receiver
@@ -333,8 +346,6 @@ class DBProvider {
                 self.usersRef.child(receiverID).setValue(user)
             }
         })
-        // Upadate cache with new chats
-        self.getUser(id: self.m_authProvider.userID(), completion: nil)
     }
     
     func getUserRooms(completion: GetRoomsHandler?) {

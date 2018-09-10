@@ -11,7 +11,6 @@ import UIKit
 class SignUpVC: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var m_displayNameTextField: UITextField!
-    @IBOutlet weak var m_emailTextField: UITextField!
     @IBOutlet weak var m_passwordTextField: UITextField!
     @IBOutlet weak var m_confirmPassTextField: UITextField!
     @IBOutlet weak var m_signUpButton: UIButton!
@@ -32,7 +31,6 @@ class SignUpVC: UIViewController, UITextFieldDelegate {
         self.view.addGestureRecognizer(swipeDown)
         
         m_displayNameTextField.delegate = self
-        m_emailTextField.delegate = self
         m_passwordTextField.delegate = self
         m_confirmPassTextField.delegate = self
         
@@ -43,8 +41,7 @@ class SignUpVC: UIViewController, UITextFieldDelegate {
     }
     
     func setUpUI() {
-        m_displayNameTextField.tag = 1
-        m_emailTextField.tag = 2
+        m_displayNameTextField.tag = 2
         m_passwordTextField.tag = 3
         m_confirmPassTextField.tag = 4
         
@@ -60,7 +57,7 @@ class SignUpVC: UIViewController, UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         let nextTag = textField.tag + 1
-        let nextResponder = textField.superview?.viewWithTag(nextTag) as UIResponder!
+        let nextResponder = textField.superview?.viewWithTag(nextTag) as UIResponder?
         if nextResponder != nil {
             nextResponder?.becomeFirstResponder()
         } else {
@@ -70,28 +67,32 @@ class SignUpVC: UIViewController, UITextFieldDelegate {
     }
 
     @IBAction func signUp(_ sender: Any) {
-        if m_emailTextField.text != "" && m_displayNameTextField.text != "" && m_passwordTextField.text != "" && (m_passwordTextField.text?.count)! > 5 {
-            if m_passwordTextField.text! == m_confirmPassTextField.text! {
-                present(m_loadingOverlay, animated: false, completion: nil)
-            
-                AuthProvider.Instance.signUp(email: m_emailTextField.text!, displayName: m_displayNameTextField.text!, password: m_passwordTextField.text!, loginHandler: {(message) in
-                
-                    if message != nil {
-                        self.dismiss(animated: false, completion: {() in
-                            self.alertUser(title: "Problem Creating User", message: message!)
-                        })
-                    } else {
-                        print("Successfully created user")
-                        print("Login Successful")
-                        self.dismiss(animated: false, completion: {() in
-                            self.dismiss(animated: true, completion: {() in
-                                self.performSegue(withIdentifier: self.SIGN_UP_SEGUE, sender: nil)
+        if m_displayNameTextField.text != "" && m_passwordTextField.text != "" {
+            if (m_passwordTextField.text?.count)! > 5 {
+                if m_passwordTextField.text! == m_confirmPassTextField.text! {
+                    present(m_loadingOverlay, animated: false, completion: nil)
+                    
+                    AuthProvider.Instance.signUp(email: m_displayNameTextField.text! + "@mail.com", displayName: m_displayNameTextField.text!, password: m_passwordTextField.text!, loginHandler: {(message) in
+                        
+                        if message != nil {
+                            self.dismiss(animated: false, completion: {() in
+                                self.alertUser(title: "Problem Creating User", message: message!)
                             })
-                        })
-                    }
-                })
+                        } else {
+                            print("Successfully created user")
+                            print("Login Successful")
+                            self.dismiss(animated: false, completion: {() in
+                                self.dismiss(animated: true, completion: {() in
+                                    self.performSegue(withIdentifier: self.SIGN_UP_SEGUE, sender: nil)
+                                })
+                            })
+                        }
+                    })
+                } else {
+                    self.alertUser(title: "Password Error", message: "Passwords do not match")
+                }
             } else {
-                self.alertUser(title: "Password Error", message: "Passwords do not match")
+                self.alertUser(title: "Password Too Short", message: "Password must be at least 5 characters")
             }
         } else {
             alertUser(title: "Sign up Incomplete", message: "Please fill out all text fields")

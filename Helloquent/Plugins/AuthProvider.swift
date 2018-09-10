@@ -16,10 +16,10 @@ import SDWebImage
 typealias LoginHandler = (_ msg: String?) -> Void
 
 struct LoginErrorCode {
-    static let INVALID_EMAIL = "Invalid email"
+    static let INVALID_EMAIL = "Invalid display name"
     static let WRONG_PASSWORD = "Invalid password"
     static let USER_NOT_FOUND = "User not found"
-    static let EMAIL_IN_USE = "Email already in use"
+    static let EMAIL_IN_USE = "Display name already in use"
     static let WEAK_PASSWORD = "Password should be at least 6 characters long"
     static let PROBLEM_CONNECTING = "Could not connect. Try again later."
 }

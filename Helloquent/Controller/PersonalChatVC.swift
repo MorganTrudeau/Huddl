@@ -178,7 +178,7 @@ class PersonalChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate
         let cell = super.collectionView(collectionView, cellForItemAt: indexPath) as! JSQMessagesCollectionViewCell
         cell.messageBubbleTopLabel.textColor = UIColor.init(white: 0.9, alpha: 1)
         cell.avatarImageView.isUserInteractionEnabled = true
-        
+        cell.textView!.textColor = UIColor.black
         
         if m_messages[indexPath.row].senderId != m_authProvider.userID() {
             let tap = UITapGestureRecognizer(target: self, action: #selector(ChatVC.presentUserMenu))
@@ -266,7 +266,7 @@ class PersonalChatVC: JSQMessagesViewController, UIImagePickerControllerDelegate
                 // Clear message input field
                 self.finishSendingMessage()
             } else {
-                self.alertUser(title: "Cannot send messgage", message: "You are currently blocked")
+                self.alertUser(title: "Cannot send messgage", message: "You are blocked by this user")
             }
         })
     }

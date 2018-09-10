@@ -137,7 +137,7 @@ class SigninVC: UIViewController, UITextFieldDelegate {
             // Present LoadingOverlay as a modal
             present(m_loadingOverlay, animated: false, completion: nil)
             
-            AuthProvider.Instance.login(email: m_emailTextField.text!, password: m_passwordTextField.text!, loginHandler: {(message) in
+            AuthProvider.Instance.login(email: m_emailTextField.text! + "@mail.com", password: m_passwordTextField.text!, loginHandler: {(message) in
                 
                 if message != nil {
                     self.dismiss(animated: false, completion: {() in
@@ -151,7 +151,7 @@ class SigninVC: UIViewController, UITextFieldDelegate {
                 }
             })
         } else {
-            alertUser(title: "Email and Password Required", message: "Please enter an email and password")
+            alertUser(title: "Display Name and Password Required", message: "Please enter an display name and password")
         }
     }
     
